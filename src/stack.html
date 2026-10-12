@@ -458,12 +458,12 @@ html,body{overflow-x:hidden}
 .burst i{position:absolute;left:50%;top:50%;width:7px;height:7px;border-radius:2px;background:var(--c);opacity:0}
 .routine{position:relative}
 /* Live timeline rail */
-.ltl{position:absolute;left:11px;width:2px;border-radius:2px;background:color-mix(in srgb,var(--ink) 10%,transparent);pointer-events:none;--y:0px}
+#routines{position:relative;padding-left:22px}
+.ltl{position:absolute;left:6px;width:2px;border-radius:2px;background:color-mix(in srgb,var(--ink) 10%,transparent);pointer-events:none;--y:0px}
 .ltl-fill{position:absolute;left:0;top:0;width:100%;height:var(--y);border-radius:2px;background:var(--accent);transition:height .8s ease}
-.ltl.s-past .ltl-fill{opacity:.45}
 .ltl-now{position:absolute;left:0;top:var(--y);width:0;height:0;transition:top .8s ease}
 .ltl-dot{position:absolute;left:-4px;top:-5px;width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 22%,transparent)}
-.ltl-line{position:absolute;left:8px;top:-.5px;height:1px;width:var(--lw,0px);background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 55%,transparent),transparent 85%)}
+.ltl-line{position:absolute;left:24px;top:-.5px;height:1px;width:var(--lw,0px);background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 55%,transparent),transparent 85%)}
 @media (prefers-reduced-motion:no-preference){.ltl-dot{animation:tlpulse 2.4s ease-in-out infinite}}
 @keyframes tlpulse{50%{box-shadow:0 0 0 7px color-mix(in srgb,var(--accent) 8%,transparent)}}
 .done-label{font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
@@ -783,6 +783,7 @@ function renderToday(){
   if(!loaded){box.append(el("p",{class:"sub",text:"Loading…"}));return}
   overChunks().forEach(c=>box.append(slotMeter(slotInfo(c.id))));
   if(!all.length){box.append(el("div",{class:"emptycard"},el("p",{text:"Nothing stacked yet."}),el("button",{class:"btn primary",onclick:()=>go("day")},"Open Build")));return}
+  box.append(el("div",{class:"ltl","aria-hidden":"true"},el("span",{class:"ltl-fill"}),el("span",{class:"ltl-now"},el("span",{class:"ltl-dot"}),el("span",{class:"ltl-line"}))));
   const live=cs.filter(c=>anchorsIn(c.id).length||cs.length<2);
   let nextMarked=false;
   live.forEach(c=>{
@@ -794,7 +795,7 @@ function renderToday(){
     if(state==="now")nextMarked=true;
     const cel=fx.done===c.id&&Date.now()-fx.td<1500;
     if(state==="past"&&!openPast.has(c.id)){
-      box.append(el("button",{class:"pastcard"+(fx.fold===c.id&&Date.now()-fx.tf<800?" pc-in":""),style:{background:soft(c.id)},onclick:()=>{openPast.add(c.id);fx.unfold=c.id;fx.tu=Date.now();lastSig="";renderToday()},"aria-label":`${c.name} complete: ${dn} of ${steps.length} habits done. Open`},
+      box.append(el("button",{class:"pastcard"+(fx.fold===c.id&&Date.now()-fx.tf<800?" pc-in":""),"data-start":toM(c.time),"data-end":nx?toM(nx.time):sch.end,style:{background:soft(c.id)},onclick:()=>{openPast.add(c.id);fx.unfold=c.id;fx.tu=Date.now();lastSig="";renderToday()},"aria-label":`${c.name} complete: ${dn} of ${steps.length} habits done. Open`},
         el("span",{class:"pc-check","aria-hidden":"true"},checkSvg()),
         el("span",{class:"pc-main"},el("span",{class:"pc-name",text:c.name}),el("span",{class:"pc-stat",text:steps.length?`Complete \u00B7 ${dn} of ${due} habits`+(sk?` \u00B7 ${sk} not today`:"")+` \u00B7 ${pct}%`:"Complete \u00B7 nothing stacked"})),
         el("span",{class:"pc-show","aria-hidden":"true"},chevSvg())));
@@ -802,7 +803,6 @@ function renderToday(){
     }
     box.append(el("section",{class:"routine"+(cel?" celebrate":"")+(fx.unfold===c.id&&Date.now()-fx.tu<800?" unfolding":"")+(state==="now"?" is-now":""),style:{background:soft(c.id)},"aria-label":c.name},
       cel&&!reduced()?burst():null,
-      as.length?el("div",{class:"ltl s-"+state,"aria-hidden":"true"},el("span",{class:"ltl-fill"}),state==="now"?el("span",{class:"ltl-now"},el("span",{class:"ltl-dot"}),el("span",{class:"ltl-line"})):null):null,
       el("div",{class:"rhead"},el("h2",{text:c.name}),label?el("span",{class:"nowtag"+(label==="Now"?" on":""),text:label}):null,steps.length&&dn+sk===steps.length&&dn?el("span",{class:"done-label",text:"Done"}):null,
         el("button",{class:"redit",onclick:()=>editChunk(c.id),"aria-label":`Edit ${c.name} in Build`},"Edit"),
         state==="past"?el("button",{class:"pc-show pc-up",onclick:e=>{const sec=e.currentTarget.closest(".routine");const done=()=>{openPast.delete(c.id);fx.fold=c.id;fx.tf=Date.now();lastSig="";renderToday()};if(reduced()||!sec)return done();sec.classList.add("folding");setTimeout(done,320)},"aria-label":`Collapse ${c.name}`},chevSvg()):null),
@@ -817,19 +817,19 @@ function renderToday(){
 /* Live timeline: a rail down the left of each part of the day, filled up to the current time,
    with a "now" line that moves through the activities and their habits as the minutes pass */
 function placeTimeline(){
-  const m=nowMins()+new Date().getSeconds()/60;
-  document.querySelectorAll("#routines .routine").forEach(sec=>{
-    const tl=sec.querySelector(".ltl");const acts=[...sec.querySelectorAll(".act[data-start]")];if(!tl||!acts.length)return;
-    const sr=sec.getBoundingClientRect();const box=a=>{const r=a.getBoundingClientRect();return{top:r.top-sr.top,bottom:r.bottom-sr.top}};
-    const top=box(acts[0]).top,bottom=box(acts[acts.length-1]).bottom;
-    tl.style.top=top+"px";tl.style.height=(bottom-top)+"px";
-    let y;
-    if(tl.classList.contains("s-past"))y=bottom;else if(tl.classList.contains("s-future"))y=top;
-    else{y=bottom;for(let i=0;i<acts.length;i++){const a=acts[i],s=+a.dataset.start,e=i+1<acts.length?+acts[i+1].dataset.start:+a.dataset.end;
-      if(m<s){y=box(a).top;break}
-      if(m<e){const b=box(a);y=b.top+Math.min(1,(m-s)/Math.max(1,e-s))*(b.bottom-b.top);break}}}
-    tl.style.setProperty("--y",(y-top)+"px");tl.style.setProperty("--lw",Math.max(0,sec.clientWidth-11-8-24)+"px");
-  });
+  const box=$("routines");const tl=box&&box.querySelector(".ltl");if(!tl)return;
+  const segs=[...box.querySelectorAll(".routine .act[data-start], .pastcard[data-start]")];
+  if(!segs.length){tl.hidden=true;return}tl.hidden=false;
+  const m=nowMins()+new Date().getSeconds()/60;const br=box.getBoundingClientRect();
+  const r=e=>{const q=e.getBoundingClientRect();return{top:q.top-br.top,bottom:q.bottom-br.top}};
+  const top=r(segs[0]).top,bottom=r(segs[segs.length-1]).bottom;
+  tl.style.top=top+"px";tl.style.height=(bottom-top)+"px";
+  let y=bottom;
+  for(let i=0;i<segs.length;i++){const e=segs[i],s=+e.dataset.start;const nxt=segs[i+1];
+    const en=nxt&&e.classList.contains("act")&&nxt.classList.contains("act")&&nxt.closest(".routine")===e.closest(".routine")?+nxt.dataset.start:+e.dataset.end;
+    if(m<s){y=i?r(segs[i-1]).bottom:r(e).top;break}
+    if(m<en){const b=r(e);y=b.top+Math.min(1,(m-s)/Math.max(1,en-s))*(b.bottom-b.top);break}}
+  tl.style.setProperty("--y",(y-top)+"px");tl.style.setProperty("--lw",Math.max(0,box.clientWidth-6-8-24)+"px");
 }
 if(window.ResizeObserver)new ResizeObserver(()=>requestAnimationFrame(placeTimeline)).observe($("routines"));else addEventListener("resize",()=>requestAnimationFrame(placeTimeline));
 setInterval(placeTimeline,20000);
