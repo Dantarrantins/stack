@@ -721,14 +721,22 @@ $("add-chunk").addEventListener("click",()=>{if(!can())return;const cs=chunks();
 $("edit-day").addEventListener("click",()=>{if(loaded)openSetup(2)});
 
 /* ---------- One-time upgrade: grouped moments become individual actions ---------- */
+/* Remove accidental duplicates (same action twice in one part of the day), keeping their habits */
+async function dedupe(){
+  if(migrating||!can())return;const seen={};const dupes=[];
+  anchors.slice().sort((x,y)=>stepsAt(y.id).length-stepsAt(x.id).length||(x.order??0)-(y.order??0)).forEach(a=>{const k=a.slot+"|"+a.name.trim().toLowerCase();if(seen[k])dupes.push([a,seen[k]]);else seen[k]=a});
+  if(!dupes.length)return;migrating=true;
+  try{for(const[d,keep]of dupes){for(const h of stepsAt(d.id))await db.doc("habits/"+h.id).update({anchor:keep.id,slot:keep.slot});await db.doc("anchors/"+d.id).delete()}}catch(e){showErr(e)}
+  migrating=false;
+}
 async function migrate(){
-  const old=anchors.filter(a=>Array.isArray(a.existing));if(!old.length||migrating||!can())return;migrating=true;
+  const old=anchors.filter(a=>Array.isArray(a.existing));if(!old.length){dedupe();return}if(migrating||!can())return;migrating=true;
   try{
     for(const c of chunks()){
       let n=0;
       for(const a of old.filter(x=>x.slot===c.id).sort((x,y)=>(x.order??0)-(y.order??0))){
         const items=a.existing.length?a.existing:[a.name];const ids=[];
-        for(const item of items){const id=uid("a");ids.push(id);n++;
+        for(const[ii,item]of items.entries()){const id=`${a.id}-${ii}`;ids.push(id);n++;
           await db.doc("anchors/"+id).set({name:item,slot:c.id,order:n,kind:kindFor(item,c.id),duration:(PRESETS[c.id]||[]).find(p=>p[0]===item)?.[1]||5})}
         const hs=habits.filter(h=>h.anchor===a.id);
         for(const h of hs){const i=h.after&&items.includes(h.after)?items.indexOf(h.after):items.length-1;
