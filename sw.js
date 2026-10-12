@@ -1,5 +1,5 @@
 /* Stack service worker: app shell works offline; seed.json and pages refresh from the network when available. */
-const CACHE = "stack-v8";
+const CACHE = "stack-v9";
 const SHELL = ["./", "index.html", "local-db.js", "seed.json", "manifest.webmanifest", "icons/icon-192.png", "icons/icon-512.png"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())); });
 self.addEventListener("activate", e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())); });

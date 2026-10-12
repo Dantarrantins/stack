@@ -198,7 +198,13 @@ h2{font-size:28px;font-weight:300;letter-spacing:-.01em;line-height:1.1;margin:0
 .hdet{grid-column:1/-1;margin:2px 0 8px 30px;padding:12px 14px;border-radius:12px;background:var(--surface);border:1px solid var(--line);display:grid;gap:8px}
 .hdet-why{margin:0;font-size:14.5px;line-height:1.55}
 .hdet-acts{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.hdet-sp{font-size:13px;font-weight:500;color:var(--accent-ink);background:var(--accent);padding:7px 12px;border-radius:999px;text-decoration:none}
+.hdet-sp{font-size:12.5px;font-weight:500;color:var(--accent);text-decoration:none;white-space:nowrap}
+.hdet-sp:hover{text-decoration:underline;text-underline-offset:3px}
+.hdet-res{margin:0;font-size:13.5px;color:var(--muted)}
+.hdet-res b{font-weight:500;color:var(--ink)}
+.hdet-tags{font-size:12.5px}
+.hdet-name{display:flex;align-items:center;gap:8px;flex:1;min-width:180px;font-size:12.5px;color:var(--muted)}
+.hdet-name input{flex:1;min-width:0;font:inherit;font-size:14px;color:var(--ink);padding:6px 10px;border-radius:8px;border:1px solid var(--line);background:var(--bg)}
 .hdet-more,.hdet-del{font:inherit;font-size:13px;font-weight:500;border-radius:999px;padding:7px 12px;cursor:pointer;background:transparent;border:1px solid var(--line);color:var(--ink)}
 .hdet-del{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 40%,transparent);margin-left:auto}
 @media (prefers-reduced-motion:no-preference){.hdet{animation:rise .25s ease}}
@@ -497,12 +503,13 @@ function habitRow(h,opts={}){
     opts.drag?el("button",{class:"chev","aria-label":expanded.has(h.id)?"Hide details":"Show details",onclick:()=>{expanded.has(h.id)?expanded.delete(h.id):expanded.add(h.id);renderDay()}},el("span",{class:"mono",text:`${hMins(h)} min`}),el("span",{class:"chev-i"+(expanded.has(h.id)?" open":""),"aria-hidden":"true",text:"⌄"}))
       :el("span",{class:"sside"},h.listen?el("span",{class:"play","aria-label":"Has a clip",text:"▶"}):null,el("span",{class:"mono",text:`${hMins(h)} min`})),
     opts.drag&&expanded.has(h.id)?el("div",{class:"hdet"},
-      el("div",{class:"kv"},dot(h.category),el("span",{text:h.category}),el("span",{text:`${hMins(h)} min`}),el("span",{text:h.expert})),
       el("p",{class:"hdet-why",text:h.why||h.detail}),
+      h.research?el("p",{class:"hdet-res"},el("b",{text:"Research: "}),h.research):null,
       h.caveat?el("p",{class:"caveat",style:{margin:0}},el("b",{text:h.flag?"Check first: ":"Note: "}),h.caveat):null,
+      el("div",{class:"kv hdet-tags"},dot(h.category),el("span",{text:h.category}),el("span",{text:`${hMins(h)} min`}),el("span",{text:h.expert}),
+        h.listen?el("a",{class:"hdet-sp",href:h.listen.url,target:"_blank",rel:"noopener"},`\u25B6 Listen from ${h.listen.label}`):null),
       el("div",{class:"hdet-acts"},
-        h.listen?el("a",{class:"hdet-sp",href:h.listen.url,target:"_blank",rel:"noopener"},`Listen on Spotify from ${h.listen.label}`):null,
-        el("button",{class:"hdet-more",onclick:()=>openSheet(h.id)},"Full details"),
+        el("label",{class:"hdet-name"},el("span",{text:"Name"}),el("input",{value:h.short||h.title,"aria-label":"Habit name",disabled:!can(),onchange:e=>{const v=e.target.value.trim();if(v&&v!==(h.short||h.title))renameHabit(h,v)}})),
         el("button",{class:"hdet-del",onclick:()=>{expanded.delete(h.id);unplace(h)},disabled:!can()},"Remove"))):null);
 }
 
@@ -752,6 +759,7 @@ async function place(h,aid,stayOpen){
   fx.arrive=h.id;fx.ta=Date.now();fx.swap=Date.now();buzz(10);
   try{await db.doc("habits/"+h.id).update({anchor:aid,slot:a.slot,order,after:null});if(!stayOpen)toast(`Stacked after ${a.name.toLowerCase()}`)}catch(e){showErr(e)}
 }
+async function renameHabit(h,v){if(!db)return;try{await db.doc("habits/"+h.id).update({short:v});toast("Renamed")}catch(e){showErr(e)}}
 async function unplace(h){if(!db)return;try{await db.doc("habits/"+h.id).update({anchor:null,slot:null,order:null,after:null})}catch(e){showErr(e)}}
 async function updAnchor(a,patch){if(!db)return;try{await db.doc("anchors/"+a.id).update(patch)}catch(e){showErr(e)}}
 function saveChunks(list){saveSettings({chunks:list})}
