@@ -638,7 +638,7 @@ function renderToday(){
   $("today-lede").textContent=lede(m,all,done);
   fitHello();
   paintSky(m);
-  $("today-sub").textContent=today.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"})+` · Week ${wk.n}`+(loaded&&all.length?` · ${n} of ${due} done`+(nsk?` · ${nsk} not today`:""):"");
+  $("today-sub").textContent=today.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"})+` · Week ${wk.n}`+(loaded&&all.length?` · ${n} of ${due} done`:"");
   $("prog").style.width=due?(n/due*100)+"%":all.length?"100%":"0";
   const st=loaded?stats():null;const sb=$("stats");sb.replaceChildren();
   if(st)sb.append(el("span",{},el("b",{text:st.today+"%"})," today"),el("span",{},el("b",{text:st.week+"%"})," last 7 days"),el("span",{},el("b",{text:st.overall+"%"})," average"));
