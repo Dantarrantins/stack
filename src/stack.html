@@ -20,7 +20,7 @@
   --accent:#9CC0AF; --accent-ink:#141716; --accent-soft:#22302A;
   --warn:#E2AE66; --warn-soft:#352915;
   --morning:#E0B06A; --midday:#86BC9A; --evening:#98A7CF;
-  --morning-soft:#221F1A; --late-soft:#1E1B23; --midday-soft:#1B2420; --evening-soft:#1A1F24;
+  --morning-soft:#232524; --late-soft:#1E1B23; --midday-soft:#1B2420; --evening-soft:#1A1F24;
   --c-brain:#AA9DE6; --c-move:#7CC49A; --c-sleep:#94AEC2; --c-food:#E0A866; --c-supp:#EC8D95; --c-mind:#7FC4C6; --c-habit:#B9B2A4; --c-faith:#D4BF79;
   --chip-bg:#ECEAE4; --chip-ink:#141716; --chip-line:#ECEAE4; --chip-on-bg:#000000; --chip-on-ink:#ECEAE4; --chip-on-line:#9CC0AF; color-scheme:dark}}
 :root[data-theme="dark"]{
@@ -28,7 +28,7 @@
   --accent:#9CC0AF; --accent-ink:#141716; --accent-soft:#22302A;
   --warn:#E2AE66; --warn-soft:#352915;
   --morning:#E0B06A; --midday:#86BC9A; --evening:#98A7CF;
-  --morning-soft:#221F1A; --late-soft:#1E1B23; --midday-soft:#1B2420; --evening-soft:#1A1F24;
+  --morning-soft:#232524; --late-soft:#1E1B23; --midday-soft:#1B2420; --evening-soft:#1A1F24;
   --c-brain:#AA9DE6; --c-move:#7CC49A; --c-sleep:#94AEC2; --c-food:#E0A866; --c-supp:#EC8D95; --c-mind:#7FC4C6; --c-habit:#B9B2A4; --c-faith:#D4BF79;
   --chip-bg:#ECEAE4; --chip-ink:#141716; --chip-line:#ECEAE4; --chip-on-bg:#000000; --chip-on-ink:#ECEAE4; --chip-on-line:#9CC0AF; color-scheme:dark}
 *{box-sizing:border-box}
@@ -99,6 +99,21 @@ h2{font-size:28px;font-weight:300;letter-spacing:-.01em;line-height:1.1;margin:0
 .acct-btn.danger{color:#A3412F}
 .acct-msg{margin:0;font-size:13px}
 .app-ver{margin:0;font-size:12.5px!important;color:var(--faint)!important}
+.slots{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:13.5px;color:var(--muted)}
+.slot-dots{display:inline-flex;gap:4px}
+.slot-dots i{width:9px;height:9px;border-radius:50%;border:1.5px solid var(--accent);box-sizing:border-box}
+.slot-dots i.on{background:var(--accent)}
+.slots-why{font:inherit;font-size:13.5px;background:none;border:0;padding:0;color:var(--ink);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.slot-now{font-size:14px;color:var(--muted)}
+.create-btn{justify-self:start;font:inherit;font-size:14.5px;font-weight:500;border:1px dashed var(--faint);background:transparent;color:var(--ink);border-radius:999px;padding:10px 16px;cursor:pointer}
+.create-btn:hover{border-color:var(--accent)}
+.pr-add.off{color:var(--faint)}
+.create{display:grid;gap:16px}
+.create .namefield{max-width:none}
+.create .cr-sel,.create textarea{font:inherit;font-size:16px;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.create textarea{resize:vertical}
+.danger-btn{color:#A3412F}
+#create-habit{justify-self:start;margin-top:12px}
 .redit{margin-left:auto;font:inherit;font-size:14px;color:var(--muted);background:none;border:0;padding:6px 0 6px 10px;cursor:pointer;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:3px;transition:color .15s,text-decoration-color .15s}
 #plan .chunk{scroll-margin-top:90px}
 .redit:hover,.redit:focus-visible{color:var(--ink);text-decoration-color:currentColor}
@@ -310,6 +325,7 @@ h2{font-size:28px;font-weight:300;letter-spacing:-.01em;line-height:1.1;margin:0
 @media (prefers-reduced-motion:no-preference){.sky .orb{animation:breathe 9s ease-in-out infinite}}
 @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
 .hello{padding-top:clamp(28px,6vw,56px)}
+#v-day>:first-child,#v-library>:first-child,#v-profile>:first-child{padding-top:clamp(28px,6vw,56px)}
 .clock{margin:0 0 4px;font-size:clamp(46px,10vw,72px);line-height:1;font-weight:300;letter-spacing:-.055em;font-variant-numeric:tabular-nums;color:var(--ink)}
 .lede{margin:12px 0 0;font-size:clamp(17px,2.4vw,20px);color:var(--muted);max-width:40ch}
 .clock i{font-style:normal;padding:0;margin:0 .02em 0 -.02em}
@@ -495,6 +511,7 @@ html,body{overflow-x:hidden}
     <div>
       <h1 id="lib-h">Library</h1>
       <p class="sub" id="lib-sub">Every practice, with where it came from. Tap one to read why it works and add it to a routine.</p>
+      <button class="btn" id="create-habit" type="button">+ Create your own habit</button>
     </div>
     <div class="tools"><input type="search" id="q" placeholder="Search habits, experts or episodes" aria-label="Search the library"></div>
     <div class="tools" id="cats" role="group" aria-label="Filter by category"></div>
@@ -594,9 +611,10 @@ function trial(){
 const firstFit=h=>h&&chunks().flatMap(c=>anchorsIn(c.id)).find(a=>fitsAnchor(h,a));
 
 /* ---------- Stats ---------- */
+/* Share of today's (or any day's) stacked habits that were done; "Not today" ones don't count either way */
+function dayRate(k){const steps=habits.filter(h=>h.anchor);const c=checkins[k];const d=c&&c.done;const sk=(c&&c.skipped)||{};const left=steps.filter(h=>!sk[h.id]&&!(d&&d[h.id])).length;const got=d?steps.filter(h=>d[h.id]&&!sk[h.id]).length:0;const den=got+left;if(!den)return(d||c&&c.skipped)?1:0;return Math.min(1,got/den)}
 function stats(){
-  const steps=habits.filter(h=>h.anchor);const total=steps.length||1;
-  const rate=k=>{const c=checkins[k];const d=c&&c.done;const sk=(c&&c.skipped)||{};const left=steps.filter(h=>!sk[h.id]&&!(d&&d[h.id])).length;const got=d?steps.filter(h=>d[h.id]&&!sk[h.id]).length:0;const den=got+left;if(!den)return(d||c&&c.skipped)?1:0;return Math.min(1,got/den)};
+  const rate=dayRate;
   const days=[...Array(7)].map((_,i)=>{const d=new Date(today);d.setDate(d.getDate()-i);return dkey(d)});
   const avg=days.reduce((a,k)=>a+rate(k),0)/7;
   /* Average completion: every day since your first tick, including days with none */
@@ -604,6 +622,44 @@ function stats(){
   let overall=0;if(keys.length){const first=new Date(keys[0]+"T12:00:00");const n=Math.max(1,Math.round((new Date(todayKey+"T12:00:00")-first)/864e5)+1);
     let sum=0;for(let i=0;i<n;i++){const d=new Date(today);d.setDate(d.getDate()-i);sum+=rate(dkey(d))}overall=sum/n}
   return{today:Math.round(rate(todayKey)*100),week:Math.round(avg*100),overall:Math.round(overall*100)};
+}
+
+/* ---------- Habit slots ----------
+   Everyone starts with BASE_SLOTS stacked habits. Keeping the last 7 full days at 80%+ unlocks one more slot,
+   at most one a week, up to MAX_FREE_SLOTS. settings.plan==="plus" (future paid tier) removes the limit.
+   Note: this is enforced in the app; a paid tier will also need a server-side check. */
+const BASE_SLOTS=5,MAX_FREE_SLOTS=10,UNLOCK_RATE=80,UNLOCK_DAYS=7;
+const isStacked=h=>!!h.anchor&&(h.kind||"step")==="step";
+function slotInfo(){
+  const used=habits.filter(isStacked).length;const plus=settings&&settings.plan==="plus";
+  const earned=Math.max(BASE_SLOTS,(settings&&settings.slots)||0);
+  const last7=[...Array(UNLOCK_DAYS)].map((_,i)=>{const d=new Date(today);d.setDate(d.getDate()-1-i);return dkey(d)});
+  const week=Math.round(last7.reduce((a,k)=>a+dayRate(k),0)/UNLOCK_DAYS*100);
+  const since=settings&&settings.slotAt?Math.round((new Date(todayKey+"T12:00:00")-new Date(settings.slotAt+"T12:00:00"))/864e5):UNLOCK_DAYS;
+  const wait=Math.max(0,UNLOCK_DAYS-since);
+  return{used,limit:plus?Infinity:earned,earned,plus,full:!plus&&used>=earned,week,wait,maxed:earned>=MAX_FREE_SLOTS};
+}
+function slotsLine(si){
+  if(si.plus)return"Unlimited habit slots";
+  if(si.maxed)return`${si.used} of ${si.earned} slots used \u00B7 all free slots unlocked`;
+  return si.wait?`Next slot can unlock in ${si.wait} day${si.wait>1?"s":""} if you keep the week at ${UNLOCK_RATE}%+ (now ${si.week}%)`
+    :`Keep your last 7 days at ${UNLOCK_RATE}%+ to unlock another slot (now ${si.week}%)`;
+}
+function slotMeter(si){
+  if(si.plus)return el("div",{class:"slots"},el("span",{class:"slots-t",text:"Unlimited slots"}));
+  return el("div",{class:"slots",title:slotsLine(si)},
+    el("span",{class:"slot-dots","aria-hidden":"true"},[...Array(si.earned)].map((_,i)=>el("i",{class:i<si.used?"on":null}))),
+    el("span",{class:"slots-t",text:`${Math.min(si.used,si.earned)} of ${si.earned} habit slots`}),
+    el("button",{class:"slots-why",onclick:()=>{sheet={type:"slots"};renderSheet();focusSheet()}},"How to unlock more"));
+}
+/* First run: start everyone on 5 (or on what they already have stacked), then check weekly for an unlock */
+async function checkSlots(){
+  if(!settings||!canWrite||!db)return;
+  if(!settings.slots){const used=habits.filter(isStacked).length;await saveSettings({slots:Math.max(BASE_SLOTS,used),slotAt:todayKey});return}
+  const si=slotInfo();if(si.plus||si.maxed||si.wait)return;
+  const keys=Object.keys(checkins).sort();const first=keys[0];
+  if(!first||Math.round((new Date(todayKey+"T12:00:00")-new Date(first+"T12:00:00"))/864e5)<UNLOCK_DAYS)return;
+  if(si.week>=UNLOCK_RATE){await saveSettings({slots:si.earned+1,slotAt:todayKey});fx.slot=Date.now();toast(`New habit slot unlocked \u00B7 ${si.earned+1} slots`)}
 }
 
 /* ---------- Shared rows ---------- */
@@ -715,6 +771,7 @@ function renderDay(){
     el("div",{class:"daytabs",role:"tablist","aria-label":"Parts of the day"},cs0.map(c=>el("button",{role:"tab","aria-selected":String(c.id===buildSel),onclick:()=>{if(buildSel!==c.id){buildSel=c.id;fx.btab=c.id;fx.bt=Date.now();renderDay()}}},
       autoC&&c.id===autoC.id?el("span",{class:"dt-now","aria-hidden":"true"}):null,el("span",{text:c.name}))),
       editMode?el("button",{class:"dt-add","aria-label":"Add a part of the day",title:"Add a part of the day",onclick:addChunk,disabled:!can()},"+ Add"):null)));
+  if(!editMode)box.append(slotMeter(slotInfo()));
   if(editMode)box.append(el("p",{class:"sub modehint",text:"Rename, retime, reorder or remove the things you already do. Your stacked habits are locked while you edit."}));
   const tr=!editMode&&trial(),ta=tr&&firstFit(tr);
   if(tr&&ta)box.append(el("div",{class:"trial"+(Date.now()-fx.swap<900?" in":"")},
@@ -837,7 +894,7 @@ function renderLib(){
     const a=h.anchor&&anchorById(h.anchor);
     box.append(el("div",{class:"row"},dot(h.category),
       el("div",{style:{minWidth:0}},el("button",{class:"sname",onclick:()=>openSheet(h.id),text:h.title}),
-        el("div",{class:"rowmeta",text:[h.expert,KIND[h.kind]||h.effort,h.listen?"▶ clip":""].filter(Boolean).join(" · ")})),
+        el("div",{class:"rowmeta",text:[h.custom?"Your own":h.expert,KIND[h.kind]||h.effort,h.listen?"▶ clip":""].filter(Boolean).join(" · ")})),
       el("span",{class:"placed",text:a?`${chunkName(a.slot)} · after ${a.name.toLowerCase()}`:""})));
   });
 }
@@ -852,20 +909,56 @@ function renderSheet(){
   const keepScroll=root.querySelector(".sheet")?root.querySelector(".sheet").scrollTop:0;
   root.replaceChildren();
   const frame=(...kids)=>{const s=el("aside",{class:"sheet"+(keepScroll?" still":""),role:"dialog","aria-modal":"true","aria-labelledby":"sheet-h"},...kids);root.append(el("div",{class:"scrim"+(keepScroll?" still":""),onclick:closeSheet}),s);s.scrollTop=keepScroll};
+  if(sheet.type==="slots"){
+    const si=slotInfo();
+    frame(el("div",{class:"sheet-top"},el("span",{class:"kv",text:"Habit slots"}),el("button",{class:"iconbtn",onclick:closeSheet},"OK")),
+      el("h2",{id:"sheet-h",text:sheet.blocked?`All ${si.earned} slots are in use`:`${si.used} of ${si.earned} slots in use`}),
+      slotMeter(si),
+      el("p",{class:"why",text:"Stack works best when you grow slowly. You start with "+BASE_SLOTS+" habit slots and earn more by keeping your habits going."}),
+      el("div",{class:"sec"},el("h3",{text:"How to unlock more"}),
+        el("p",{text:`Keep your last 7 days at ${UNLOCK_RATE}% or more and a new slot unlocks, one a week, up to ${MAX_FREE_SLOTS}. Days marked "Not today" don't count against you.`}),
+        el("p",{class:"slot-now",text:slotsLine(si)})),
+      sheet.blocked?el("div",{class:"sec"},el("h3",{text:"Need room now?"}),el("p",{text:"Remove a habit you've stopped doing from Build, then add the new one."})):null,
+      el("p",{class:"sub",style:{fontSize:"13.5px"},text:"More slots with Stack Plus are coming later."}));
+    return;
+  }
+  if(sheet.type==="create"){
+    const d=sheet.draft||(sheet.draft={title:"",mins:5,category:"Habits & focus",why:""});
+    const a=sheet.anchorId&&anchorById(sheet.anchorId);
+    const save=async e=>{e.preventDefault();const t=d.title.trim();if(!t||!db)return;
+      const id=uid("u");const h={title:t,short:t,custom:true,kind:"step",status:"library",category:d.category,effort:`${d.mins} min`,why:d.why.trim(),fits:[],expert:"",added:todayKey};
+      try{await db.doc("habits/"+id).set(h);
+        if(a&&!slotInfo().full){await place({id,...h},a.id,true);toast(`Created and stacked after ${a.name.toLowerCase()}`)}else toast(a?"Created. Free a slot to stack it":"Created \u00B7 find it in your Library")}catch(x){showErr(x)}
+      closeSheet()};
+    frame(el("div",{class:"sheet-top"},el("span",{class:"kv",text:a?`${chunkName(a.slot)} \u00B7 after ${a.name.toLowerCase()}`:"Your own habit"}),el("button",{class:"iconbtn",onclick:closeSheet},"Cancel")),
+      el("h2",{id:"sheet-h",text:sheet.editId?"Edit your habit":"Create your own habit"}),
+      el("form",{class:"create",onsubmit:sheet.editId?async e=>{e.preventDefault();const t=d.title.trim();if(!t)return;try{await db.doc("habits/"+sheet.editId).update({title:t,short:t,category:d.category,effort:`${d.mins} min`,why:d.why.trim()});toast("Saved")}catch(x){showErr(x)}closeSheet()}:save},
+        el("label",{class:"namefield"},"What will you do?",el("input",{id:"cr-title",value:d.title,maxlength:"60",required:true,placeholder:"e.g. Stretch for two minutes",oninput:e=>{d.title=e.target.value}})),
+        el("label",{class:"namefield"},"How long does it take?",el("select",{class:"cr-sel",onchange:e=>{d.mins=+e.target.value}},[1,2,3,5,10,15,20,30].map(m=>el("option",{value:m,selected:d.mins===m,text:`${m} min`})))),
+        el("div",{class:"namefield"},"Area",el("div",{class:"tools"},CATS.map(([c])=>el("button",{type:"button",class:"chip","aria-pressed":String(d.category===c),onclick:()=>{d.category=c;renderSheet()}},dot(c),c)))),
+        el("label",{class:"namefield"},"Why it matters to you (optional)",el("textarea",{rows:"3",maxlength:"400",placeholder:"A line to remind yourself",oninput:e=>{d.why=e.target.value}},d.why)),
+        el("button",{class:"btn primary",type:"submit",disabled:!can()},sheet.editId?"Save":a&&!slotInfo().full?"Create and stack it":"Create habit")));
+    return;
+  }
   if(sheet.type==="pick"){
     const a=anchorById(sheet.anchorId);if(!a){sheet=null;return}
+    const si=slotInfo();
     const cand=habits.filter(h=>(h.kind||"step")==="step");
     const good=cand.filter(h=>fitsAnchor(h,a)),rest=cand.filter(h=>!fitsAnchor(h,a));
     const row=h=>{const here=h.anchor===a.id;const at=!here&&h.anchor&&anchorById(h.anchor);
       return el("button",{class:"pickrow"+(here?" added":""),onclick:()=>here?unplace(h):place(h,a.id,true)},dot(h.category),
         el("span",{class:"pr-main"},el("span",{class:"pr-t",text:h.short||h.title}),el("span",{class:"pr-m",text:[h.expert,`${hMins(h)} min`,at?`now after ${at.name.toLowerCase()}`:""].filter(Boolean).join(" · ")})),
-        el("span",{class:"pr-add",text:here?"Added ✓":at?"Move here":"Add"}))};
+        el("span",{class:"pr-add"+(!here&&!at&&si.full?" off":""),text:here?"Added ✓":at?"Move here":si.full?"Full":"Add"}))};
+    const mine=cand.filter(h=>h.custom);
     const n=stepsAt(a.id).length;
     frame(el("div",{class:"sheet-top"},el("span",{class:"kv",text:`${chunkName(a.slot)} · ${a.name}`}),el("button",{class:"iconbtn",onclick:closeSheet},n?"Done":"Close")),
       el("h2",{id:"sheet-h",text:`After you ${a.name.charAt(0).toLowerCase()+a.name.slice(1)}…`}),
       el("p",{class:"sub",style:{marginTop:0},text:n?`${n} habit${n>1?"s":""} stacked here. Add another, or tap Done.`:"Pick one or more habits to stack here. Good fits come first."}),
-      good.length?el("div",{class:"sec"},el("h3",{text:"Good fits"}),el("div",{class:"picklist"},good.map(row))):null,
-      el("div",{class:"sec"},el("h3",{text:good.length?"Everything else":"All habits"}),el("div",{class:"picklist"},rest.map(row))));
+      slotMeter(si),
+      el("button",{class:"create-btn",onclick:()=>{sheet={type:"create",anchorId:a.id};renderSheet();focusSheet()},disabled:!can()},"+ Create your own habit"),
+      mine.length?el("div",{class:"sec"},el("h3",{text:"Your own"}),el("div",{class:"picklist"},mine.map(row))):null,
+      good.length?el("div",{class:"sec"},el("h3",{text:"Good fits"}),el("div",{class:"picklist"},good.filter(h=>!h.custom).map(row))):null,
+      el("div",{class:"sec"},el("h3",{text:good.length?"Everything else":"All habits"}),el("div",{class:"picklist"},rest.filter(h=>!h.custom).map(row))));
     return;
   }
   const h=habits.find(x=>x.id===sheet.id);if(!h){sheet=null;return}
@@ -876,13 +969,16 @@ function renderSheet(){
     opts.map(({a,c})=>el("option",{value:a.id,selected:h.anchor===a.id,text:`${c.name} · after ${a.name.toLowerCase()}${fitsAnchor(h,a)?" (good fit)":""}`})));
   frame(el("div",{class:"sheet-top"},el("span",{class:"kv"},dot(h.category),h.category),el("button",{class:"iconbtn",onclick:closeSheet,"aria-label":"Close"},"Close")),
     el("h2",{id:"sheet-h",text:h.title}),
-    el("div",{class:"kv"},el("span",{text:h.expert}),el("span",{class:"mono",text:`${hMins(h)} min`}),k?el("span",{class:"pill",text:k}):null,ev?el("span",{class:"pill"+(ev==="Several experts"?" strong":""),text:ev}):null,h.flag?el("span",{class:"pill flag",text:"GP check"}):null),
-    el("p",{class:"why",text:h.why||h.detail}),
+    el("div",{class:"kv"},el("span",{text:h.custom?"Your own habit":h.expert}),el("span",{class:"mono",text:`${hMins(h)} min`}),k?el("span",{class:"pill",text:k}):null,ev?el("span",{class:"pill"+(ev==="Several experts"?" strong":""),text:ev}):null,h.flag?el("span",{class:"pill flag",text:"GP check"}):null),
+    h.why||h.detail?el("p",{class:"why",text:h.why||h.detail}):null,
     h.listen?el("a",{class:"listen",href:h.listen.url,target:"_blank",rel:"noopener"},"▶  Listen on Spotify",el("span",{text:`from ${h.listen.label}`})):null,
     h.research?el("div",{class:"sec"},el("h3",{text:"What the research says"}),el("p",{text:h.research})):null,
     h.caveat?el("p",{class:"caveat"},el("b",{text:h.flag?"Check first: ":"Note: "}),h.caveat):null,
     opts.length?el("div",{class:"place"},el("label",{for:"place-sel",class:"sec"},el("h3",{text:"Stack it after"})),sel,h.anchor?el("button",{class:"textbtn",onclick:()=>{unplace(h);closeSheet()},disabled:!can()},"Remove from my day"):null):el("p",{class:"sub",style:{fontSize:"13.5px"},text:"This one is a weekly practice or principle, so it isn't stacked into the day."}),
-    el("p",{class:"src kv"},"Source: ",h.url?el("a",{href:h.url,target:"_blank",rel:"noopener",text:h.episode||"Episode"}):(h.episode||""),h.listen?" · clip times are approximate":""));
+    h.custom?el("div",{class:"btns"},
+        el("button",{class:"btn",disabled:!can(),onclick:()=>{sheet={type:"create",editId:h.id,draft:{title:h.title,mins:hMins(h),category:h.category,why:h.why||""}};renderSheet();focusSheet()}},"Edit"),
+        el("button",{class:"btn danger-btn",disabled:!can(),onclick:async()=>{if(!db)return;try{await db.doc("habits/"+h.id).delete();toast("Habit deleted")}catch(x){showErr(x)}closeSheet()}},"Delete habit"))
+      :el("p",{class:"src kv"},"Source: ",h.url?el("a",{href:h.url,target:"_blank",rel:"noopener",text:h.episode||"Episode"}):(h.episode||""),h.listen?" · clip times are approximate":""));
 }
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&sheet)closeSheet()});
 function openRename(c){
@@ -909,6 +1005,7 @@ function renderAll(){if(drag)return;renderToday();renderDay();renderCats();rende
 /* ---------- Writes ---------- */
 async function place(h,aid,stayOpen){
   if(!db)return;const a=anchorById(aid);if(!a)return;
+  if(!h.anchor&&slotInfo().full){sheet={type:"slots",blocked:true};renderSheet();focusSheet();return}
   const order=Math.max(0,...stepsAt(aid).filter(x=>x.id!==h.id).map(x=>x.order||0))+1;
   fx.arrive=h.id;fx.ta=Date.now();fx.swap=Date.now();buzz(10);
   try{await db.doc("habits/"+h.id).update({anchor:aid,slot:a.slot,order,after:null});if(!stayOpen)toast(`Stacked after ${a.name.toLowerCase()}`)}catch(e){showErr(e)}
@@ -1048,7 +1145,9 @@ async function finishSetup(){
       else{const id=uid("a");created.set(m,id);await db.doc("anchors/"+id).set({name:m.name,slot:m.chunk,order:counters[m.chunk],kind:kindFor(m.name,m.chunk),duration:m.duration||5})}
     }catch(e){showErr(e)}
   }
-  if(!s.editOnly)for(const hid of s.starters){
+  if(!s.editOnly&&!(settings&&settings.slots))await saveSettings({slots:BASE_SLOTS,slotAt:todayKey});
+  let room=slotInfo().limit-habits.filter(isStacked).length;
+  if(!s.editOnly)for(const hid of s.starters){if(room<=0)break;room--;
     const h=habits.find(x=>x.id===hid);if(!h)continue;
     const m=s.acts.find(m=>m.on&&valid.has(m.chunk)&&fitsOf(h).includes(kindFor(m.name,m.chunk)));if(!m)continue;
     const aid=m.id||created.get(m);if(!aid)continue;
@@ -1057,6 +1156,7 @@ async function finishSetup(){
   toast(s.editOnly?"Your day is updated":"Your day is set up");go("day");
 }
 $("profile-btn").addEventListener("click",()=>go("profile"));
+$("create-habit").addEventListener("click",()=>{if(!can())return;sheet={type:"create"};renderSheet();focusSheet();setTimeout(()=>{const i=$("cr-title");i&&i.focus()},60)});
 /* ---------- Profile: name, interests, account, setup ---------- */
 function renderProfile(){
   const nm=(settings&&settings.name)||"";
@@ -1080,6 +1180,7 @@ function renderProfile(){
       el("p",{class:"sub",text:"Stack suggests habits from these areas."}),
       el("div",{class:"tools"},CATS.map(([c])=>el("button",{class:"chip","aria-pressed":String(ints.has(c)),disabled:!can(),onclick:()=>{
         const n=new Set(ints);n.has(c)?n.delete(c):n.add(c);if(!n.size)return;saveSettings({interests:[...n]})}},dot(c),c)))),
+    el("section",{class:"pf-card"},el("h2",{text:"Habit slots"}),slotMeter(slotInfo()),el("p",{class:"sub",text:slotsLine(slotInfo())})),
     el("section",{class:"pf-card"},el("h2",{text:"Your day"}),
       el("p",{class:"sub",text:"Walk through setup again to reshape the parts of your day and what you already do."}),
       el("div",{class:"btns"},el("button",{class:"btn",onclick:()=>openSetup(),disabled:!can()},"Run setup again"),el("button",{class:"btn",onclick:()=>go("day")},"Open Build"))),
@@ -1096,7 +1197,7 @@ renderAll();
   if(user){try{if(await user.can("data.write")===false)canWrite=false}catch(e){}}
   let gH=false,gS=false,gA=false;
   const ready=()=>{if(gH&&gA&&!loaded){loaded=true;document.body.classList.add("intro");setTimeout(()=>document.body.classList.remove("intro"),900)}
-    if(gH&&gA&&gS)migrate();
+    if(gH&&gA&&gS){migrate();checkSlots()}
     if(gH&&gS&&gA&&!settingsSeen){settingsSeen=true;if(!(settings&&settings.onboarded)&&canWrite)openSetup()}};
   db.collection("anchors").onSnapshot(s=>{gA=true;anchors=s.docs.map(d=>({id:d.id,...d.data()}));ready();renderAll()},showErr);
   db.collection("habits").onSnapshot(s=>{gH=true;habits=s.docs.map(d=>({id:d.id,...d.data()}));ready();renderAll()},showErr);

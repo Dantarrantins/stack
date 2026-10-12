@@ -98,3 +98,24 @@ test("profile page edits the name and interests", async ({ page }) => {
   await page.getByRole("button", { name: "Today", exact: true }).click();
   await expect(page.locator("#today-h")).toHaveText("Good afternoon, Daniel");
 });
+
+test("habit slots cap stacking at 5, and people can create their own habits", async ({ page }) => {
+  await setUp(page);
+  await page.getByRole("button", { name: "Build", exact: true }).click();
+  await page.locator(".stacklink").first().click();
+  for (let i = 0; i < 8; i++) {
+    const add = page.locator('.pickrow .pr-add:text-is("Add")').first();
+    if (!(await add.count())) break;
+    await add.click();
+  }
+  await expect(page.locator(".sheet .slots-t")).toHaveText("5 of 5 habit slots");
+  await page.locator('.pickrow .pr-add:text-is("Full")').first().click();
+  await expect(page.locator("#sheet-h")).toHaveText("All 5 slots are in use");
+  await page.locator(".sheet .iconbtn").click();
+  await page.getByRole("button", { name: "Library", exact: true }).click();
+  await page.click("#create-habit");
+  await page.fill("#cr-title", "Stretch for two minutes");
+  await page.click(".create button[type=submit]");
+  await expect(page.locator("#lib")).toContainText("Stretch for two minutes");
+  await expect(page.locator("#lib")).toContainText("Your own");
+});
