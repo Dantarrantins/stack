@@ -208,6 +208,16 @@ h2{font-size:28px;font-weight:300;letter-spacing:-.01em;line-height:1.1;margin:0
 .stack{list-style:none;margin:2px 0 0 56px;padding:0 0 0 14px;border-left:2px solid color-mix(in srgb,var(--accent) 35%,transparent);display:grid;gap:2px;min-height:4px}
 #v-day .stack{margin-left:22px}
 .hbul{width:9px;height:9px;border-radius:50%;background:var(--accent);margin:0 6px}
+.chev{display:flex;align-items:center;gap:6px;background:none;border:0;padding:6px 2px;color:var(--muted);font:inherit;font-size:13px;cursor:pointer}
+.chev-i{display:inline-block;transition:transform .2s;font-size:14px;line-height:1;transform:translateY(-3px)}
+.chev-i.open{transform:rotate(180deg) translateY(-1px)}
+.hdet{grid-column:1/-1;margin:2px 0 8px 30px;padding:12px 14px;border-radius:12px;background:var(--surface);border:1px solid var(--line);display:grid;gap:8px}
+.hdet-why{margin:0;font-size:14.5px;line-height:1.55}
+.hdet-acts{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.hdet-sp{font-size:13px;font-weight:500;color:var(--accent-ink);background:var(--accent);padding:7px 12px;border-radius:999px;text-decoration:none}
+.hdet-more,.hdet-del{font:inherit;font-size:13px;font-weight:500;border-radius:999px;padding:7px 12px;cursor:pointer;background:transparent;border:1px solid var(--line);color:var(--ink)}
+.hdet-del{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 40%,transparent);margin-left:auto}
+@media (prefers-reduced-motion:no-preference){.hdet{animation:rise .25s ease}}
 .stack:empty{border-left:0;min-height:0;margin-top:0}
 .hab{display:grid;grid-template-columns:auto auto 1fr auto;gap:10px;align-items:center;padding:6px 0;border-radius:10px;background:inherit}
 #v-today .hab{grid-template-columns:auto 1fr auto}
@@ -476,11 +486,21 @@ function habitRow(h,opts={}){
   return el("li",{class:"hab"+(on&&!opts.drag?" done":"")+(fx.tick===h.id&&now-fx.t<700?" pop":"")+(fx.arrive===h.id&&now-fx.ta<1500?" arrive":""),"data-id":h.id},
     opts.drag?el("span",{class:"grip",title:"Drag to move","aria-hidden":"true"},"⠇"):null,
     opts.drag?el("span",{class:"hbul","aria-hidden":"true"}):el("button",{class:"tick","aria-pressed":String(on),"aria-label":(on?"Untick ":"Tick ")+(h.short||h.title),onclick:()=>toggleDone(h.id),disabled:!can()},checkSvg()),
-    el("button",{class:"sname",onclick:()=>openSheet(h.id),text:h.short||h.title}),
-    el("span",{class:"sside"},h.listen?el("span",{class:"play","aria-label":"Has a clip",text:"▶"}):null,el("span",{class:"mono",text:`${hMins(h)} min`})));
+    opts.drag?el("button",{class:"sname","aria-expanded":String(expanded.has(h.id)),onclick:()=>{expanded.has(h.id)?expanded.delete(h.id):expanded.add(h.id);renderDay()},text:h.short||h.title}):el("button",{class:"sname",onclick:()=>openSheet(h.id),text:h.short||h.title}),
+    opts.drag?el("button",{class:"chev","aria-label":expanded.has(h.id)?"Hide details":"Show details",onclick:()=>{expanded.has(h.id)?expanded.delete(h.id):expanded.add(h.id);renderDay()}},el("span",{class:"mono",text:`${hMins(h)} min`}),el("span",{class:"chev-i"+(expanded.has(h.id)?" open":""),"aria-hidden":"true",text:"⌄"}))
+      :el("span",{class:"sside"},h.listen?el("span",{class:"play","aria-label":"Has a clip",text:"▶"}):null,el("span",{class:"mono",text:`${hMins(h)} min`})),
+    opts.drag&&expanded.has(h.id)?el("div",{class:"hdet"},
+      el("div",{class:"kv"},dot(h.category),el("span",{text:h.category}),el("span",{text:`${hMins(h)} min`}),el("span",{text:h.expert})),
+      el("p",{class:"hdet-why",text:h.why||h.detail}),
+      h.caveat?el("p",{class:"caveat",style:{margin:0}},el("b",{text:h.flag?"Check first: ":"Note: "}),h.caveat):null,
+      el("div",{class:"hdet-acts"},
+        h.listen?el("a",{class:"hdet-sp",href:h.listen.url,target:"_blank",rel:"noopener"},`Listen on Spotify from ${h.listen.label}`):null,
+        el("button",{class:"hdet-more",onclick:()=>openSheet(h.id)},"Full details"),
+        el("button",{class:"hdet-del",onclick:()=>{expanded.delete(h.id);unplace(h)},disabled:!can()},"Remove"))):null);
 }
 
 /* ---------- Today: tick-off only ---------- */
+const expanded=new Set();
 let lastSig="";
 function renderToday(){
   const done=doneMap();
