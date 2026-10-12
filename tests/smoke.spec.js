@@ -139,3 +139,16 @@ test("people over 3 in a part of the day choose which 3 to keep", async ({ page 
     for (const h of Object.values(c.habits)) if (h.anchor && (h.kind || "step") === "step") { const s = (c.anchors[h.anchor] || {}).slot; n[s] = (n[s] || 0) + 1; } return Math.max(...Object.values(n)); });
   expect(perChunk).toBeLessThanOrEqual(3);
 });
+
+test("hearting habits builds a Saved list in the Library", async ({ page }) => {
+  await setUp(page);
+  await page.getByRole("button", { name: "Library", exact: true }).click();
+  await page.locator("#lib .heart").first().click();
+  await page.locator("#lib .heart").nth(2).click();
+  await expect(page.locator(".chip-saved")).toContainText("Saved 2");
+  await page.locator(".chip-saved").click();
+  await expect(page.locator("#lib .row")).toHaveCount(2);
+  await page.reload();
+  await page.getByRole("button", { name: "Library", exact: true }).click();
+  await expect(page.locator(".chip-saved")).toContainText("Saved 2");
+});

@@ -116,6 +116,18 @@ h2{font-size:28px;font-weight:300;letter-spacing:-.01em;line-height:1.1;margin:0
 .create textarea{resize:vertical}
 .danger-btn{color:#A3412F}
 #create-habit{justify-self:start;margin-top:12px}
+.heart{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;border:0;background:transparent;color:var(--faint);cursor:pointer;padding:0;transition:color .15s,transform .15s}
+.heart svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round}
+.heart:hover{color:var(--muted)}
+.heart.on{color:#C4566A}
+.heart.on svg{fill:currentColor}
+.heart.pop{animation:heartpop .45s ease}
+@keyframes heartpop{40%{transform:scale(1.3)}100%{transform:scale(1)}}
+.lib-side{display:flex;align-items:center;gap:8px}
+.sheet-acts{display:flex;align-items:center;gap:6px}
+.chip-heart{display:inline-grid}
+.chip-heart svg{width:13px;height:13px;fill:#C4566A;stroke:#C4566A;stroke-width:1.5}
+@media (prefers-reduced-motion:reduce){.heart.pop{animation:none}}
 .redit{margin-left:auto;font:inherit;font-size:14px;color:var(--muted);background:none;border:0;padding:6px 0 6px 10px;cursor:pointer;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:3px;transition:color .15s,text-decoration-color .15s}
 #plan .chunk{scroll-margin-top:90px}
 .redit:hover,.redit:focus-visible{color:var(--ink);text-decoration-color:currentColor}
@@ -609,6 +621,10 @@ function schedule(cid){
 const fx={tick:null,t:0,arrive:null,ta:0,done:null,td:0,swap:0};
 const SVGNS="http://www.w3.org/2000/svg";
 function dashSvg(){const s=document.createElementNS(SVGNS,"svg");s.setAttribute("viewBox","0 0 16 16");s.setAttribute("aria-hidden","true");const p=document.createElementNS(SVGNS,"path");p.setAttribute("d","M4.5 8h7");s.append(p);return s}
+function heartSvg(){const s=document.createElementNS(SVGNS,"svg");s.setAttribute("viewBox","0 0 24 24");s.setAttribute("aria-hidden","true");const p=document.createElementNS(SVGNS,"path");p.setAttribute("d","M12 20.5s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.7c0 5.6-7.5 10.2-7.5 10.2z");s.append(p);return s}
+/* Hearts: save habits that interest you to come back to */
+async function toggleSaved(h){if(!db||!can())return;const on=!h.saved;fx.heart=h.id;fx.th=Date.now();buzz(6);try{await db.doc("habits/"+h.id).update({saved:on});if(on)toast("Saved to your hearts")}catch(e){showErr(e)}}
+function heartBtn(h,extra){return el("button",{class:"heart"+(h.saved?" on":"")+(fx.heart===h.id&&Date.now()-fx.th<600?" pop":"")+(extra?" "+extra:""),"aria-pressed":String(!!h.saved),"aria-label":(h.saved?"Remove from saved: ":"Save: ")+(h.short||h.title),title:h.saved?"Saved":"Save for later",disabled:!can(),onclick:e=>{e.stopPropagation();toggleSaved(h)}},heartSvg())}
 function binSvg(){const s=document.createElementNS(SVGNS,"svg");s.setAttribute("viewBox","0 0 24 24");s.setAttribute("aria-hidden","true");["M4 7h16","M10 11v6","M14 11v6","M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12","M9 7V4h6v3"].forEach(d=>{const p=document.createElementNS(SVGNS,"path");p.setAttribute("d",d);s.append(p)});return s}
 function chevSvg(){const s=document.createElementNS(SVGNS,"svg");s.setAttribute("viewBox","0 0 24 24");const p=document.createElementNS(SVGNS,"path");p.setAttribute("d","M6 9l6 6 6-6");s.append(p);return s}
 function checkSvg(){const s=document.createElementNS(SVGNS,"svg");s.setAttribute("viewBox","0 0 16 16");s.setAttribute("aria-hidden","true");const p=document.createElementNS(SVGNS,"path");p.setAttribute("d","M3.5 8.5l3 3 6-7");s.append(p);return s}
@@ -906,6 +922,8 @@ async function moveActs(cid,ids,moved){
 /* ---------- Library ---------- */
 function renderCats(){
   const box=$("cats");box.replaceChildren();
+  const ns=habits.filter(h=>h.saved).length;
+  box.append(el("button",{class:"chip chip-saved","aria-pressed":String(filter==="Saved"),onclick:()=>{filter="Saved";renderCats();renderLib()}},el("span",{class:"chip-heart","aria-hidden":"true"},heartSvg()),`Saved ${ns}`));
   [["All"],...CATS].forEach(([c])=>{
     const n=c==="All"?habits.length:habits.filter(h=>h.category===c).length;
     if(c!=="All"&&!n)return;
@@ -915,16 +933,16 @@ function renderCats(){
 function renderLib(){
   const box=$("lib");box.replaceChildren();
   const q=query.trim().toLowerCase();
-  const list=habits.filter(h=>(filter==="All"||h.category===filter)&&(!q||[h.title,h.detail,h.expert,h.episode,h.category].join(" ").toLowerCase().includes(q)))
+  const list=habits.filter(h=>(filter==="All"||(filter==="Saved"?h.saved:h.category===filter))&&(!q||[h.title,h.detail,h.expert,h.episode,h.category].join(" ").toLowerCase().includes(q)))
     .sort((a,b)=>CATS.findIndex(c=>c[0]===a.category)-CATS.findIndex(c=>c[0]===b.category)||a.title.localeCompare(b.title));
   if(!habits.length){box.append(el("p",{class:"empty",text:loaded?"The library is empty.":"Loading…"}));return}
-  if(!list.length){box.append(el("p",{class:"empty",text:"Nothing matches that search."}));return}
+  if(!list.length){box.append(el("p",{class:"empty",text:filter==="Saved"&&!q?"Nothing saved yet. Tap the heart on any habit to keep it here.":"Nothing matches that search."}));return}
   list.forEach(h=>{
     const a=h.anchor&&anchorById(h.anchor);
     box.append(el("div",{class:"row"},dot(h.category),
       el("div",{style:{minWidth:0}},el("button",{class:"sname",onclick:()=>openSheet(h.id),text:h.title}),
         el("div",{class:"rowmeta",text:[h.custom?"Your own":h.expert,KIND[h.kind]||h.effort,h.listen?"▶ clip":""].filter(Boolean).join(" · ")})),
-      el("span",{class:"placed",text:a?`${chunkName(a.slot)} · after ${a.name.toLowerCase()}`:""})));
+      el("span",{class:"lib-side"},el("span",{class:"placed",text:a?`${chunkName(a.slot)} · after ${a.name.toLowerCase()}`:""}),heartBtn(h))));
   });
 }
 
@@ -1000,6 +1018,7 @@ function renderSheet(){
       slotMeter(si),
       el("button",{class:"create-btn",onclick:()=>{sheet={type:"create",anchorId:a.id};renderSheet();focusSheet()},disabled:!can()},"+ Create your own habit"),
       mine.length?el("div",{class:"sec"},el("h3",{text:"Your own"}),el("div",{class:"picklist"},mine.map(row))):null,
+      cand.some(h=>h.saved&&!h.custom)?el("div",{class:"sec"},el("h3",{text:"Saved"}),el("div",{class:"picklist"},cand.filter(h=>h.saved&&!h.custom).map(row))):null,
       good.length?el("div",{class:"sec"},el("h3",{text:"Good fits"}),el("div",{class:"picklist"},good.filter(h=>!h.custom).map(row))):null,
       el("div",{class:"sec"},el("h3",{text:good.length?"Everything else":"All habits"}),el("div",{class:"picklist"},rest.filter(h=>!h.custom).map(row))));
     return;
@@ -1010,7 +1029,7 @@ function renderSheet(){
   const sel=el("select",{id:"place-sel","aria-label":"Stack this habit after",disabled:!can(),onchange:e=>{const v=e.target.value;v?place(h,v):unplace(h)}},
     el("option",{value:"",text:h.anchor?"Not stacked":"Choose where…"}),
     opts.map(({a,c})=>el("option",{value:a.id,selected:h.anchor===a.id,text:`${c.name} · after ${a.name.toLowerCase()}${fitsAnchor(h,a)?" (good fit)":""}`})));
-  frame(el("div",{class:"sheet-top"},el("span",{class:"kv"},dot(h.category),h.category),el("button",{class:"iconbtn",onclick:closeSheet,"aria-label":"Close"},"Close")),
+  frame(el("div",{class:"sheet-top"},el("span",{class:"kv"},dot(h.category),h.category),el("span",{class:"sheet-acts"},heartBtn(h),el("button",{class:"iconbtn",onclick:closeSheet,"aria-label":"Close"},"Close"))),
     el("h2",{id:"sheet-h",text:h.title}),
     el("div",{class:"kv"},el("span",{text:h.custom?"Your own habit":h.expert}),el("span",{class:"mono",text:`${hMins(h)} min`}),k?el("span",{class:"pill",text:k}):null,ev?el("span",{class:"pill"+(ev==="Several experts"?" strong":""),text:ev}):null,h.flag?el("span",{class:"pill flag",text:"GP check"}):null),
     h.why||h.detail?el("p",{class:"why",text:h.why||h.detail}):null,

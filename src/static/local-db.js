@@ -9,7 +9,7 @@
   let store = { seedVersion: 0, c: {} };
   try { const raw = localStorage.getItem(KEY); if (raw) store = JSON.parse(raw); } catch (e) {}
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) {} };
-  const USER_FIELDS = ["anchor", "slot", "order", "after", "renamed"];
+  const USER_FIELDS = ["anchor", "slot", "order", "after", "renamed", "saved"];
 
   const ready = fetch("seed.json", { cache: "no-cache" }).then(r => r.json()).then(seed => {
     if ((store.seedVersion || 0) >= seed.version) return;
