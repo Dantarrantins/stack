@@ -215,10 +215,11 @@ h2{font-size:28px;font-weight:300;letter-spacing:-.01em;line-height:1.1;margin:0
 .skipbtn{font:inherit;font-size:12.5px;color:var(--faint);background:none;border:0;padding:6px 2px 6px 6px;margin-left:2px;cursor:pointer;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:3px;transition:color .15s,text-decoration-color .15s}
 .skipbtn:hover,.skipbtn:focus-visible{color:var(--muted);text-decoration-color:currentColor}
 .skip-tag{font-size:12.5px;color:var(--muted);font-style:italic}
-.hab.skipped{opacity:.55}
+/* "Not today": the circle still fills, in a soft stone tone with a dash, so the row feels settled rather than missed */
+.hab.skipped .tick{background:var(--faint);border-color:var(--faint)}
+.hab.skipped .tick svg{stroke-dashoffset:0}
 .hab.skipped .sname{color:var(--muted)}
-.hab.skipped .tick{border-style:dashed}
-.hab.skipped .tick svg{opacity:0}
+.skipbtn.undo{color:var(--faint)}
 .grip{cursor:grab;color:var(--faint);font-size:16px;line-height:1;padding:6px 2px;touch-action:none;user-select:none;-webkit-user-select:none}
 .grip:hover{color:var(--ink)}
 .act-h .grip{margin-left:-6px}
@@ -522,6 +523,7 @@ function schedule(cid){
 /* ---------- Motion helpers ---------- */
 const fx={tick:null,t:0,arrive:null,ta:0,done:null,td:0,swap:0};
 const SVGNS="http://www.w3.org/2000/svg";
+function dashSvg(){const s=document.createElementNS(SVGNS,"svg");s.setAttribute("viewBox","0 0 16 16");s.setAttribute("aria-hidden","true");const p=document.createElementNS(SVGNS,"path");p.setAttribute("d","M4.5 8h7");s.append(p);return s}
 function checkSvg(){const s=document.createElementNS(SVGNS,"svg");s.setAttribute("viewBox","0 0 16 16");s.setAttribute("aria-hidden","true");const p=document.createElementNS(SVGNS,"path");p.setAttribute("d","M3.5 8.5l3 3 6-7");s.append(p);return s}
 const reduced=()=>{try{return matchMedia("(prefers-reduced-motion: reduce)").matches}catch(e){return false}};
 function buzz(ms){try{navigator.vibrate&&navigator.vibrate(ms)}catch(e){}}
@@ -562,11 +564,11 @@ function habitRow(h,opts={}){
   const done=doneMap();const on=!!done[h.id];const sk=!opts.drag&&!on&&!!skipMap()[h.id];const now=Date.now();
   return el("li",{class:"hab"+(on&&!opts.drag?" done":"")+(sk?" skipped":"")+(fx.tick===h.id&&now-fx.t<700?" pop":"")+(fx.arrive===h.id&&now-fx.ta<1500?" arrive":""),"data-id":h.id},
     opts.drag?el("span",{class:"grip",title:"Drag to move","aria-hidden":"true"},"⠇"):null,
-    opts.drag?el("span",{class:"hbul","aria-hidden":"true"}):el("button",{class:"tick","aria-pressed":String(on),"aria-label":(on?"Untick ":"Tick ")+(h.short||h.title),onclick:()=>sk?toggleSkip(h.id):toggleDone(h.id),disabled:!can()},checkSvg()),
+    opts.drag?el("span",{class:"hbul","aria-hidden":"true"}):el("button",{class:"tick","aria-pressed":String(on),"aria-label":(on?"Untick ":"Tick ")+(h.short||h.title),onclick:()=>sk?toggleSkip(h.id):toggleDone(h.id),disabled:!can()},sk?dashSvg():checkSvg()),
     opts.drag?el("button",{class:"sname","aria-expanded":String(expanded.has(h.id)),onclick:()=>{expanded.has(h.id)?expanded.delete(h.id):expanded.add(h.id);renderDay()},text:h.short||h.title}):el("button",{class:"sname",onclick:()=>openSheet(h.id),text:h.short||h.title}),
     opts.drag?el("button",{class:"chev","aria-label":expanded.has(h.id)?"Hide details":"Show details",onclick:()=>{expanded.has(h.id)?expanded.delete(h.id):expanded.add(h.id);renderDay()}},el("span",{class:"mono",text:`${hMins(h)} min`}),el("span",{class:"chev-i"+(expanded.has(h.id)?" open":""),"aria-hidden":"true",text:"⌄"}))
-      :sk?el("span",{class:"sside"},el("span",{class:"skip-tag",text:"Not today"}),el("button",{class:"skipbtn",onclick:()=>toggleSkip(h.id),disabled:!can(),"aria-label":"Undo skip for "+(h.short||h.title)},"Undo"))
-      :el("span",{class:"sside"},el("span",{class:"mono",text:`${hMins(h)} min`}),on?null:el("button",{class:"skipbtn",onclick:()=>toggleSkip(h.id),disabled:!can(),"aria-label":"Skip "+(h.short||h.title)+" today",title:"Not doing this today"},"Skip")),
+      :sk?el("span",{class:"sside"},el("span",{class:"skip-tag",text:"Not today"}),el("button",{class:"skipbtn undo",onclick:()=>toggleSkip(h.id),disabled:!can(),"aria-label":"Undo skip for "+(h.short||h.title)},"Undo"))
+      :el("span",{class:"sside"},el("span",{class:"mono",text:`${hMins(h)} min`}),on?null:el("button",{class:"skipbtn",onclick:()=>toggleSkip(h.id),disabled:!can(),"aria-label":"Mark "+(h.short||h.title)+" as not today",title:"Not doing this today"},"Not today")),
     opts.drag&&expanded.has(h.id)?el("div",{class:"hdet"},
       el("p",{class:"hdet-why",text:h.why||h.detail}),
       h.research?el("p",{class:"hdet-res"},el("b",{text:"Research: "}),h.research):null,
@@ -610,7 +612,7 @@ function renderToday(){
   $("today-lede").textContent=lede(m,all,done);
   fitHello();
   paintSky(m);
-  $("today-sub").textContent=today.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"})+` · Week ${wk.n}`+(loaded&&all.length?` · ${n} of ${due} done`+(nsk?` · ${nsk} skipped`:""):"");
+  $("today-sub").textContent=today.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"})+` · Week ${wk.n}`+(loaded&&all.length?` · ${n} of ${due} done`+(nsk?` · ${nsk} not today`:""):"");
   $("prog").style.width=due?(n/due*100)+"%":all.length?"100%":"0";
   const st=loaded?stats():null;const sb=$("stats");sb.replaceChildren();
   if(st)sb.append(el("span",{},el("b",{text:st.today+"%"})," today"),el("span",{},el("b",{text:st.week+"%"})," last 7 days"),el("span",{},el("b",{text:st.overall+"%"})," average"));
@@ -630,7 +632,7 @@ function renderToday(){
     if(state==="past"&&!openPast.has(c.id)){
       box.append(el("button",{class:"pastcard"+(fx.fold===c.id&&Date.now()-fx.tf<800?" pc-in":""),style:{background:soft(c.id)},onclick:()=>{openPast.add(c.id);fx.unfold=c.id;fx.tu=Date.now();lastSig="";renderToday()},"aria-label":`${c.name} complete: ${dn} of ${steps.length} habits done. Open`},
         el("span",{class:"pc-check","aria-hidden":"true"},checkSvg()),
-        el("span",{class:"pc-main"},el("span",{class:"pc-name",text:c.name}),el("span",{class:"pc-stat",text:steps.length?`Complete \u00B7 ${dn} of ${due} habits`+(sk?` \u00B7 ${sk} skipped`:"")+` \u00B7 ${pct}%`:"Complete \u00B7 nothing stacked"})),
+        el("span",{class:"pc-main"},el("span",{class:"pc-name",text:c.name}),el("span",{class:"pc-stat",text:steps.length?`Complete \u00B7 ${dn} of ${due} habits`+(sk?` \u00B7 ${sk} not today`:"")+` \u00B7 ${pct}%`:"Complete \u00B7 nothing stacked"})),
         el("span",{class:"pc-show","aria-hidden":"true",text:"\u2304"})));
       return;
     }
@@ -863,7 +865,7 @@ function saveChunks(list){saveSettings({chunks:list})}
 async function toggleSkip(id){
   if(!db)return;
   const done={...doneMap()};const skp={...skipMap()};const adding=!skp[id];
-  if(adding){skp[id]=true;delete done[id];buzz(6)}else delete skp[id];
+  if(adding){skp[id]=true;delete done[id];fx.tick=id;fx.t=Date.now();buzz(6)}else delete skp[id];
   checkins={...checkins,[todayKey]:{date:todayKey,done,skipped:skp}};
   lastSig="";renderToday();renderDay();
   try{await db.doc("checkins/"+todayKey).set({date:todayKey,done,skipped:skp})}catch(e){showErr(e)}
