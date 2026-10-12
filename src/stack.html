@@ -302,7 +302,15 @@ html,body{overflow-x:hidden}
 body.scrolled .top{background:color-mix(in srgb,var(--bg) 88%,transparent)!important;backdrop-filter:blur(10px)!important;-webkit-backdrop-filter:blur(10px)!important}
 @media (max-width:600px){body.scrolled .top{background:transparent!important;backdrop-filter:none!important}}
 .wrap{position:relative;z-index:1}
-#v-today>.sky{top:-120px}
+/* Big corner glow: centred on the top-right corner of the screen so the colour radiates out across the page */
+#v-today>.sky{top:-110px;right:calc((100% - 100vw)/2);width:min(1200px,170vw);height:min(1200px,170vw);transform:translate(42%,-42%)}
+.sky .orb{inset:auto;right:0;left:0;top:calc(var(--y,40px) - 40px);width:100%;height:100%;filter:none;opacity:.85}
+.sky[data-phase="night"] .orb{opacity:.6}
+.top{z-index:5}@media (max-width:600px){.top{position:relative}}
+.sky[data-phase="morning"] .orb{background:radial-gradient(circle closest-side,rgba(250,214,130,.85) 0%,rgba(250,214,130,.5) 22%,rgba(250,214,130,.2) 50%,rgba(250,214,130,.06) 75%,rgba(250,214,130,0) 100%)}
+.sky[data-phase="midday"] .orb{background:radial-gradient(circle closest-side,rgba(255,222,135,.9) 0%,rgba(255,222,135,.55) 22%,rgba(255,222,135,.22) 50%,rgba(255,222,135,.07) 75%,rgba(255,222,135,0) 100%)}
+.sky[data-phase="evening"] .orb{background:radial-gradient(circle closest-side,rgba(240,150,110,.8) 0%,rgba(236,145,135,.45) 22%,rgba(232,140,160,.18) 50%,rgba(232,140,160,.05) 75%,rgba(232,140,160,0) 100%)}
+.sky[data-phase="night"] .orb{background:radial-gradient(circle closest-side,rgba(205,215,235,.75) 0%,rgba(185,198,228,.4) 22%,rgba(170,185,220,.15) 50%,rgba(170,185,220,.04) 75%,rgba(170,185,220,0) 100%)}
 /* Build modes */
 .wrap>*,.view>*,.plan>*,.chunk>*,.acts>*,.act>*{min-width:0}
 .ename{width:0}
