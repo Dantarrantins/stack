@@ -677,7 +677,7 @@ function slotMeter(si,compact){
   return el("div",{class:"slots",title:slotsLine(si)},
     el("span",{class:"slot-dots","aria-hidden":"true"},[...Array(si.earned)].map((_,i)=>el("i",{class:i<si.used?"on":null}))),
     el("span",{class:"slots-t",text:`${Math.min(si.used,si.earned)} of ${si.earned} slots${si.name?" in "+si.name.toLowerCase():""}`}),
-    compact?null:el("button",{class:"slots-why",onclick:()=>{sheet={type:"slots",cid:si.cid};renderSheet();focusSheet()}},"How to unlock more"));
+    compact?null:el("button",{class:"slots-why",onclick:()=>{sheet={type:"slots",cid:si.cid};renderSheet();focusSheet()}},"Earn more as you build habits"));
 }
 /* Everyone starts on BASE_SLOTS per part of the day; extra habits already stacked are trimmed by the person (nothing is removed automatically) */
 async function checkSlots(){
@@ -944,7 +944,7 @@ function renderSheet(){
       el("h2",{id:"sheet-h",text:sheet.blocked?`${si.name} is full`:si.cid?`${si.used} of ${si.earned} slots in ${si.name.toLowerCase()}`:"Habit slots"}),
       si.cid?slotMeter(si,true):null,
       el("p",{class:"why",text:`Stack works best when you grow slowly. Each part of the day starts with ${BASE_SLOTS} habit slots, and you earn more by keeping your habits going.`}),
-      el("div",{class:"sec"},el("h3",{text:"How to unlock more"}),
+      el("div",{class:"sec"},el("h3",{text:"How to earn more"}),
         el("p",{text:`Keep your last 7 days at ${UNLOCK_RATE}% or more and every part of the day gets another slot, one a week, up to ${MAX_FREE_SLOTS}. Days marked "Not today" don't count against you.`}),
         el("p",{class:"slot-now",text:slotsLine(si)})),
       sheet.blocked?el("div",{class:"sec"},el("h3",{text:"Need room now?"}),el("p",{text:`Remove a habit from ${si.name.toLowerCase()} you've stopped doing, then add the new one, or stack it in another part of the day.`})):null,
