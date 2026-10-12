@@ -328,6 +328,15 @@ html,body{overflow-x:hidden}
 .chunk.editing .act-h{min-height:40px}
 .locked{margin:2px 0 0 22px;padding-left:14px;border-left:2px solid var(--line);font-size:13px;color:var(--muted)}
 .addact{justify-self:start;font:inherit;font-size:14px;color:var(--accent);background:none;border:0;padding:10px 0 4px;cursor:pointer}
+@media (prefers-reduced-motion:no-preference){
+  .routine.unfolding{animation:unfold .5s cubic-bezier(.2,.8,.2,1)}
+  .routine.unfolding .acts>*{animation:rise .45s cubic-bezier(.2,.8,.2,1) both}
+  .routine.unfolding .acts>*:nth-child(2){animation-delay:.04s}.routine.unfolding .acts>*:nth-child(3){animation-delay:.08s}.routine.unfolding .acts>*:nth-child(4){animation-delay:.12s}.routine.unfolding .acts>*:nth-child(n+5){animation-delay:.16s}
+  .routine.folding{animation:fold .32s cubic-bezier(.4,0,.6,1) forwards}
+  .pastcard.pc-in{animation:rise .35s cubic-bezier(.2,.8,.2,1)}
+}
+@keyframes unfold{from{clip-path:inset(0 0 calc(100% - 76px) 0 round 16px);opacity:.7}to{clip-path:inset(0 0 0 0 round 16px);opacity:1}}
+@keyframes fold{from{clip-path:inset(0 0 0 0 round 16px);opacity:1}to{clip-path:inset(0 0 calc(100% - 76px) 0 round 16px);opacity:.4}}
 /* Stats */
 .statrow{display:flex;align-items:center;gap:14px;margin-top:18px;flex-wrap:wrap}
 .statrow .progress{margin-top:0;flex:0 1 240px}
@@ -602,18 +611,18 @@ function renderToday(){
     if(state==="now")nextMarked=true;
     const cel=fx.done===c.id&&Date.now()-fx.td<1500;
     if(state==="past"&&!openPast.has(c.id)){
-      box.append(el("button",{class:"pastcard",style:{background:soft(c.id)},onclick:()=>{openPast.add(c.id);lastSig="";renderToday()},"aria-label":`${c.name}: ${dn} of ${steps.length} done. Show`},
+      box.append(el("button",{class:"pastcard"+(fx.fold===c.id&&Date.now()-fx.tf<800?" pc-in":""),style:{background:soft(c.id)},onclick:()=>{openPast.add(c.id);fx.unfold=c.id;fx.tu=Date.now();lastSig="";renderToday()},"aria-label":`${c.name}: ${dn} of ${steps.length} done. Show`},
         el("span",{class:"pc-name",text:c.name}),
         el("span",{class:"pc-bar","aria-hidden":"true"},el("i",{style:{width:pct+"%"}})),
         el("span",{class:"pc-stat mono",text:`${dn}/${steps.length} · ${pct}%`}),
         el("span",{class:"pc-show",text:"Show"})));
       return;
     }
-    box.append(el("section",{class:"routine"+(cel?" celebrate":"")+(state==="now"?" is-now":""),style:{background:soft(c.id)},"aria-label":c.name},
+    box.append(el("section",{class:"routine"+(cel?" celebrate":"")+(fx.unfold===c.id&&Date.now()-fx.tu<800?" unfolding":"")+(state==="now"?" is-now":""),style:{background:soft(c.id)},"aria-label":c.name},
       cel&&!reduced()?burst():null,
       el("div",{class:"rhead"},el("h2",{text:c.name}),label?el("span",{class:"nowtag"+(label==="Now"?" on":""),text:label}):null,steps.length&&dn===steps.length?el("span",{class:"done-label",text:"Done"}):null,
         el("span",{class:"rmeta mono",text:`${fromM(toM(c.time))}–${fromM(sch.end)} · ${dn}/${steps.length}`}),
-        state==="past"?el("button",{class:"mini",onclick:()=>{openPast.delete(c.id);lastSig="";renderToday()},"aria-label":`Collapse ${c.name}`},"\u2303"):null),
+        state==="past"?el("button",{class:"mini",onclick:e=>{const sec=e.currentTarget.closest(".routine");const done=()=>{openPast.delete(c.id);fx.fold=c.id;fx.tf=Date.now();lastSig="";renderToday()};if(reduced()||!sec)return done();sec.classList.add("folding");setTimeout(done,320)},"aria-label":`Collapse ${c.name}`},"\u2303"):null),
       el("div",{class:"acts"},as.map(a=>{const st=stepsAt(a.id);
         return el("div",{class:"act"+(st.length?"":" quiet")},
           el("div",{class:"act-h"},el("span",{class:"act-time mono",text:fromM(sch.times[a.id].start)}),el("span",{class:"act-name",text:a.name})),
