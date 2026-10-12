@@ -278,6 +278,10 @@ h2{font-size:28px;font-weight:300;letter-spacing:-.01em;line-height:1.1;margin:0
 @media (prefers-reduced-motion:no-preference){.sky .orb{animation:breathe 9s ease-in-out infinite}}
 @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
 .hello{padding-top:clamp(28px,6vw,56px)}
+.clock{margin:0 0 10px;font-size:clamp(22px,4vw,28px);font-weight:300;letter-spacing:.04em;font-variant-numeric:tabular-nums;color:var(--muted)}
+.clock i{font-style:normal;padding:0 1px}
+@media (prefers-reduced-motion:no-preference){.clock i{animation:blink 2s steps(1) infinite}}
+@keyframes blink{50%{opacity:.25}}
 .hello h1{font-size:clamp(46px,10vw,72px);line-height:1;max-width:13ch}
 html,body{overflow-x:hidden}
 .nowtag{white-space:nowrap;font-size:11.5px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;padding:3px 9px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
@@ -367,6 +371,7 @@ html,body{overflow-x:hidden}
   <section class="view" id="v-today" aria-labelledby="today-h">
     <div class="sky" id="sky" aria-hidden="true"><i class="orb"></i></div>
     <div class="hello">
+      <p class="clock" id="clock" aria-label="Current time"><span id="clock-h">--</span><i>:</i><span id="clock-m">--</span></p>
       <h1 id="today-h">Hello</h1>
       <p class="sub" id="today-sub">Loading your routines…</p>
       <div class="statrow"><div class="progress" aria-hidden="true"><i id="prog" style="width:0"></i></div><div class="stats" id="stats"></div></div>
@@ -575,6 +580,8 @@ function renderToday(){
   });
 }
 setInterval(()=>{lastSig="";renderToday()},60000);
+function tickClock(){const d=new Date();const h=$("clock-h"),mm=$("clock-m");if(h){h.textContent=pad(d.getHours());mm.textContent=pad(d.getMinutes())}}
+tickClock();setInterval(tickClock,1000);
 
 /* ---------- Build: the schedule builder ---------- */
 function renderDay(){
