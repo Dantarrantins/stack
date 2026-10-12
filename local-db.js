@@ -4,7 +4,7 @@
    localStorage and seeded from seed.json. Only defined when window.claude is absent,
    so the same index.html still runs inside the Claude artifact. */
 (function () {
-  if (window.claude && window.claude.use) return;
+  /* Always use the on-device store in the web build (browser extensions can define their own window.claude). */
   const KEY = "stack:data:v1";
   let store = { seedVersion: 0, c: {} };
   try { const raw = localStorage.getItem(KEY); if (raw) store = JSON.parse(raw); } catch (e) {}
@@ -66,6 +66,7 @@
   }
   const db = { doc: docRef, collection: collRef };
   const user = { can: async () => true, isOwner: () => true, canEdit: () => true, id: async () => "local" };
-  window.claude = { use: async name => (name === "db" ? db : name === "user" ? user : null) };
+  const api = { use: async name => (name === "db" ? db : name === "user" ? user : null) };
+  try { Object.defineProperty(window, "claude", { value: api, writable: false, configurable: false }); } catch (e) { window.claude = api; }
   window.addEventListener("storage", e => { if (e.key === KEY) { try { store = JSON.parse(e.newValue); notify(); } catch (x) {} } });
 })();
