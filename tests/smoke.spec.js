@@ -78,6 +78,23 @@ test("sign-in screen, email link, and first sign-in brings this device's data ac
   await page.goto(await page.evaluate(() => window.__sentLink));
   await expect(page.locator(".gate")).toHaveCount(0);
   await expect(page.locator("#today-h")).toHaveText("Good afternoon, Dan");
-  await page.click("#rerun");
+  await page.click("#profile-btn");
   await expect(page.locator(".acct-who")).toHaveText("Signed in as dan@example.com");
+});
+
+test("profile page edits the name and interests", async ({ page }) => {
+  await setUp(page);
+  await page.click("#profile-btn");
+  await expect(page).toHaveURL(/#profile/);
+  const name = page.locator("#profile .namefield input");
+  await name.fill("Daniel");
+  await name.press("Enter");
+  await expect(page.locator(".pf-name")).toHaveText("Daniel");
+  await expect(page.locator("#avatar-i")).toHaveText("D");
+  const chip = page.locator("#profile .chip").first();
+  const before = await chip.getAttribute("aria-pressed");
+  await chip.click();
+  await expect(chip).not.toHaveAttribute("aria-pressed", before);
+  await page.getByRole("button", { name: "Today", exact: true }).click();
+  await expect(page.locator("#today-h")).toHaveText("Good afternoon, Daniel");
 });
