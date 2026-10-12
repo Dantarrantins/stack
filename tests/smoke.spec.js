@@ -119,3 +119,22 @@ test("habit slots cap stacking at 5, and people can create their own habits", as
   await expect(page.locator("#lib")).toContainText("Stretch for two minutes");
   await expect(page.locator("#lib")).toContainText("Your own");
 });
+
+test("people over their 5 slots choose which 5 to keep", async ({ page }) => {
+  await setUp(page);
+  await page.evaluate(() => {
+    const k = "stack:data:v1"; const s = JSON.parse(localStorage.getItem(k));
+    const a = Object.keys(s.c.anchors)[0]; let n = 0;
+    for (const h of Object.values(s.c.habits)) { if ((h.kind || "step") === "step" && !h.anchor && n < 6) { h.anchor = a; h.slot = s.c.anchors[a].slot; h.order = 50 + n; n++; } }
+    localStorage.setItem(k, JSON.stringify(s));
+  });
+  await page.reload();
+  await page.getByRole("button", { name: "Today", exact: true }).click();
+  await expect(page.locator("#routines .slots.over")).toBeVisible();
+  await page.locator(".slots-trim").first().click();
+  await expect(page.locator("#sheet-h")).toHaveText("Choose the 5 habits to keep");
+  await page.getByRole("button", { name: "Keep these 5" }).click();
+  await expect(page.locator("#routines .slots.over")).toHaveCount(0);
+  const stacked = await page.evaluate(() => Object.values(JSON.parse(localStorage.getItem("stack:data:v1")).c.habits).filter(h => h.anchor && (h.kind || "step") === "step").length);
+  expect(stacked).toBe(5);
+});
