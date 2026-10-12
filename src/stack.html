@@ -345,6 +345,8 @@ html,body{overflow-x:hidden}
 .pc-name{font-size:28px;font-weight:300;letter-spacing:-.01em;line-height:1.1}
 .pc-stat{font-size:13px;color:var(--muted)}
 .pc-show{display:grid;place-items:center;width:36px;height:36px;color:var(--muted)}
+.pc-up{border:0;background:none;padding:0;cursor:pointer;margin-left:4px}
+.pc-up svg{transform:rotate(180deg)}
 .pc-show svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 /* Top bar is see-through at the top of the page so the sky glow can sit behind it */
 .top{background:transparent!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;transition:background .25s}
@@ -744,7 +746,7 @@ function renderToday(){
       cel&&!reduced()?burst():null,
       el("div",{class:"rhead"},el("h2",{text:c.name}),label?el("span",{class:"nowtag"+(label==="Now"?" on":""),text:label}):null,steps.length&&dn+sk===steps.length&&dn?el("span",{class:"done-label",text:"Done"}):null,
         el("button",{class:"redit",onclick:()=>editChunk(c.id),"aria-label":`Edit ${c.name} in Build`},"Edit"),
-        state==="past"?el("button",{class:"mini",onclick:e=>{const sec=e.currentTarget.closest(".routine");const done=()=>{openPast.delete(c.id);fx.fold=c.id;fx.tf=Date.now();lastSig="";renderToday()};if(reduced()||!sec)return done();sec.classList.add("folding");setTimeout(done,320)},"aria-label":`Collapse ${c.name}`},"\u2303"):null),
+        state==="past"?el("button",{class:"pc-show pc-up",onclick:e=>{const sec=e.currentTarget.closest(".routine");const done=()=>{openPast.delete(c.id);fx.fold=c.id;fx.tf=Date.now();lastSig="";renderToday()};if(reduced()||!sec)return done();sec.classList.add("folding");setTimeout(done,320)},"aria-label":`Collapse ${c.name}`},chevSvg()):null),
       el("div",{class:"acts"},as.map(a=>{const st=stepsAt(a.id);
         return el("div",{class:"act"+(st.length?"":" quiet")},
           el("div",{class:"act-h"},el("span",{class:"act-time mono",text:fromM(sch.times[a.id].start)}),el("span",{class:"act-name",text:a.name})),
