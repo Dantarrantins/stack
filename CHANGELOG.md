@@ -7,5 +7,5 @@ Newest first. Each release bumps `VERSION` and adds a line here.
 - Today: time-of-day greeting, clock and sky glow; parts of the day collapse as they pass; "Not today" for habits you're skipping.
 - Build: parts of the day as tabs, Edit routine mode, drag to reorder, habit details and research.
 - Library of expert-backed habits, plus your own habits (create, edit, delete).
-- Habit slots: everyone has 5 stacked habits (anyone with more chooses which 5 to keep); keeping your last 7 days at 80%+ unlocks one more a week, up to 10.
+- Habit slots: 3 stacked habits per part of the day (anyone with more chooses which 3 to keep); keeping your last 7 days at 80%+ unlocks one more in each part, once a week, up to 6.
 - Profile page (name, interests, habit slots, account).

@@ -99,7 +99,7 @@ test("profile page edits the name and interests", async ({ page }) => {
   await expect(page.locator("#today-h")).toHaveText("Good afternoon, Daniel");
 });
 
-test("habit slots cap stacking at 5, and people can create their own habits", async ({ page }) => {
+test("habit slots cap each part of the day at 3, and people can create their own habits", async ({ page }) => {
   await setUp(page);
   await page.getByRole("button", { name: "Build", exact: true }).click();
   await page.locator(".stacklink").first().click();
@@ -108,9 +108,9 @@ test("habit slots cap stacking at 5, and people can create their own habits", as
     if (!(await add.count())) break;
     await add.click();
   }
-  await expect(page.locator(".sheet .slots-t")).toHaveText("5 of 5 habit slots");
+  await expect(page.locator(".sheet .slots-t")).toHaveText(/^3 of 3 slots in /);
   await page.locator('.pickrow .pr-add:text-is("Full")').first().click();
-  await expect(page.locator("#sheet-h")).toHaveText("All 5 slots are in use");
+  await expect(page.locator("#sheet-h")).toHaveText(/ is full$/);
   await page.locator(".sheet .iconbtn").click();
   await page.getByRole("button", { name: "Library", exact: true }).click();
   await page.click("#create-habit");
@@ -120,7 +120,7 @@ test("habit slots cap stacking at 5, and people can create their own habits", as
   await expect(page.locator("#lib")).toContainText("Your own");
 });
 
-test("people over their 5 slots choose which 5 to keep", async ({ page }) => {
+test("people over 3 in a part of the day choose which 3 to keep", async ({ page }) => {
   await setUp(page);
   await page.evaluate(() => {
     const k = "stack:data:v1"; const s = JSON.parse(localStorage.getItem(k));
@@ -132,9 +132,10 @@ test("people over their 5 slots choose which 5 to keep", async ({ page }) => {
   await page.getByRole("button", { name: "Today", exact: true }).click();
   await expect(page.locator("#routines .slots.over")).toBeVisible();
   await page.locator(".slots-trim").first().click();
-  await expect(page.locator("#sheet-h")).toHaveText("Choose the 5 habits to keep");
-  await page.getByRole("button", { name: "Keep these 5" }).click();
+  await expect(page.locator("#sheet-h")).toHaveText(/^Choose 3 for /);
+  await page.getByRole("button", { name: "Keep these 3" }).click();
   await expect(page.locator("#routines .slots.over")).toHaveCount(0);
-  const stacked = await page.evaluate(() => Object.values(JSON.parse(localStorage.getItem("stack:data:v1")).c.habits).filter(h => h.anchor && (h.kind || "step") === "step").length);
-  expect(stacked).toBe(5);
+  const perChunk = await page.evaluate(() => { const c = JSON.parse(localStorage.getItem("stack:data:v1")).c; const n = {};
+    for (const h of Object.values(c.habits)) if (h.anchor && (h.kind || "step") === "step") { const s = (c.anchors[h.anchor] || {}).slot; n[s] = (n[s] || 0) + 1; } return Math.max(...Object.values(n)); });
+  expect(perChunk).toBeLessThanOrEqual(3);
 });

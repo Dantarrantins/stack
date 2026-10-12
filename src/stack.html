@@ -646,45 +646,47 @@ function stats(){
 }
 
 /* ---------- Habit slots ----------
-   Everyone starts with BASE_SLOTS stacked habits. Keeping the last 7 full days at 80%+ unlocks one more slot,
-   at most one a week, up to MAX_FREE_SLOTS. settings.plan==="plus" (future paid tier) removes the limit.
-   Note: this is enforced in the app; a paid tier will also need a server-side check. */
-const BASE_SLOTS=5,MAX_FREE_SLOTS=10,UNLOCK_RATE=80,UNLOCK_DAYS=7;
+   Each part of the day starts with BASE_SLOTS stacked habits. Keeping the last 7 full days at 80%+ unlocks one more
+   slot in every part of the day, at most once a week, up to MAX_FREE_SLOTS each. settings.plan==="plus" (future paid tier)
+   removes the limit. Note: enforced in the app; a paid tier will also need a server-side check. */
+const BASE_SLOTS=3,MAX_FREE_SLOTS=6,UNLOCK_RATE=80,UNLOCK_DAYS=7;
 const isStacked=h=>!!h.anchor&&(h.kind||"step")==="step";
-function slotInfo(){
-  const used=habits.filter(isStacked).length;const plus=settings&&settings.plan==="plus";
+const chunkOf=h=>((anchorById(h.anchor)||{}).slot)||h.slot;
+function slotInfo(cid){
+  const plus=settings&&settings.plan==="plus";
+  const used=habits.filter(h=>isStacked(h)&&(!cid||chunkOf(h)===cid)).length;
   const earned=Math.max(BASE_SLOTS,(settings&&settings.slots)||0);
   const last7=[...Array(UNLOCK_DAYS)].map((_,i)=>{const d=new Date(today);d.setDate(d.getDate()-1-i);return dkey(d)});
   const week=Math.round(last7.reduce((a,k)=>a+dayRate(k),0)/UNLOCK_DAYS*100);
   const since=settings&&settings.slotAt?Math.round((new Date(todayKey+"T12:00:00")-new Date(settings.slotAt+"T12:00:00"))/864e5):UNLOCK_DAYS;
   const wait=Math.max(0,UNLOCK_DAYS-since);
-  return{used,limit:plus?Infinity:earned,earned,plus,full:!plus&&used>=earned,over:!plus&&used>earned,week,wait,maxed:earned>=MAX_FREE_SLOTS};
+  return{cid,name:cid?chunkName(cid):"",used,limit:plus?Infinity:earned,earned,plus,full:!!cid&&!plus&&used>=earned,over:!!cid&&!plus&&used>earned,week,wait,maxed:earned>=MAX_FREE_SLOTS};
 }
+const overChunks=()=>chunks().filter(c=>slotInfo(c.id).over);
 function slotsLine(si){
   if(si.plus)return"Unlimited habit slots";
-  if(si.maxed)return`${si.used} of ${si.earned} slots used \u00B7 all free slots unlocked`;
+  if(si.maxed)return`All free slots unlocked \u00B7 ${si.earned} per part of the day`;
   return si.wait?`Next slot can unlock in ${si.wait} day${si.wait>1?"s":""} if you keep the week at ${UNLOCK_RATE}%+ (now ${si.week}%)`
-    :`Keep your last 7 days at ${UNLOCK_RATE}%+ to unlock another slot (now ${si.week}%)`;
+    :`Keep your last 7 days at ${UNLOCK_RATE}%+ to unlock another slot in each part of the day (now ${si.week}%)`;
 }
-function slotMeter(si){
+function slotMeter(si,compact){
   if(si.plus)return el("div",{class:"slots"},el("span",{class:"slots-t",text:"Unlimited slots"}));
   if(si.over)return el("div",{class:"slots over"},
-    el("span",{class:"slots-t",text:`${si.used} habits stacked \u00B7 ${si.earned} slots`}),
-    el("button",{class:"btn primary slots-trim",onclick:()=>{sheet={type:"trim"};renderSheet();focusSheet()},disabled:!can()},`Choose your ${si.earned}`));
+    el("span",{class:"slots-t",text:`${si.name}: ${si.used} habits stacked \u00B7 ${si.earned} slots`}),
+    el("button",{class:"btn primary slots-trim",onclick:()=>{sheet={type:"trim",cid:si.cid};renderSheet();focusSheet()},disabled:!can()},`Choose your ${si.earned}`));
   return el("div",{class:"slots",title:slotsLine(si)},
     el("span",{class:"slot-dots","aria-hidden":"true"},[...Array(si.earned)].map((_,i)=>el("i",{class:i<si.used?"on":null}))),
-    el("span",{class:"slots-t",text:`${Math.min(si.used,si.earned)} of ${si.earned} habit slots`}),
-    el("button",{class:"slots-why",onclick:()=>{sheet={type:"slots"};renderSheet();focusSheet()}},"How to unlock more"));
+    el("span",{class:"slots-t",text:`${Math.min(si.used,si.earned)} of ${si.earned} slots${si.name?" in "+si.name.toLowerCase():""}`}),
+    compact?null:el("button",{class:"slots-why",onclick:()=>{sheet={type:"slots",cid:si.cid};renderSheet();focusSheet()}},"How to unlock more"));
 }
-/* First run: start everyone on 5 (or on what they already have stacked), then check weekly for an unlock */
+/* Everyone starts on BASE_SLOTS per part of the day; extra habits already stacked are trimmed by the person (nothing is removed automatically) */
 async function checkSlots(){
   if(!settings||!canWrite||!db)return;
-  /* Everyone starts on BASE_SLOTS; extra habits already stacked have to be trimmed (nothing is removed automatically) */
-  if(!settings.slots||!settings.slotsV2){await saveSettings({slots:BASE_SLOTS,slotAt:todayKey,slotsV2:true});return}
+  if(!settings.slots||!settings.slotsV3){await saveSettings({slots:BASE_SLOTS,slotAt:todayKey,slotsV3:true});return}
   const si=slotInfo();if(si.plus||si.maxed||si.wait)return;
   const keys=Object.keys(checkins).sort();const first=keys[0];
   if(!first||Math.round((new Date(todayKey+"T12:00:00")-new Date(first+"T12:00:00"))/864e5)<UNLOCK_DAYS)return;
-  if(si.week>=UNLOCK_RATE){await saveSettings({slots:si.earned+1,slotAt:todayKey});fx.slot=Date.now();toast(`New habit slot unlocked \u00B7 ${si.earned+1} slots`)}
+  if(si.week>=UNLOCK_RATE){await saveSettings({slots:si.earned+1,slotAt:todayKey});fx.slot=Date.now();toast(`New slot unlocked \u00B7 ${si.earned+1} per part of the day`)}
 }
 
 /* ---------- Shared rows ---------- */
@@ -748,7 +750,7 @@ function renderToday(){
   if(st)sb.append(el("span",{},el("b",{text:st.today+"%"})," today"),el("span",{},el("b",{text:st.week+"%"})," last 7 days"),el("span",{},el("b",{text:st.overall+"%"})," average"));
   const box=$("routines");box.replaceChildren();
   if(!loaded){box.append(el("p",{class:"sub",text:"Loading…"}));return}
-  {const si=slotInfo();if(si.over)box.append(slotMeter(si))}
+  overChunks().forEach(c=>box.append(slotMeter(slotInfo(c.id))));
   if(!all.length){box.append(el("div",{class:"emptycard"},el("p",{text:"Nothing stacked yet."}),el("button",{class:"btn primary",onclick:()=>go("day")},"Open Build")));return}
   const live=cs.filter(c=>anchorsIn(c.id).length||cs.length<2);
   let nextMarked=false;
@@ -798,7 +800,7 @@ function renderDay(){
     el("div",{class:"daytabs",role:"tablist","aria-label":"Parts of the day"},cs0.map(c=>el("button",{role:"tab","aria-selected":String(c.id===buildSel),onclick:()=>{if(buildSel!==c.id){buildSel=c.id;fx.btab=c.id;fx.bt=Date.now();renderDay()}}},
       autoC&&c.id===autoC.id?el("span",{class:"dt-now","aria-hidden":"true"}):null,el("span",{text:c.name}))),
       editMode?el("button",{class:"dt-add","aria-label":"Add a part of the day",title:"Add a part of the day",onclick:addChunk,disabled:!can()},"+ Add"):null)));
-  if(!editMode)box.append(slotMeter(slotInfo()));
+  if(!editMode&&buildSel)box.append(slotMeter(slotInfo(buildSel)));
   if(editMode)box.append(el("p",{class:"sub modehint",text:"Rename, retime, reorder or remove the things you already do. Your stacked habits are locked while you edit."}));
   const tr=null,ta=null; /* "Try this week" card retired */
   if(tr&&ta)box.append(el("div",{class:"trial"+(Date.now()-fx.swap<900?" in":"")},
@@ -937,25 +939,25 @@ function renderSheet(){
   root.replaceChildren();
   const frame=(...kids)=>{const s=el("aside",{class:"sheet"+(keepScroll?" still":""),role:"dialog","aria-modal":"true","aria-labelledby":"sheet-h"},...kids);root.append(el("div",{class:"scrim"+(keepScroll?" still":""),onclick:closeSheet}),s);s.scrollTop=keepScroll};
   if(sheet.type==="slots"){
-    const si=slotInfo();
+    const si=slotInfo(sheet.cid);
     frame(el("div",{class:"sheet-top"},el("span",{class:"kv",text:"Habit slots"}),el("button",{class:"iconbtn",onclick:closeSheet},"OK")),
-      el("h2",{id:"sheet-h",text:sheet.blocked?`All ${si.earned} slots are in use`:`${si.used} of ${si.earned} slots in use`}),
-      slotMeter(si),
-      el("p",{class:"why",text:"Stack works best when you grow slowly. You start with "+BASE_SLOTS+" habit slots and earn more by keeping your habits going."}),
+      el("h2",{id:"sheet-h",text:sheet.blocked?`${si.name} is full`:si.cid?`${si.used} of ${si.earned} slots in ${si.name.toLowerCase()}`:"Habit slots"}),
+      si.cid?slotMeter(si,true):null,
+      el("p",{class:"why",text:`Stack works best when you grow slowly. Each part of the day starts with ${BASE_SLOTS} habit slots, and you earn more by keeping your habits going.`}),
       el("div",{class:"sec"},el("h3",{text:"How to unlock more"}),
-        el("p",{text:`Keep your last 7 days at ${UNLOCK_RATE}% or more and a new slot unlocks, one a week, up to ${MAX_FREE_SLOTS}. Days marked "Not today" don't count against you.`}),
+        el("p",{text:`Keep your last 7 days at ${UNLOCK_RATE}% or more and every part of the day gets another slot, one a week, up to ${MAX_FREE_SLOTS}. Days marked "Not today" don't count against you.`}),
         el("p",{class:"slot-now",text:slotsLine(si)})),
-      sheet.blocked?el("div",{class:"sec"},el("h3",{text:"Need room now?"}),el("p",{text:"Remove a habit you've stopped doing from Build, then add the new one."})):null,
+      sheet.blocked?el("div",{class:"sec"},el("h3",{text:"Need room now?"}),el("p",{text:`Remove a habit from ${si.name.toLowerCase()} you've stopped doing, then add the new one, or stack it in another part of the day.`})):null,
       el("p",{class:"sub",style:{fontSize:"13.5px"},text:"More slots with Stack Plus are coming later."}));
     return;
   }
   if(sheet.type==="trim"){
-    const si=slotInfo();const all=chunks().flatMap(c=>anchorsIn(c.id).flatMap(a=>stepsAt(a.id))).filter(isStacked);
+    const si=slotInfo(sheet.cid);const all=anchorsIn(sheet.cid).flatMap(a=>stepsAt(a.id)).filter(isStacked);
     if(!sheet.keep)sheet.keep=new Set(all.slice(0,si.earned).map(h=>h.id));
     const k=sheet.keep;const n=k.size;
     frame(el("div",{class:"sheet-top"},el("span",{class:"kv",text:"Habit slots"}),el("button",{class:"iconbtn",onclick:closeSheet},"Cancel")),
-      el("h2",{id:"sheet-h",text:`Choose the ${si.earned} habits to keep`}),
-      el("p",{class:"sub",style:{marginTop:0},text:`You have ${si.earned} slots. The rest go back to your Library, where you can stack them again as you unlock more slots.`}),
+      el("h2",{id:"sheet-h",text:`Choose ${si.earned} for ${si.name.toLowerCase()}`}),
+      el("p",{class:"sub",style:{marginTop:0},text:`Each part of the day has ${si.earned} slots. The rest go back to your Library, where you can stack them again as you unlock more slots.`}),
       el("div",{class:"picklist"},all.map(h=>{const on=k.has(h.id);const a=anchorById(h.anchor);
         return el("button",{class:"pickrow"+(on?" added":""),"aria-pressed":String(on),onclick:()=>{on?k.delete(h.id):k.size<si.earned&&k.add(h.id);renderSheet()}},dot(h.category),
           el("span",{class:"pr-main"},el("span",{class:"pr-t",text:h.short||h.title}),el("span",{class:"pr-m",text:a?`${chunkName(a.slot)} \u00B7 after ${a.name.toLowerCase()}`:""})),
@@ -969,7 +971,7 @@ function renderSheet(){
     const save=async e=>{e.preventDefault();const t=d.title.trim();if(!t||!db)return;
       const id=uid("u");const h={title:t,short:t,custom:true,kind:"step",status:"library",category:d.category,effort:`${d.mins} min`,why:d.why.trim(),fits:[],expert:"",added:todayKey};
       try{await db.doc("habits/"+id).set(h);
-        if(a&&!slotInfo().full){await place({id,...h},a.id,true);toast(`Created and stacked after ${a.name.toLowerCase()}`)}else toast(a?"Created. Free a slot to stack it":"Created \u00B7 find it in your Library")}catch(x){showErr(x)}
+        if(a&&!slotInfo(a.slot).full){await place({id,...h},a.id,true);toast(`Created and stacked after ${a.name.toLowerCase()}`)}else toast(a?"Created. Free a slot to stack it":"Created \u00B7 find it in your Library")}catch(x){showErr(x)}
       closeSheet()};
     frame(el("div",{class:"sheet-top"},el("span",{class:"kv",text:a?`${chunkName(a.slot)} \u00B7 after ${a.name.toLowerCase()}`:"Your own habit"}),el("button",{class:"iconbtn",onclick:closeSheet},"Cancel")),
       el("h2",{id:"sheet-h",text:sheet.editId?"Edit your habit":"Create your own habit"}),
@@ -978,18 +980,18 @@ function renderSheet(){
         el("label",{class:"namefield"},"How long does it take?",el("select",{class:"cr-sel",onchange:e=>{d.mins=+e.target.value}},[1,2,3,5,10,15,20,30].map(m=>el("option",{value:m,selected:d.mins===m,text:`${m} min`})))),
         el("div",{class:"namefield"},"Area",el("div",{class:"tools"},CATS.map(([c])=>el("button",{type:"button",class:"chip","aria-pressed":String(d.category===c),onclick:()=>{d.category=c;renderSheet()}},dot(c),c)))),
         el("label",{class:"namefield"},"Why it matters to you (optional)",el("textarea",{rows:"3",maxlength:"400",placeholder:"A line to remind yourself",oninput:e=>{d.why=e.target.value}},d.why)),
-        el("button",{class:"btn primary",type:"submit",disabled:!can()},sheet.editId?"Save":a&&!slotInfo().full?"Create and stack it":"Create habit")));
+        el("button",{class:"btn primary",type:"submit",disabled:!can()},sheet.editId?"Save":a&&!slotInfo(a.slot).full?"Create and stack it":"Create habit")));
     return;
   }
   if(sheet.type==="pick"){
     const a=anchorById(sheet.anchorId);if(!a){sheet=null;return}
-    const si=slotInfo();
+    const si=slotInfo(a.slot);
     const cand=habits.filter(h=>(h.kind||"step")==="step");
     const good=cand.filter(h=>fitsAnchor(h,a)),rest=cand.filter(h=>!fitsAnchor(h,a));
     const row=h=>{const here=h.anchor===a.id;const at=!here&&h.anchor&&anchorById(h.anchor);
       return el("button",{class:"pickrow"+(here?" added":""),onclick:()=>here?unplace(h):place(h,a.id,true)},dot(h.category),
         el("span",{class:"pr-main"},el("span",{class:"pr-t",text:h.short||h.title}),el("span",{class:"pr-m",text:[h.expert,`${hMins(h)} min`,at?`now after ${at.name.toLowerCase()}`:""].filter(Boolean).join(" · ")})),
-        el("span",{class:"pr-add"+(!here&&!at&&si.full?" off":""),text:here?"Added ✓":at?"Move here":si.full?"Full":"Add"}))};
+        el("span",{class:"pr-add"+(!here&&si.full&&!(at&&at.slot===a.slot)?" off":""),text:here?"Added ✓":si.full&&!(at&&at.slot===a.slot)?"Full":at?"Move here":"Add"}))};
     const mine=cand.filter(h=>h.custom);
     const n=stepsAt(a.id).length;
     frame(el("div",{class:"sheet-top"},el("span",{class:"kv",text:`${chunkName(a.slot)} · ${a.name}`}),el("button",{class:"iconbtn",onclick:closeSheet},n?"Done":"Close")),
@@ -1046,7 +1048,7 @@ function renderAll(){if(drag)return;renderToday();renderDay();renderCats();rende
 /* ---------- Writes ---------- */
 async function place(h,aid,stayOpen){
   if(!db)return;const a=anchorById(aid);if(!a)return;
-  if(!h.anchor&&slotInfo().full){sheet={type:"slots",blocked:true};renderSheet();focusSheet();return}
+  if((!h.anchor||chunkOf(h)!==a.slot)&&slotInfo(a.slot).full){sheet={type:"slots",blocked:true,cid:a.slot};renderSheet();focusSheet();return}
   const order=Math.max(0,...stepsAt(aid).filter(x=>x.id!==h.id).map(x=>x.order||0))+1;
   fx.arrive=h.id;fx.ta=Date.now();fx.swap=Date.now();buzz(10);
   try{await db.doc("habits/"+h.id).update({anchor:aid,slot:a.slot,order,after:null});if(!stayOpen)toast(`Stacked after ${a.name.toLowerCase()}`)}catch(e){showErr(e)}
@@ -1186,11 +1188,12 @@ async function finishSetup(){
       else{const id=uid("a");created.set(m,id);await db.doc("anchors/"+id).set({name:m.name,slot:m.chunk,order:counters[m.chunk],kind:kindFor(m.name,m.chunk),duration:m.duration||5})}
     }catch(e){showErr(e)}
   }
-  if(!s.editOnly&&!(settings&&settings.slots))await saveSettings({slots:BASE_SLOTS,slotAt:todayKey});
-  let room=slotInfo().limit-habits.filter(isStacked).length;
-  if(!s.editOnly)for(const hid of s.starters){if(room<=0)break;room--;
+  if(!s.editOnly&&!(settings&&settings.slotsV3))await saveSettings({slots:BASE_SLOTS,slotAt:todayKey,slotsV3:true});
+  const room={};
+  if(!s.editOnly)for(const hid of s.starters){
     const h=habits.find(x=>x.id===hid);if(!h)continue;
     const m=s.acts.find(m=>m.on&&valid.has(m.chunk)&&fitsOf(h).includes(kindFor(m.name,m.chunk)));if(!m)continue;
+    if(room[m.chunk]===undefined)room[m.chunk]=slotInfo().limit-slotInfo(m.chunk).used;if(room[m.chunk]<=0)continue;room[m.chunk]--;
     const aid=m.id||created.get(m);if(!aid)continue;
     try{await db.doc("habits/"+hid).update({anchor:aid,slot:m.chunk,order:99,after:null})}catch(e){showErr(e)}
   }
@@ -1221,7 +1224,7 @@ function renderProfile(){
       el("p",{class:"sub",text:"Stack suggests habits from these areas."}),
       el("div",{class:"tools"},CATS.map(([c])=>el("button",{class:"chip","aria-pressed":String(ints.has(c)),disabled:!can(),onclick:()=>{
         const n=new Set(ints);n.has(c)?n.delete(c):n.add(c);if(!n.size)return;saveSettings({interests:[...n]})}},dot(c),c)))),
-    el("section",{class:"pf-card"},el("h2",{text:"Habit slots"}),slotMeter(slotInfo()),el("p",{class:"sub",text:slotsLine(slotInfo())})),
+    el("section",{class:"pf-card"},el("h2",{text:"Habit slots"}),...chunks().map(c=>slotMeter(slotInfo(c.id),true)),el("p",{class:"sub",text:slotsLine(slotInfo())})),
     el("section",{class:"pf-card"},el("h2",{text:"Your day"}),
       el("p",{class:"sub",text:"Walk through setup again to reshape the parts of your day and what you already do."}),
       el("div",{class:"btns"},el("button",{class:"btn",onclick:()=>openSetup(),disabled:!can()},"Run setup again"),el("button",{class:"btn",onclick:()=>go("day")},"Open Build"))),
