@@ -96,6 +96,9 @@ h2{font-size:28px;font-weight:300;letter-spacing:-.01em;line-height:1.1;margin:0
 .rdot{display:none}
 .rhead h2{flex:1}
 .rmeta{color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
+.redit{margin-left:auto;font:inherit;font-size:14px;color:var(--muted);background:none;border:0;padding:6px 0 6px 10px;cursor:pointer;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:3px;transition:color .15s,text-decoration-color .15s}
+#plan .chunk{scroll-margin-top:90px}
+.redit:hover,.redit:focus-visible{color:var(--ink);text-decoration-color:currentColor}
 .rbody{display:grid}
 .anchor{padding:14px 0 10px;border-top:1px solid var(--line)}
 .aname{font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
@@ -658,7 +661,7 @@ function renderToday(){
     box.append(el("section",{class:"routine"+(cel?" celebrate":"")+(fx.unfold===c.id&&Date.now()-fx.tu<800?" unfolding":"")+(state==="now"?" is-now":""),style:{background:soft(c.id)},"aria-label":c.name},
       cel&&!reduced()?burst():null,
       el("div",{class:"rhead"},el("h2",{text:c.name}),label?el("span",{class:"nowtag"+(label==="Now"?" on":""),text:label}):null,steps.length&&dn+sk===steps.length&&dn?el("span",{class:"done-label",text:"Done"}):null,
-        el("span",{class:"rmeta mono",text:`${fromM(toM(c.time))}–${fromM(sch.end)}`+(steps.length?` · ${dn}/${due}`:"")}),
+        el("button",{class:"redit",onclick:()=>editChunk(c.id),"aria-label":`Edit ${c.name} in Build`},"Edit"),
         state==="past"?el("button",{class:"mini",onclick:e=>{const sec=e.currentTarget.closest(".routine");const done=()=>{openPast.delete(c.id);fx.fold=c.id;fx.tf=Date.now();lastSig="";renderToday()};if(reduced()||!sec)return done();sec.classList.add("folding");setTimeout(done,320)},"aria-label":`Collapse ${c.name}`},"\u2303"):null),
       el("div",{class:"acts"},as.map(a=>{const st=stepsAt(a.id);
         return el("div",{class:"act"+(st.length?"":" quiet")},
@@ -695,7 +698,7 @@ function renderDay(){
   const cs=chunks();
   cs.forEach(c=>{
     const as=anchorsIn(c.id);const sch=schedule(c.id);
-    box.append(el("section",{class:"chunk"+(editMode?" editing":""),style:{background:soft(c.id)},"aria-label":c.name},
+    box.append(el("section",{"data-chunk":c.id,class:"chunk"+(editMode?" editing":""),style:{background:soft(c.id)},"aria-label":c.name},
       el("div",{class:"chead"},
         editMode?el("input",{class:"ename ename-chunk",value:c.name,"data-key":"c-"+c.id,"aria-label":"Part of the day name",disabled:!can(),onchange:e=>{const v=e.target.value.trim();if(v&&v!==c.name)saveChunks(chunks().map(x=>x.id===c.id?{...x,name:v}:x))},onkeydown:e=>{if(e.key==="Enter")e.target.blur()}}):el("h2",{text:c.name}),
         editMode?el("label",{class:"act-time mono"},el("input",{type:"time",value:c.time,"aria-label":`${c.name} starts`,disabled:!can(),onchange:e=>{if(e.target.value)saveChunks(chunks().map(x=>x.id===c.id?{...x,time:e.target.value}:x))}})):el("span",{class:"rmeta mono",text:as.length?`until ${fromM(sch.end)}`:""}),
@@ -862,6 +865,8 @@ function openRename(c){
 }
 
 /* ---------- Routing ---------- */
+/* Today → Build, scrolled to that part of the day */
+function editChunk(id){go("day");requestAnimationFrame(()=>{const sec=document.querySelector(`#plan [data-chunk="${id}"]`);if(sec)sec.scrollIntoView({block:"start",behavior:reduced()?"auto":"smooth"})})}
 function go(v){if(!["today","day","library"].includes(v))v="today";try{history.replaceState(null,"","#"+v)}catch(e){}show(v)}
 function show(v){["today","day","library"].forEach(x=>{const e=$("v-"+x);e.hidden=x!==v;if(x===v){e.classList.remove("enter");void e.offsetWidth;e.classList.add("enter")}});document.querySelectorAll(".tabs button").forEach(b=>b.setAttribute("aria-current",b.dataset.view===v?"page":"false"));window.scrollTo(0,0);if(v==="today")fitHello()}
 document.querySelectorAll(".tabs button").forEach(b=>b.addEventListener("click",()=>go(b.dataset.view)));
