@@ -346,6 +346,11 @@ body.scrolled .top{background:color-mix(in srgb,var(--bg) 88%,transparent)!impor
 .daytabs button[aria-selected="true"]{background:var(--chip-on-bg);color:var(--chip-on-ink)}
 .dt-now{width:6px;height:6px;border-radius:50%;background:var(--accent)}
 .daytabs button[aria-selected="true"] .dt-now{background:currentColor}
+.dayhead{display:flex;align-items:center;justify-content:space-between;gap:12px}
+#edit-toggle{white-space:nowrap;flex:0 0 auto}
+#edit-toggle[aria-pressed="true"]{background:var(--chip-on-bg);color:var(--chip-on-ink);border-color:var(--chip-on-bg)}
+.dt-add{flex:0 0 auto;border:1px dashed var(--line);background:transparent;color:var(--muted);font:inherit;font-size:14px;padding:8px 14px;border-radius:999px;cursor:pointer;white-space:nowrap}
+.dt-add:hover{color:var(--ink);border-color:var(--muted)}
 .edittoggle{font:inherit;font-size:14px;background:none;border:0;padding:8px 2px;color:var(--muted);cursor:pointer;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:3px;white-space:nowrap}
 .edittoggle:hover,.edittoggle:focus-visible{color:var(--ink);text-decoration-color:currentColor}
 .edittoggle[aria-pressed="true"]{color:var(--ink);font-weight:500}
@@ -458,11 +463,10 @@ body.scrolled .top{background:color-mix(in srgb,var(--bg) 88%,transparent)!impor
 
   <section class="view" id="v-day" aria-labelledby="day-h" hidden>
     <div>
-      <h1 id="day-h">Build your day</h1>
+      <div class="dayhead"><h1 id="day-h">Build your day</h1><button class="iconbtn" id="edit-toggle" type="button" aria-pressed="false" hidden>Edit</button></div>
       <p class="sub">The things you already do, in order, with new habits stacked underneath. Times shift to fit as you stack.</p>
     </div>
     <div class="plan" id="plan"></div>
-    <div class="btns"><button class="btn" id="add-chunk" type="button" hidden>+ Add a part of the day</button></div>
   </section>
 
   <section class="view" id="v-library" aria-labelledby="lib-h" hidden>
@@ -684,11 +688,11 @@ function renderDay(){
   /* Parts of the day as tabs; opens on the part you're in now */
   const m0=nowMins();const autoC=[...cs0].reverse().find(c=>m0>=toM(c.time))||cs0[0];
   if(!cs0.some(c=>c.id===buildSel))buildSel=autoC&&autoC.id;
+  const et=$("edit-toggle");et.hidden=false;et.setAttribute("aria-pressed",String(editMode));et.textContent=editMode?"Done":"Edit";et.setAttribute("aria-label",editMode?"Finish editing your routine":"Edit your routine");
   box.append(el("div",{class:"buildbar"},
     el("div",{class:"daytabs",role:"tablist","aria-label":"Parts of the day"},cs0.map(c=>el("button",{role:"tab","aria-selected":String(c.id===buildSel),onclick:()=>{if(buildSel!==c.id){buildSel=c.id;fx.btab=c.id;fx.bt=Date.now();renderDay()}}},
-      autoC&&c.id===autoC.id?el("span",{class:"dt-now","aria-hidden":"true"}):null,el("span",{text:c.name})))),
-    el("button",{class:"edittoggle","aria-pressed":String(editMode),onclick:()=>{editMode=!editMode;renderDay()}},editMode?"Done editing":"Edit routine")));
-  $("add-chunk").hidden=!editMode;
+      autoC&&c.id===autoC.id?el("span",{class:"dt-now","aria-hidden":"true"}):null,el("span",{text:c.name}))),
+      editMode?el("button",{class:"dt-add","aria-label":"Add a part of the day",title:"Add a part of the day",onclick:addChunk,disabled:!can()},"+ Add"):null)));
   if(editMode)box.append(el("p",{class:"sub modehint",text:"Rename, retime, reorder or remove the things you already do. Your stacked habits are locked while you edit."}));
   const tr=!editMode&&trial(),ta=tr&&firstFit(tr);
   if(tr&&ta)box.append(el("div",{class:"trial"+(Date.now()-fx.swap<900?" in":"")},
@@ -921,7 +925,8 @@ function showErr(e){
   if(e&&e.code==="invalid_argument"){canWrite=false;s.textContent="This view is read-only, so changes can't be saved.";renderAll()}
   else s.textContent="That change didn't save. Try again in a moment.";
 }
-$("add-chunk").addEventListener("click",()=>{if(!can())return;const cs=chunks();const last=cs[cs.length-1];const t=last?Math.min(toM(last.time)+180,23*60):20*60;const id=uid("c");buildSel=id;saveChunks([...cs,{id,name:"Late evening",time:fromM(t)}])});
+$("edit-toggle").addEventListener("click",()=>{editMode=!editMode;renderDay()});
+function addChunk(){if(!can())return;const cs=chunks();const last=cs[cs.length-1];const t=last?Math.min(toM(last.time)+180,23*60):20*60;const id=uid("c");buildSel=id;saveChunks([...cs,{id,name:"Late evening",time:fromM(t)}])}
 
 /* ---------- One-time upgrade: grouped moments become individual actions ---------- */
 /* Remove accidental duplicates (same action twice in one part of the day), keeping their habits */

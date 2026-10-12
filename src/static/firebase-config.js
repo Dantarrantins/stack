@@ -13,7 +13,14 @@
       messagingSenderId: "472991282036",
       appId: "1:472991282036:web:007abc973c23c39bc77221"
     },
-    preview: null // filled in once the preview project exists
+    preview: {
+      apiKey: "AIzaSyCj_AQZQRwSx4Xt712ChkYumJP159pgkWM",
+      authDomain: "stack-preview.firebaseapp.com",
+      projectId: "stack-preview",
+      storageBucket: "stack-preview.firebasestorage.app",
+      messagingSenderId: "1071410364946",
+      appId: "1:1071410364946:web:a6689a8d8aad6753a18ecb"
+    }
   };
   const LIVE_HOSTS = ["dantarrantins.github.io", "stack-app.pages.dev", "stack.design-narrative.com"];
   const host = location.hostname;

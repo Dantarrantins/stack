@@ -51,9 +51,12 @@ test("Build shows one part of the day at a time and can switch to editing", asyn
   await expect(page.locator("#plan .chunk")).toHaveCount(1);
   await page.locator("#plan .daytabs").getByText("Evening").click();
   await expect(page.locator("#plan .chunk h2")).toHaveText("Evening");
-  await page.locator(".edittoggle").click();
+  await page.locator("#edit-toggle").click();
   await expect(page.locator("#plan .ename").first()).toBeVisible();
-  await expect(page.locator(".edittoggle")).toHaveText("Done editing");
+  await expect(page.locator("#edit-toggle")).toHaveText("Done");
+  await expect(page.locator(".dt-add")).toBeVisible();
+  await page.locator("#edit-toggle").click();
+  await expect(page.locator(".dt-add")).toHaveCount(0);
 });
 
 test("sign-in screen, email link, and first sign-in brings this device's data across", async ({ page }) => {
