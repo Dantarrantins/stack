@@ -241,9 +241,9 @@ h2{font-size:28px;font-weight:300;letter-spacing:-.01em;line-height:1.1;margin:0
 .chev-i{display:inline-block;transition:transform .2s;font-size:14px;line-height:1;transform:translateY(-3px)}
 .chev-i.open{transform:rotate(180deg) translateY(-1px)}
 .hdet{grid-column:1/-1;margin:0 0 10px 30px;padding:2px 0 4px;display:grid;gap:8px}
-.sname-edit{flex:1;min-width:0;font:inherit;font-size:inherit;font-weight:inherit;color:var(--ink);background:transparent;border:0;border-bottom:1px dashed var(--faint);border-radius:0;padding:2px 0;outline:none}
+.sname-edit{width:100%;box-sizing:border-box;min-width:0;font:inherit;font-size:inherit;font-weight:inherit;color:var(--ink);background:transparent;border:0;border-bottom:1px dashed var(--faint);border-radius:0;padding:2px 0;outline:none}
 .sname-edit:focus{border-bottom-color:var(--accent)}
-.hd-side{display:inline-flex;align-items:center;gap:2px}
+.hd-side{display:inline-flex;align-items:center;gap:2px;justify-self:end}
 .hdet-bin{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;border:0;background:transparent;color:var(--muted);cursor:pointer}
 .hdet-bin:hover{color:var(--warn);background:color-mix(in srgb,var(--warn) 10%,transparent)}
 .hdet-bin svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
@@ -701,7 +701,7 @@ function habitRow(h,opts={}){
       el("p",{class:"hdet-why",text:h.why||h.detail}),
       h.research?el("p",{class:"hdet-res"},el("b",{text:"Research: "}),h.research):null,
       h.caveat?el("p",{class:"caveat",style:{margin:0}},el("b",{text:h.flag?"Check first: ":"Note: "}),h.caveat):null,
-      el("div",{class:"kv hdet-tags"},dot(h.category),el("span",{text:h.category}),el("span",{text:`${hMins(h)} min`}),el("span",{text:h.expert}),
+      el("div",{class:"kv hdet-tags"},el("span",{text:h.category}),el("span",{text:`${hMins(h)} min`}),el("span",{text:h.expert}),
         h.listen?el("a",{class:"hdet-sp",href:h.listen.url,target:"_blank",rel:"noopener"},`\u25B6 Listen from ${h.listen.label}`):null),
       null):null);
 }
