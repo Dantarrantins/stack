@@ -187,7 +187,7 @@ h2{font-size:28px;font-weight:300;letter-spacing:-.01em;line-height:1.1;margin:0
 .act-time input:hover:not(:disabled),.act-time input:focus{border-color:var(--line);background:var(--surface);color:var(--ink);outline:none}
 .act-name{flex:1;font-size:19px;font-weight:400;letter-spacing:-.01em;min-width:0}
 .act-dur{font:inherit;font-size:12.5px;color:var(--muted);background:transparent;border:0;padding:4px 2px;cursor:pointer;text-align:right}
-.act.quiet .act-name{color:var(--muted)}
+
 .stack{list-style:none;margin:2px 0 0 56px;padding:0 0 0 14px;border-left:2px solid color-mix(in srgb,var(--accent) 35%,transparent);display:grid;gap:2px;min-height:4px}
 #v-day .stack{margin-left:22px}
 .hbul{width:9px;height:9px;border-radius:50%;background:var(--accent);margin:0 6px}
@@ -212,6 +212,13 @@ h2{font-size:28px;font-weight:300;letter-spacing:-.01em;line-height:1.1;margin:0
 #v-today .hab{grid-template-columns:auto 1fr auto}
 .hab .sname{font-size:16px}
 .hab.done .sname{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--faint)}
+.skipbtn{font:inherit;font-size:12.5px;color:var(--faint);background:none;border:0;padding:6px 2px 6px 6px;margin-left:2px;cursor:pointer;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:3px;transition:color .15s,text-decoration-color .15s}
+.skipbtn:hover,.skipbtn:focus-visible{color:var(--muted);text-decoration-color:currentColor}
+.skip-tag{font-size:12.5px;color:var(--muted);font-style:italic}
+.hab.skipped{opacity:.55}
+.hab.skipped .sname{color:var(--muted)}
+.hab.skipped .tick{border-style:dashed}
+.hab.skipped .tick svg{opacity:0}
 .grip{cursor:grab;color:var(--faint);font-size:16px;line-height:1;padding:6px 2px;touch-action:none;user-select:none;-webkit-user-select:none}
 .grip:hover{color:var(--ink)}
 .act-h .grip{margin-left:-6px}
@@ -538,11 +545,11 @@ const firstFit=h=>h&&chunks().flatMap(c=>anchorsIn(c.id)).find(a=>fitsAnchor(h,a
 /* ---------- Stats ---------- */
 function stats(){
   const steps=habits.filter(h=>h.anchor);const total=steps.length||1;
-  const rate=k=>{const d=checkins[k]&&checkins[k].done;if(!d)return 0;return Math.min(1,steps.filter(h=>d[h.id]).length/total)};
+  const rate=k=>{const c=checkins[k];const d=c&&c.done;const sk=(c&&c.skipped)||{};const left=steps.filter(h=>!sk[h.id]&&!(d&&d[h.id])).length;const got=d?steps.filter(h=>d[h.id]&&!sk[h.id]).length:0;const den=got+left;if(!den)return(d||c&&c.skipped)?1:0;return Math.min(1,got/den)};
   const days=[...Array(7)].map((_,i)=>{const d=new Date(today);d.setDate(d.getDate()-i);return dkey(d)});
   const avg=days.reduce((a,k)=>a+rate(k),0)/7;
   /* Average completion: every day since your first tick, including days with none */
-  const keys=Object.keys(checkins).filter(k=>checkins[k].done&&Object.keys(checkins[k].done).length).sort();
+  const keys=Object.keys(checkins).filter(k=>Object.keys(checkins[k].done||{}).length||Object.keys(checkins[k].skipped||{}).length).sort();
   let overall=0;if(keys.length){const first=new Date(keys[0]+"T12:00:00");const n=Math.max(1,Math.round((new Date(todayKey+"T12:00:00")-first)/864e5)+1);
     let sum=0;for(let i=0;i<n;i++){const d=new Date(today);d.setDate(d.getDate()-i);sum+=rate(dkey(d))}overall=sum/n}
   return{today:Math.round(rate(todayKey)*100),week:Math.round(avg*100),overall:Math.round(overall*100)};
@@ -550,14 +557,16 @@ function stats(){
 
 /* ---------- Shared rows ---------- */
 const doneMap=()=>(checkins[todayKey]&&checkins[todayKey].done)||{};
+const skipMap=()=>(checkins[todayKey]&&checkins[todayKey].skipped)||{};
 function habitRow(h,opts={}){
-  const done=doneMap();const on=!!done[h.id];const now=Date.now();
-  return el("li",{class:"hab"+(on&&!opts.drag?" done":"")+(fx.tick===h.id&&now-fx.t<700?" pop":"")+(fx.arrive===h.id&&now-fx.ta<1500?" arrive":""),"data-id":h.id},
+  const done=doneMap();const on=!!done[h.id];const sk=!opts.drag&&!on&&!!skipMap()[h.id];const now=Date.now();
+  return el("li",{class:"hab"+(on&&!opts.drag?" done":"")+(sk?" skipped":"")+(fx.tick===h.id&&now-fx.t<700?" pop":"")+(fx.arrive===h.id&&now-fx.ta<1500?" arrive":""),"data-id":h.id},
     opts.drag?el("span",{class:"grip",title:"Drag to move","aria-hidden":"true"},"⠇"):null,
-    opts.drag?el("span",{class:"hbul","aria-hidden":"true"}):el("button",{class:"tick","aria-pressed":String(on),"aria-label":(on?"Untick ":"Tick ")+(h.short||h.title),onclick:()=>toggleDone(h.id),disabled:!can()},checkSvg()),
+    opts.drag?el("span",{class:"hbul","aria-hidden":"true"}):el("button",{class:"tick","aria-pressed":String(on),"aria-label":(on?"Untick ":"Tick ")+(h.short||h.title),onclick:()=>sk?toggleSkip(h.id):toggleDone(h.id),disabled:!can()},checkSvg()),
     opts.drag?el("button",{class:"sname","aria-expanded":String(expanded.has(h.id)),onclick:()=>{expanded.has(h.id)?expanded.delete(h.id):expanded.add(h.id);renderDay()},text:h.short||h.title}):el("button",{class:"sname",onclick:()=>openSheet(h.id),text:h.short||h.title}),
     opts.drag?el("button",{class:"chev","aria-label":expanded.has(h.id)?"Hide details":"Show details",onclick:()=>{expanded.has(h.id)?expanded.delete(h.id):expanded.add(h.id);renderDay()}},el("span",{class:"mono",text:`${hMins(h)} min`}),el("span",{class:"chev-i"+(expanded.has(h.id)?" open":""),"aria-hidden":"true",text:"⌄"}))
-      :el("span",{class:"sside"},h.listen?el("span",{class:"play","aria-label":"Has a clip",text:"▶"}):null,el("span",{class:"mono",text:`${hMins(h)} min`})),
+      :sk?el("span",{class:"sside"},el("span",{class:"skip-tag",text:"Not today"}),el("button",{class:"skipbtn",onclick:()=>toggleSkip(h.id),disabled:!can(),"aria-label":"Undo skip for "+(h.short||h.title)},"Undo"))
+      :el("span",{class:"sside"},el("span",{class:"mono",text:`${hMins(h)} min`}),on?null:el("button",{class:"skipbtn",onclick:()=>toggleSkip(h.id),disabled:!can(),"aria-label":"Skip "+(h.short||h.title)+" today",title:"Not doing this today"},"Skip")),
     opts.drag&&expanded.has(h.id)?el("div",{class:"hdet"},
       el("p",{class:"hdet-why",text:h.why||h.detail}),
       h.research?el("p",{class:"hdet-res"},el("b",{text:"Research: "}),h.research):null,
@@ -578,7 +587,7 @@ function phase(m){return m<5*60?"night":m<11*60?"morning":m<17*60?"midday":m<21*
 function fitHello(){const h=$("today-h"),c=$("clock");if(!h)return;h.style.fontSize="72px";const w=h.parentElement.clientWidth;if(!w)return;const need=h.scrollWidth;const size=need>w?Math.max(26,Math.floor(72*w/need)):72;h.style.fontSize=size+"px";if(c)c.style.fontSize=size+"px"}
 addEventListener("resize",()=>fitHello());if(document.fonts)document.fonts.ready.then(()=>fitHello());
 addEventListener("scroll",()=>document.body.classList.toggle("scrolled",scrollY>8),{passive:true});
-function lede(m,all,done){const p=phase(m);const left=all.filter(h=>!done[h.id]).length;
+function lede(m,all,done){const p=phase(m);const sk=skipMap();const left=all.filter(h=>!done[h.id]&&!sk[h.id]).length;
   if(all.length&&!left)return"Everything's stacked and done for today. Nicely done.";
   return p==="morning"?"A fresh start. Begin with what's up next.":p==="midday"?"Keep the rhythm going through the afternoon.":p==="evening"?"Time to slow down and finish the day well.":"Rest well. Tomorrow's stack is ready."}
 function greeting(m){const p=phase(m);return p==="morning"?"Good morning":p==="midday"?"Good afternoon":p==="evening"?"Good evening":"Good night"}
@@ -590,19 +599,19 @@ function paintSky(m){
 }
 function nowMins(){const d=new Date();return d.getHours()*60+d.getMinutes()}
 function renderToday(){
-  const done=doneMap();
+  const done=doneMap();const skipped=skipMap();
   const all=habits.filter(h=>h.anchor);
-  const n=all.filter(h=>done[h.id]).length;
+  const n=all.filter(h=>done[h.id]).length;const nsk=all.filter(h=>!done[h.id]&&skipped[h.id]).length;const due=all.length-nsk;
   const m=nowMins();const cs=chunks();
-  const sig=JSON.stringify([loaded,done,all.map(h=>[h.id,h.anchor,h.order,h.short||h.title,h.effort]),anchors,cs,Object.keys(checkins).length,can(),Math.floor(m/5),settings&&settings.name,[...openPast]]);
+  const sig=JSON.stringify([loaded,done,skipped,all.map(h=>[h.id,h.anchor,h.order,h.short||h.title,h.effort]),anchors,cs,Object.keys(checkins).length,can(),Math.floor(m/5),settings&&settings.name,[...openPast]]);
   if(sig===lastSig)return;lastSig=sig;
   const name=settings&&settings.name;
   $("today-h").textContent=`${greeting(m)}${name?", "+name:""}`;
   $("today-lede").textContent=lede(m,all,done);
   fitHello();
   paintSky(m);
-  $("today-sub").textContent=today.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"})+` · Week ${wk.n}`+(loaded&&all.length?` · ${n} of ${all.length} done`:"");
-  $("prog").style.width=all.length?(n/all.length*100)+"%":"0";
+  $("today-sub").textContent=today.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"})+` · Week ${wk.n}`+(loaded&&all.length?` · ${n} of ${due} done`+(nsk?` · ${nsk} skipped`:""):"");
+  $("prog").style.width=due?(n/due*100)+"%":all.length?"100%":"0";
   const st=loaded?stats():null;const sb=$("stats");sb.replaceChildren();
   if(st)sb.append(el("span",{},el("b",{text:st.today+"%"})," today"),el("span",{},el("b",{text:st.week+"%"})," last 7 days"),el("span",{},el("b",{text:st.overall+"%"})," average"));
   const box=$("routines");box.replaceChildren();
@@ -613,7 +622,7 @@ function renderToday(){
   live.forEach(c=>{
     const i=cs.indexOf(c);const as=anchorsIn(c.id);const sch=schedule(c.id);
     const steps=as.flatMap(a=>stepsAt(a.id));
-    const dn=steps.filter(h=>done[h.id]).length;const pct=steps.length?Math.round(dn/steps.length*100):0;
+    const dn=steps.filter(h=>done[h.id]).length;const sk=steps.filter(h=>!done[h.id]&&skipped[h.id]).length;const due=steps.length-sk;const pct=due?Math.round(dn/due*100):100;
     const nx=cs[i+1];const state=nx&&m>=toM(nx.time)?"past":m>=toM(c.time)?"now":"future";
     const label=state==="future"&&!nextMarked?(nextMarked=true,"Up next"):null;
     if(state==="now")nextMarked=true;
@@ -621,14 +630,14 @@ function renderToday(){
     if(state==="past"&&!openPast.has(c.id)){
       box.append(el("button",{class:"pastcard"+(fx.fold===c.id&&Date.now()-fx.tf<800?" pc-in":""),style:{background:soft(c.id)},onclick:()=>{openPast.add(c.id);fx.unfold=c.id;fx.tu=Date.now();lastSig="";renderToday()},"aria-label":`${c.name} complete: ${dn} of ${steps.length} habits done. Open`},
         el("span",{class:"pc-check","aria-hidden":"true"},checkSvg()),
-        el("span",{class:"pc-main"},el("span",{class:"pc-name",text:c.name}),el("span",{class:"pc-stat",text:steps.length?`Complete \u00B7 ${dn} of ${steps.length} habits \u00B7 ${pct}%`:"Complete \u00B7 nothing stacked"})),
+        el("span",{class:"pc-main"},el("span",{class:"pc-name",text:c.name}),el("span",{class:"pc-stat",text:steps.length?`Complete \u00B7 ${dn} of ${due} habits`+(sk?` \u00B7 ${sk} skipped`:"")+` \u00B7 ${pct}%`:"Complete \u00B7 nothing stacked"})),
         el("span",{class:"pc-show","aria-hidden":"true",text:"\u2304"})));
       return;
     }
     box.append(el("section",{class:"routine"+(cel?" celebrate":"")+(fx.unfold===c.id&&Date.now()-fx.tu<800?" unfolding":"")+(state==="now"?" is-now":""),style:{background:soft(c.id)},"aria-label":c.name},
       cel&&!reduced()?burst():null,
-      el("div",{class:"rhead"},el("h2",{text:c.name}),label?el("span",{class:"nowtag"+(label==="Now"?" on":""),text:label}):null,steps.length&&dn===steps.length?el("span",{class:"done-label",text:"Done"}):null,
-        el("span",{class:"rmeta mono",text:`${fromM(toM(c.time))}–${fromM(sch.end)}`+(steps.length?` · ${dn}/${steps.length}`:"")}),
+      el("div",{class:"rhead"},el("h2",{text:c.name}),label?el("span",{class:"nowtag"+(label==="Now"?" on":""),text:label}):null,steps.length&&dn+sk===steps.length&&dn?el("span",{class:"done-label",text:"Done"}):null,
+        el("span",{class:"rmeta mono",text:`${fromM(toM(c.time))}–${fromM(sch.end)}`+(steps.length?` · ${dn}/${due}`:"")}),
         state==="past"?el("button",{class:"mini",onclick:e=>{const sec=e.currentTarget.closest(".routine");const done=()=>{openPast.delete(c.id);fx.fold=c.id;fx.tf=Date.now();lastSig="";renderToday()};if(reduced()||!sec)return done();sec.classList.add("folding");setTimeout(done,320)},"aria-label":`Collapse ${c.name}`},"\u2303"):null),
       el("div",{class:"acts"},as.map(a=>{const st=stepsAt(a.id);
         return el("div",{class:"act"+(st.length?"":" quiet")},
@@ -850,18 +859,28 @@ async function renameHabit(h,v){if(!db)return;try{await db.doc("habits/"+h.id).u
 async function unplace(h){if(!db)return;try{await db.doc("habits/"+h.id).update({anchor:null,slot:null,order:null,after:null})}catch(e){showErr(e)}}
 async function updAnchor(a,patch){if(!db)return;try{await db.doc("anchors/"+a.id).update(patch)}catch(e){showErr(e)}}
 function saveChunks(list){saveSettings({chunks:list})}
+/* "Not today": a skipped habit drops out of today's total, so a rainy-day skip doesn't count against you */
+async function toggleSkip(id){
+  if(!db)return;
+  const done={...doneMap()};const skp={...skipMap()};const adding=!skp[id];
+  if(adding){skp[id]=true;delete done[id];buzz(6)}else delete skp[id];
+  checkins={...checkins,[todayKey]:{date:todayKey,done,skipped:skp}};
+  lastSig="";renderToday();renderDay();
+  try{await db.doc("checkins/"+todayKey).set({date:todayKey,done,skipped:skp})}catch(e){showErr(e)}
+}
 async function toggleDone(id){
   if(!db)return;
   const cur=doneMap();
   const next={...cur};const adding=!next[id];if(adding)next[id]=true;else delete next[id];
-  checkins={...checkins,[todayKey]:{date:todayKey,done:next}};
+  const skp={...skipMap()};if(adding)delete skp[id];
+  checkins={...checkins,[todayKey]:{date:todayKey,done:next,skipped:skp}};
   if(adding){fx.tick=id;fx.t=Date.now();buzz(8);
     const h=habits.find(x=>x.id===id);const cid=h&&h.slot;
     if(cid){const steps=anchorsIn(cid).flatMap(a=>stepsAt(a.id));
-      if(steps.length&&steps.every(x=>next[x.id])){fx.done=cid;fx.td=Date.now();buzz([10,40,18]);
-        toast(habits.filter(x=>x.anchor).every(x=>next[x.id])?"Everything stacked today is done.":`${chunkName(cid)} done`)}}}
+      if(steps.length&&steps.every(x=>next[x.id]||skp[x.id])){fx.done=cid;fx.td=Date.now();buzz([10,40,18]);
+        toast(habits.filter(x=>x.anchor).every(x=>next[x.id]||skp[x.id])?"Everything stacked today is done.":`${chunkName(cid)} done`)}}}
   lastSig="";renderToday();renderDay();
-  try{await db.doc("checkins/"+todayKey).set({date:todayKey,done:next})}catch(e){showErr(e)}
+  try{await db.doc("checkins/"+todayKey).set({date:todayKey,done:next,skipped:skp})}catch(e){showErr(e)}
 }
 async function skip(){if(!db)return;fx.swap=Date.now();const n=(typeof week.skips==="number"?week.skips:0)+1;try{await db.doc("weeks/"+weekKey).set({skips:n})}catch(e){showErr(e)}}
 async function saveSettings(patch){if(!db)return;const next={...(settings||{}),...patch};settings=next;try{await db.doc("settings/main").set(next)}catch(e){showErr(e)}}
