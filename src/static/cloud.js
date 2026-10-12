@@ -16,7 +16,7 @@
 
   const LOCAL_KEY = "stack:data:v1", EMAIL_KEY = "stack:signin-email";
   const COLLS = ["habits", "anchors", "settings", "checkins", "weeks"];
-  const KEEP = ["anchor", "slot", "order", "after", "renamed"];
+  const KEEP = ["anchor", "slot", "order", "after", "renamed", "saved"];
   const ls = { get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} }, del: k => { try { localStorage.removeItem(k); } catch (e) {} } };
   let uid = null;
 

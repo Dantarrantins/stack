@@ -47,3 +47,13 @@ Setup (for a new project):
 4. **Firestore Database:** create it (production mode, a European location such as `europe-west2` London), then paste `firestore.rules` into the Rules tab and publish.
 
 Setup in the app shows who's signed in, with Sign out and Delete account (deletes all of that person's data, then the login).
+
+
+## How changes get released
+
+- **`src/stack.html`** is the app. `src/static/` holds everything shipped alongside it. `python3 build.py` builds the site into `dist/`.
+- **Branches:** `dev` is where work happens and deploys to the **preview** site (its own test Firebase project, marked with a "Preview" badge). `main` is the **live** site.
+- **Checks:** every push runs `.github/workflows/checks.yml` (build + Playwright smoke tests in `tests/`). Run locally with `npm test`.
+- **Releasing:** bump `VERSION`, add a line to `CHANGELOG.md`, open a pull request `dev → main`, merge when checks are green. Open copies of the app show "A new version of Stack is ready · Refresh".
+- **Data changes** must stay readable by the previous version (people may have an older copy open), so add fields rather than renaming or removing them.
+- The Claude artifact is a design sandbox only; it runs on Claude's own database, not Firebase.
