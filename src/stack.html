@@ -316,8 +316,8 @@ html,body{overflow-x:hidden}
 .pc-show svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 /* Top bar is see-through at the top of the page so the sky glow can sit behind it */
 .top{background:transparent!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;transition:background .25s}
-body.scrolled .top{background:color-mix(in srgb,var(--bg) 88%,transparent)!important;backdrop-filter:blur(10px)!important;-webkit-backdrop-filter:blur(10px)!important}
-@media (max-width:600px){body.scrolled .top{background:transparent!important;backdrop-filter:none!important}}
+/* Top bar scrolls away with the page (no background change on scroll) */
+.top{position:relative!important}
 .wrap{position:relative;z-index:1}
 /* Big corner glow: centred on the top-right corner of the screen so the colour radiates out across the page */
 #v-today>.sky{top:-110px;right:calc((100% - 100vw)/2);width:min(1200px,170vw);height:min(1200px,170vw);transform:translate(42%,-42%)}
@@ -616,7 +616,6 @@ function phase(m){return m<5*60?"night":m<11*60?"morning":m<17*60?"midday":m<21*
 /* Keep the greeting on one line: size it to the available width (max 72px); the clock matches */
 function fitHello(){const h=$("today-h"),c=$("clock");if(!h)return;h.style.fontSize="72px";const w=h.parentElement.clientWidth;if(!w)return;const need=h.scrollWidth;const size=need>w?Math.max(26,Math.floor(72*w/need)):72;h.style.fontSize=size+"px";if(c)c.style.fontSize=size+"px"}
 addEventListener("resize",()=>fitHello());if(document.fonts)document.fonts.ready.then(()=>fitHello());
-addEventListener("scroll",()=>document.body.classList.toggle("scrolled",scrollY>8),{passive:true});
 function lede(m,all,done){const p=phase(m);const sk=skipMap();const left=all.filter(h=>!done[h.id]&&!sk[h.id]).length;
   if(all.length&&!left)return"Everything's stacked and done for today. Nicely done.";
   return p==="morning"?"A fresh start. Begin with what's up next.":p==="midday"?"Keep the rhythm going through the afternoon.":p==="evening"?"Time to slow down and finish the day well.":"Rest well. Tomorrow's stack is ready."}
