@@ -232,6 +232,9 @@ h2{font-size:28px;font-weight:300;letter-spacing:-.01em;line-height:1.1;margin:0
 
 .stack{list-style:none;margin:2px 0 0 56px;padding:0 0 0 14px;border-left:2px solid color-mix(in srgb,var(--accent) 35%,transparent);display:grid;gap:2px;min-height:4px}
 #v-day .stack{margin-left:22px}
+/* Build: each habit dot sits on the vertical line, like a timeline */
+#v-day .stack .hbul{margin:0 6px 0 -19.5px;position:relative;z-index:1}
+#v-day .hdet{margin-left:6px}
 .hbul{width:9px;height:9px;border-radius:50%;background:var(--accent);margin:0 6px}
 /* The habit's dot doubles as its drag handle: a bigger invisible hit area around it */
 .grip-dot{position:relative;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
@@ -692,10 +695,9 @@ function habitRow(h,opts={}){
     opts.drag&&expanded.has(h.id)?el("input",{class:"sname-edit",value:h.short||h.title,"data-key":"h-"+h.id,"aria-label":"Habit name (tap to rename)",disabled:!can(),
         onchange:e=>{const v=e.target.value.trim();if(v&&v!==(h.short||h.title))renameHabit(h,v);else e.target.value=h.short||h.title},onkeydown:e=>{if(e.key==="Enter")e.target.blur();if(e.key==="Escape"){e.target.value=h.short||h.title;e.target.blur()}}})
     :opts.drag?el("button",{class:"sname","aria-expanded":"false",onclick:()=>{expanded.add(h.id);renderDay()},text:h.short||h.title}):el("button",{class:"sname",onclick:()=>openSheet(h.id),text:h.short||h.title}),
-    opts.drag&&expanded.has(h.id)?el("span",{class:"hd-side"},
-        el("button",{class:"hdet-bin",onclick:()=>{expanded.delete(h.id);unplace(h)},disabled:!can(),"aria-label":`Remove ${h.short||h.title} from my day`,title:"Remove from my day"},binSvg()),
-        el("button",{class:"chev","aria-label":"Hide details",onclick:()=>{expanded.delete(h.id);renderDay()}},el("span",{class:"chev-i open","aria-hidden":"true",text:"⌄"})))
-    :opts.drag?el("button",{class:"chev","aria-label":"Show details",onclick:()=>{expanded.add(h.id);renderDay()}},el("span",{class:"mono",text:`${hMins(h)} min`}),el("span",{class:"chev-i","aria-hidden":"true",text:"⌄"}))
+    opts.drag?el("span",{class:"hd-side"},
+        el("button",{class:"chev","aria-label":expanded.has(h.id)?"Hide details":"Show details",onclick:()=>{expanded.has(h.id)?expanded.delete(h.id):expanded.add(h.id);renderDay()}},el("span",{class:"chev-i"+(expanded.has(h.id)?" open":""),"aria-hidden":"true",text:"\u2304"})),
+        el("button",{class:"hdet-bin",onclick:()=>{expanded.delete(h.id);unplace(h)},disabled:!can(),"aria-label":`Remove ${h.short||h.title} from my day`,title:"Remove from my day"},binSvg()))
       :sk?el("span",{class:"sside"},el("span",{class:"skip-tag",text:"Not today"}),el("button",{class:"skipbtn undo",onclick:()=>toggleSkip(h.id),disabled:!can(),"aria-label":"Undo skip for "+(h.short||h.title)},"Undo"))
       :el("span",{class:"sside"},el("span",{class:"mono",text:`${hMins(h)} min`}),on?null:el("button",{class:"skipbtn",onclick:()=>toggleSkip(h.id),disabled:!can(),"aria-label":"Mark "+(h.short||h.title)+" as not today",title:"Not doing this today"},"Not today")),
     opts.drag&&expanded.has(h.id)?el("div",{class:"hdet"},
