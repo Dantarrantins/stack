@@ -22,7 +22,7 @@
       appId: "1:1071410364946:web:a6689a8d8aad6753a18ecb"
     }
   };
-  const LIVE_HOSTS = ["dantarrantins.github.io", "stack-app.pages.dev", "stack.design-narrative.com"];
+  const LIVE_HOSTS = ["dantarrantins.github.io", "stack-habits.pages.dev", "stack.design-narrative.com"];
   const host = location.hostname;
   const q = new URLSearchParams(location.search);
   let env;
