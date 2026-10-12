@@ -361,7 +361,8 @@ html,body{overflow-x:hidden}
 .pc-name{font-size:28px;font-weight:300;letter-spacing:-.01em;line-height:1.1}
 .pc-stat{font-size:13px;color:var(--muted)}
 .pc-show{display:grid;place-items:center;width:36px;height:36px;color:var(--muted)}
-.pc-up{border:0;background:none;padding:0;cursor:pointer;margin-left:4px}
+.pc-up{border:0;background:none;padding:0;cursor:pointer;margin-left:4px;align-self:center;height:auto}
+.rhead:has(.pc-up){align-items:center}
 .pc-up svg{transform:rotate(180deg)}
 .pc-show svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 /* Top bar is see-through at the top of the page so the sky glow can sit behind it */
