@@ -294,7 +294,7 @@ h2{font-size:28px;font-weight:300;letter-spacing:-.01em;line-height:1.1;margin:0
 .ghost{position:fixed;z-index:50;pointer-events:none;background:var(--surface);border-radius:12px;box-shadow:0 14px 40px rgba(0,0,0,.18);padding-inline:10px;opacity:.96}
 .dragging{display:none!important}
 .placeholder{border:1.5px dashed var(--accent);border-radius:10px;background:color-mix(in srgb,var(--accent) 6%,transparent)}
-.stacklink{justify-self:start;margin-left:22px;font:inherit;font-size:13.5px;font-weight:500;color:var(--accent);background:none;border:0;padding:4px 0 0 14px;cursor:pointer}
+.stacklink{justify-self:start;margin-left:34px;font:inherit;font-size:13.5px;font-weight:500;color:var(--accent);background:none;border:0;padding:4px 0 0 14px;cursor:pointer}
 .stacklink:disabled{opacity:.4}
 .sugg{margin-left:22px;padding:8px 12px;display:flex;align-items:center;gap:10px;border:1px dashed var(--faint);border-radius:12px;flex-wrap:wrap}
 .sugg-l{font-size:11.5px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
@@ -337,7 +337,7 @@ h2{font-size:28px;font-weight:300;letter-spacing:-.01em;line-height:1.1;margin:0
 .hab.pop .tick{animation:pop .45s cubic-bezier(.3,1.6,.5,1)}
 .hab.pop .tick svg{animation:draw .35s ease .08s both}
 .hab.pop .tick::after{animation:ring .6s ease-out}
-@media (max-width:600px){.stack{margin-left:0}#v-day .stack{margin-left:6px}.stacklink,.sugg{margin-left:6px}.act-name{font-size:18px}}
+@media (max-width:600px){.stack{margin-left:0}#v-day .stack{margin-left:6px}.sugg{margin-left:6px}.stacklink{margin-left:18px}.act-name{font-size:18px}}
 @media (prefers-reduced-motion:reduce){.hab.pop .tick,.hab.pop .tick svg,.hab.pop .tick::after,.hab.arrive{animation:none}}
 /* Today header: greeting and sky */
 #v-today{position:relative}
@@ -412,6 +412,8 @@ html,body{overflow-x:hidden}
 .daytabs button[aria-selected="true"] .dt-now{background:currentColor}
 .dayhead{display:flex;align-items:center;justify-content:space-between;gap:12px}
 #edit-toggle{white-space:nowrap;flex:0 0 auto}
+.buildrow{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.buildrow .slots{flex:1 1 0;min-width:0;row-gap:4px}
 #edit-toggle[aria-pressed="true"]{background:var(--chip-on-bg);color:var(--chip-on-ink);border-color:var(--chip-on-bg)}
 .dt-add{flex:0 0 auto;border:1px dashed var(--line);background:transparent;color:var(--muted);font:inherit;font-size:14px;padding:8px 14px;border-radius:999px;cursor:pointer;white-space:nowrap}
 .dt-add:hover{color:var(--ink);border-color:var(--muted)}
@@ -527,7 +529,7 @@ html,body{overflow-x:hidden}
 
   <section class="view" id="v-day" aria-labelledby="day-h" hidden>
     <div>
-      <div class="dayhead"><h1 id="day-h">Build your day</h1><button class="iconbtn" id="edit-toggle" type="button" aria-pressed="false" hidden>Edit</button></div>
+      <div class="dayhead"><h1 id="day-h">Build your day</h1></div>
       <p class="sub">The things you already do, in order, with new habits stacked underneath. Times shift to fit as you stack.</p>
     </div>
     <div class="plan" id="plan"></div>
@@ -811,12 +813,12 @@ function renderDay(){
   /* Parts of the day as tabs; opens on the part you're in now */
   const m0=nowMins();const autoC=[...cs0].reverse().find(c=>m0>=toM(c.time))||cs0[0];
   if(!cs0.some(c=>c.id===buildSel))buildSel=autoC&&autoC.id;
-  const et=$("edit-toggle");et.hidden=false;et.setAttribute("aria-pressed",String(editMode));et.textContent=editMode?"Done":"Edit";et.setAttribute("aria-label",editMode?"Finish editing your routine":"Edit your routine");
   box.append(el("div",{class:"buildbar"},
     el("div",{class:"daytabs",role:"tablist","aria-label":"Parts of the day"},cs0.map(c=>el("button",{role:"tab","aria-selected":String(c.id===buildSel),onclick:()=>{if(buildSel!==c.id){buildSel=c.id;fx.btab=c.id;fx.bt=Date.now();renderDay()}}},
       autoC&&c.id===autoC.id?el("span",{class:"dt-now","aria-hidden":"true"}):null,el("span",{text:c.name}))),
       editMode?el("button",{class:"dt-add","aria-label":"Add a part of the day",title:"Add a part of the day",onclick:addChunk,disabled:!can()},"+ Add"):null)));
-  if(!editMode&&buildSel)box.append(slotMeter(slotInfo(buildSel)));
+  box.append(el("div",{class:"buildrow"},!editMode&&buildSel?slotMeter(slotInfo(buildSel)):el("span"),
+    el("button",{class:"iconbtn",id:"edit-toggle",type:"button","aria-pressed":String(editMode),disabled:!can(),onclick:()=>{editMode=!editMode;renderDay()}},editMode?"Done":"Edit routine")));
   if(editMode)box.append(el("p",{class:"sub modehint",text:"Rename, retime, reorder or remove the things you already do. Your stacked habits are locked while you edit."}));
   const tr=null,ta=null; /* "Try this week" card retired */
   if(tr&&ta)box.append(el("div",{class:"trial"+(Date.now()-fx.swap<900?" in":"")},
@@ -1106,7 +1108,6 @@ function showErr(e){
   if(e&&e.code==="invalid_argument"){canWrite=false;s.textContent="This view is read-only, so changes can't be saved.";renderAll()}
   else s.textContent="That change didn't save. Try again in a moment.";
 }
-$("edit-toggle").addEventListener("click",()=>{editMode=!editMode;renderDay()});
 function addChunk(){if(!can())return;const cs=chunks();const last=cs[cs.length-1];const t=last?Math.min(toM(last.time)+180,23*60):20*60;const id=uid("c");buildSel=id;saveChunks([...cs,{id,name:"Late evening",time:fromM(t)}])}
 
 /* ---------- One-time upgrade: grouped moments become individual actions ---------- */
