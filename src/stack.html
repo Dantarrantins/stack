@@ -312,7 +312,8 @@ html,body{overflow-x:hidden}
 .pc-main{display:grid;gap:2px;min-width:0}
 .pc-name{font-size:28px;font-weight:300;letter-spacing:-.01em;line-height:1.1}
 .pc-stat{font-size:13px;color:var(--muted)}
-.pc-show{font-size:16px;color:var(--faint);transform:translateY(-4px)}
+.pc-show{display:grid;place-items:center;width:36px;height:36px;color:var(--muted)}
+.pc-show svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 /* Top bar is see-through at the top of the page so the sky glow can sit behind it */
 .top{background:transparent!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;transition:background .25s}
 body.scrolled .top{background:color-mix(in srgb,var(--bg) 88%,transparent)!important;backdrop-filter:blur(10px)!important;-webkit-backdrop-filter:blur(10px)!important}
@@ -550,6 +551,7 @@ function schedule(cid){
 const fx={tick:null,t:0,arrive:null,ta:0,done:null,td:0,swap:0};
 const SVGNS="http://www.w3.org/2000/svg";
 function dashSvg(){const s=document.createElementNS(SVGNS,"svg");s.setAttribute("viewBox","0 0 16 16");s.setAttribute("aria-hidden","true");const p=document.createElementNS(SVGNS,"path");p.setAttribute("d","M4.5 8h7");s.append(p);return s}
+function chevSvg(){const s=document.createElementNS(SVGNS,"svg");s.setAttribute("viewBox","0 0 24 24");const p=document.createElementNS(SVGNS,"path");p.setAttribute("d","M6 9l6 6 6-6");s.append(p);return s}
 function checkSvg(){const s=document.createElementNS(SVGNS,"svg");s.setAttribute("viewBox","0 0 16 16");s.setAttribute("aria-hidden","true");const p=document.createElementNS(SVGNS,"path");p.setAttribute("d","M3.5 8.5l3 3 6-7");s.append(p);return s}
 const reduced=()=>{try{return matchMedia("(prefers-reduced-motion: reduce)").matches}catch(e){return false}};
 function buzz(ms){try{navigator.vibrate&&navigator.vibrate(ms)}catch(e){}}
@@ -659,7 +661,7 @@ function renderToday(){
       box.append(el("button",{class:"pastcard"+(fx.fold===c.id&&Date.now()-fx.tf<800?" pc-in":""),style:{background:soft(c.id)},onclick:()=>{openPast.add(c.id);fx.unfold=c.id;fx.tu=Date.now();lastSig="";renderToday()},"aria-label":`${c.name} complete: ${dn} of ${steps.length} habits done. Open`},
         el("span",{class:"pc-check","aria-hidden":"true"},checkSvg()),
         el("span",{class:"pc-main"},el("span",{class:"pc-name",text:c.name}),el("span",{class:"pc-stat",text:steps.length?`Complete \u00B7 ${dn} of ${due} habits`+(sk?` \u00B7 ${sk} not today`:"")+` \u00B7 ${pct}%`:"Complete \u00B7 nothing stacked"})),
-        el("span",{class:"pc-show","aria-hidden":"true",text:"\u2304"})));
+        el("span",{class:"pc-show","aria-hidden":"true"},chevSvg())));
       return;
     }
     box.append(el("section",{class:"routine"+(cel?" celebrate":"")+(fx.unfold===c.id&&Date.now()-fx.tu<800?" unfolding":"")+(state==="now"?" is-now":""),style:{background:soft(c.id)},"aria-label":c.name},
