@@ -290,6 +290,7 @@ html,body{overflow-x:hidden}
 
 .pastcard{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;width:100%;border:0;border-radius:var(--r);padding:18px 24px;cursor:pointer;color:var(--ink);font:inherit;text-align:left;opacity:.62;filter:saturate(.6);transition:opacity .2s}
 .pastcard:hover{opacity:.85}
+.empty-hint{display:block;margin:6px 0 0;padding:0;border:0;background:none;color:var(--muted);font:inherit;font-size:14px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 .pc-check{width:30px;height:30px;border-radius:50%;background:color-mix(in srgb,var(--accent) 22%,transparent);display:grid;place-items:center}
 .pc-check svg{width:15px;height:15px;fill:none;stroke:var(--accent);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 .pc-main{display:grid;gap:2px;min-width:0}
@@ -567,8 +568,8 @@ let lastSig="";
 const openPast=new Set();
 function phase(m){return m<5*60?"night":m<11*60?"morning":m<17*60?"midday":m<21*60?"evening":"night"}
 /* Keep the greeting on one line: size it to the available width (max 72px); the clock matches */
-function fitHello(){const h=$("today-h"),c=$("clock");if(!h)return;h.style.fontSize="72px";const w=h.parentElement.clientWidth;const need=h.scrollWidth;const size=need>w?Math.max(26,Math.floor(72*w/need)):72;h.style.fontSize=size+"px";if(c)c.style.fontSize=size+"px"}
-addEventListener("resize",()=>fitHello());
+function fitHello(){const h=$("today-h"),c=$("clock");if(!h)return;h.style.fontSize="72px";const w=h.parentElement.clientWidth;if(!w)return;const need=h.scrollWidth;const size=need>w?Math.max(26,Math.floor(72*w/need)):72;h.style.fontSize=size+"px";if(c)c.style.fontSize=size+"px"}
+addEventListener("resize",()=>fitHello());if(document.fonts)document.fonts.ready.then(()=>fitHello());
 addEventListener("scroll",()=>document.body.classList.toggle("scrolled",scrollY>8),{passive:true});
 function lede(m,all,done){const p=phase(m);const left=all.filter(h=>!done[h.id]).length;
   if(all.length&&!left)return"Everything's stacked and done for today. Nicely done.";
@@ -600,12 +601,12 @@ function renderToday(){
   const box=$("routines");box.replaceChildren();
   if(!loaded){box.append(el("p",{class:"sub",text:"Loading…"}));return}
   if(!all.length){box.append(el("div",{class:"emptycard"},el("p",{text:"Nothing stacked yet."}),el("button",{class:"btn primary",onclick:()=>go("day")},"Open Build")));return}
-  const live=cs.filter(c=>anchorsIn(c.id).some(a=>stepsAt(a.id).length));
+  const live=cs.filter(c=>anchorsIn(c.id).length||cs.length<2);
   let nextMarked=false;
   live.forEach(c=>{
     const i=cs.indexOf(c);const as=anchorsIn(c.id);const sch=schedule(c.id);
     const steps=as.flatMap(a=>stepsAt(a.id));
-    const dn=steps.filter(h=>done[h.id]).length;const pct=Math.round(dn/steps.length*100);
+    const dn=steps.filter(h=>done[h.id]).length;const pct=steps.length?Math.round(dn/steps.length*100):0;
     const nx=cs[i+1];const state=nx&&m>=toM(nx.time)?"past":m>=toM(c.time)?"now":"future";
     const label=state==="future"&&!nextMarked?(nextMarked=true,"Up next"):null;
     if(state==="now")nextMarked=true;
@@ -613,19 +614,20 @@ function renderToday(){
     if(state==="past"&&!openPast.has(c.id)){
       box.append(el("button",{class:"pastcard"+(fx.fold===c.id&&Date.now()-fx.tf<800?" pc-in":""),style:{background:soft(c.id)},onclick:()=>{openPast.add(c.id);fx.unfold=c.id;fx.tu=Date.now();lastSig="";renderToday()},"aria-label":`${c.name} complete: ${dn} of ${steps.length} habits done. Open`},
         el("span",{class:"pc-check","aria-hidden":"true"},checkSvg()),
-        el("span",{class:"pc-main"},el("span",{class:"pc-name",text:c.name}),el("span",{class:"pc-stat",text:`Complete \u00B7 ${dn} of ${steps.length} habits \u00B7 ${pct}%`})),
+        el("span",{class:"pc-main"},el("span",{class:"pc-name",text:c.name}),el("span",{class:"pc-stat",text:steps.length?`Complete \u00B7 ${dn} of ${steps.length} habits \u00B7 ${pct}%`:"Complete \u00B7 nothing stacked"})),
         el("span",{class:"pc-show","aria-hidden":"true",text:"\u2304"})));
       return;
     }
     box.append(el("section",{class:"routine"+(cel?" celebrate":"")+(fx.unfold===c.id&&Date.now()-fx.tu<800?" unfolding":"")+(state==="now"?" is-now":""),style:{background:soft(c.id)},"aria-label":c.name},
       cel&&!reduced()?burst():null,
       el("div",{class:"rhead"},el("h2",{text:c.name}),label?el("span",{class:"nowtag"+(label==="Now"?" on":""),text:label}):null,steps.length&&dn===steps.length?el("span",{class:"done-label",text:"Done"}):null,
-        el("span",{class:"rmeta mono",text:`${fromM(toM(c.time))}–${fromM(sch.end)} · ${dn}/${steps.length}`}),
+        el("span",{class:"rmeta mono",text:`${fromM(toM(c.time))}–${fromM(sch.end)}`+(steps.length?` · ${dn}/${steps.length}`:"")}),
         state==="past"?el("button",{class:"mini",onclick:e=>{const sec=e.currentTarget.closest(".routine");const done=()=>{openPast.delete(c.id);fx.fold=c.id;fx.tf=Date.now();lastSig="";renderToday()};if(reduced()||!sec)return done();sec.classList.add("folding");setTimeout(done,320)},"aria-label":`Collapse ${c.name}`},"\u2303"):null),
       el("div",{class:"acts"},as.map(a=>{const st=stepsAt(a.id);
         return el("div",{class:"act"+(st.length?"":" quiet")},
           el("div",{class:"act-h"},el("span",{class:"act-time mono",text:fromM(sch.times[a.id].start)}),el("span",{class:"act-name",text:a.name})),
-          st.length?el("ol",{class:"stack"},st.map(h=>habitRow(h))):null)}))));
+          st.length?el("ol",{class:"stack"},st.map(h=>habitRow(h))):null)})),
+      steps.length?null:el("button",{class:"linkbtn empty-hint",onclick:()=>go("day")},"Nothing stacked here yet \u00B7 add a habit in Build")));
   });
 }
 setInterval(()=>{lastSig="";renderToday()},60000);
@@ -824,7 +826,7 @@ function openRename(c){
 
 /* ---------- Routing ---------- */
 function go(v){if(!["today","day","library"].includes(v))v="today";try{history.replaceState(null,"","#"+v)}catch(e){}show(v)}
-function show(v){["today","day","library"].forEach(x=>{const e=$("v-"+x);e.hidden=x!==v;if(x===v){e.classList.remove("enter");void e.offsetWidth;e.classList.add("enter")}});document.querySelectorAll(".tabs button").forEach(b=>b.setAttribute("aria-current",b.dataset.view===v?"page":"false"));window.scrollTo(0,0)}
+function show(v){["today","day","library"].forEach(x=>{const e=$("v-"+x);e.hidden=x!==v;if(x===v){e.classList.remove("enter");void e.offsetWidth;e.classList.add("enter")}});document.querySelectorAll(".tabs button").forEach(b=>b.setAttribute("aria-current",b.dataset.view===v?"page":"false"));window.scrollTo(0,0);if(v==="today")fitHello()}
 document.querySelectorAll(".tabs button").forEach(b=>b.addEventListener("click",()=>go(b.dataset.view)));
 window.addEventListener("hashchange",()=>show((location.hash||"#today").slice(1)));
 $("q").addEventListener("input",e=>{query=e.target.value;renderLib()});
