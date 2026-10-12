@@ -20,6 +20,7 @@ head = '''<!doctype html>
 '''
 i = src.index('<header class="top">')
 pre, body = src[:i], src[i:]
-body = body.replace('<script>', '<script src="local-db.js"></script>\n<script>', 1)
+libs = ''.join(f'<script src="{f}"></script>\n' for f in ['vendor/firebase-app-compat.js','vendor/firebase-auth-compat.js','vendor/firebase-firestore-compat.js','firebase-config.js','cloud.js','local-db.js'])
+body = body.replace('<script>', libs + '<script>', 1)
 sw = '<script>if("serviceWorker" in navigator&&location.protocol==="https:"){addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}</script>\n'
 open('index.html', 'w').write(head + pre + '</head>\n<body>\n' + body + '\n' + sw + '</body>\n</html>\n')

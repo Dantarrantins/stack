@@ -33,3 +33,15 @@ git commit -am "Update" && git push
 ```
 
 On a phone, open the site and choose **Add to Home Screen** to install it.
+
+## Accounts and sync (Firebase)
+
+The web app runs on-device only until `firebase-config.js` holds a Firebase web config. Once it does, `cloud.js` asks people to sign in (Google or an emailed sign-in link) and stores each person's data in Firestore under `users/{uid}/…`. The first time someone signs in on a device that already has Stack data, that data is copied into their account (once only; a backup stays on the device).
+
+Setup:
+1. Create a project at https://console.firebase.google.com and add a **Web app**. Paste its config object into `firebase-config.js` as `window.STACK_FIREBASE = { … }`.
+2. **Authentication → Sign-in method:** enable **Google** and **Email/Password** with **Email link (passwordless sign-in)** switched on.
+3. **Authentication → Settings → Authorised domains:** add `dantarrantins.github.io` (and any custom domain).
+4. **Firestore Database:** create it (production mode, a European location such as `europe-west2` London), then paste `firestore.rules` into the Rules tab and publish.
+
+Setup in the app shows who's signed in, with Sign out and Delete account (deletes all of that person's data, then the login).

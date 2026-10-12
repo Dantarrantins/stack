@@ -96,6 +96,11 @@ h2{font-size:28px;font-weight:300;letter-spacing:-.01em;line-height:1.1;margin:0
 .rdot{display:none}
 .rhead h2{flex:1}
 .rmeta{color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
+.acct{display:grid;gap:8px;margin-top:8px;padding-top:16px;border-top:1px solid var(--line);font-size:14px;color:var(--muted)}
+.acct-acts{display:flex;gap:16px;flex-wrap:wrap}
+.acct-btn{font:inherit;font-size:14px;background:none;border:0;padding:4px 0;color:var(--ink);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.acct-btn.danger{color:#A3412F}
+.acct-msg{margin:0;font-size:13px}
 .redit{margin-left:auto;font:inherit;font-size:14px;color:var(--muted);background:none;border:0;padding:6px 0 6px 10px;cursor:pointer;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:3px;transition:color .15s,text-decoration-color .15s}
 #plan .chunk{scroll-margin-top:90px}
 .redit:hover,.redit:focus-visible{color:var(--ink);text-decoration-color:currentColor}
@@ -478,6 +483,11 @@ body.scrolled .top{background:color-mix(in srgb,var(--bg) 88%,transparent)!impor
 <div id="sheet-root"></div>
 <div class="onb" id="onb" hidden role="dialog" aria-modal="true" aria-labelledby="onb-h"><div class="onb-in" id="onb-in"></div></div>
 
+<script src="vendor/firebase-app-compat.js"></script>
+<script src="vendor/firebase-auth-compat.js"></script>
+<script src="vendor/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="cloud.js"></script>
 <script src="local-db.js"></script>
 <script>
 /* ---------- Model ----------
@@ -881,7 +891,7 @@ async function place(h,aid,stayOpen){
   fx.arrive=h.id;fx.ta=Date.now();fx.swap=Date.now();buzz(10);
   try{await db.doc("habits/"+h.id).update({anchor:aid,slot:a.slot,order,after:null});if(!stayOpen)toast(`Stacked after ${a.name.toLowerCase()}`)}catch(e){showErr(e)}
 }
-async function renameHabit(h,v){if(!db)return;try{await db.doc("habits/"+h.id).update({short:v});toast("Renamed")}catch(e){showErr(e)}}
+async function renameHabit(h,v){if(!db)return;try{await db.doc("habits/"+h.id).update({short:v,renamed:true});toast("Renamed")}catch(e){showErr(e)}}
 async function unplace(h){if(!db)return;try{await db.doc("habits/"+h.id).update({anchor:null,slot:null,order:null,after:null})}catch(e){showErr(e)}}
 async function updAnchor(a,patch){if(!db)return;try{await db.doc("anchors/"+a.id).update(patch)}catch(e){showErr(e)}}
 function saveChunks(list){saveSettings({chunks:list})}
@@ -956,6 +966,17 @@ function openSetup(startAt){
   ob={step:startAt||0,name:(settings&&settings.name)||"",chunks:cs,acts,interests:new Set(interests()||CATS.map(c=>c[0])),starters:new Set(habits.some(h=>h.anchor)?[]:STARTERS),editOnly:!!startAt};
   $("onb").hidden=false;renderSetup();
 }
+/* Account (web app with sign-in only): who you're signed in as, sign out, delete everything */
+function accountBox(){
+  const A=window.stackAccount;if(!A)return null;let armed=false;
+  const msg=el("p",{class:"acct-msg",role:"status"});
+  const del=el("button",{class:"acct-btn danger",onclick:async()=>{
+    if(!armed){armed=true;del.textContent="Tap again to delete all your data";setTimeout(()=>{armed=false;del.textContent="Delete account"},5000);return}
+    del.disabled=true;msg.textContent="Deleting…";
+    try{await A.deleteAll();location.reload()}catch(e){msg.textContent=e.message||"Couldn't delete. Try again."}}},"Delete account");
+  return el("div",{class:"acct"},el("span",{class:"acct-who",text:`Signed in as ${A.email()}`}),
+    el("div",{class:"acct-acts"},el("button",{class:"acct-btn",onclick:()=>A.signOut()},"Sign out"),del),msg);
+}
 function closeSetup(){$("onb").hidden=true;ob=null}
 function renderSetup(){
   const box=$("onb-in");box.replaceChildren();const i=ob.step;
@@ -964,7 +985,8 @@ function renderSetup(){
   if(i===0){body.append(el("h1",{id:"onb-h",text:"Small practices, stacked onto your day."}),
     el("label",{class:"namefield",for:"ob-name"},"What should we call you?",el("input",{id:"ob-name",value:ob.name||"",placeholder:"First name",autocomplete:"given-name",oninput:e=>{ob.name=e.target.value}})),
     el("p",{text:"You already have routines: you wake up, shower, brush your teeth, eat. Stack helps you attach small, expert-backed habits to those moments, so a new habit has somewhere to live."}),
-    el("p",{text:"First you'll map what you already do. Then you'll stack one or two new things onto it."}));}
+    el("p",{text:"First you'll map what you already do. Then you'll stack one or two new things onto it."}),
+    accountBox());}
   else if(i===1){body.append(el("h1",{id:"onb-h",text:"How is your day shaped?"}),el("p",{text:"Most days split into a few parts. Set roughly when each one starts."}),
     el("div",{class:"ob-chunks"},ob.chunks.map((c,ci)=>el("div",{class:"ob-chunkrow",style:{background:soft(c.id)}},
       el("input",{class:"ob-cname",value:c.name,"aria-label":"Part of the day",oninput:e=>{c.name=e.target.value}}),

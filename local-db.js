@@ -1,15 +1,15 @@
 /* Stack: on-device data store.
    Implements the small slice of the claude.ai artifact `db` API that the app uses
    (doc/collection, get/set/update/delete, onSnapshot, orderBy, limit), backed by
-   localStorage and seeded from seed.json. Only defined when window.claude is absent,
-   so the same index.html still runs inside the Claude artifact. */
+   localStorage and seeded from seed.json. Used when no Firebase config is set (see cloud.js). */
 (function () {
+  if (window.__stackCloud) return; // signed-in cloud build (cloud.js) is handling data
   /* Always use the on-device store in the web build (browser extensions can define their own window.claude). */
   const KEY = "stack:data:v1";
   let store = { seedVersion: 0, c: {} };
   try { const raw = localStorage.getItem(KEY); if (raw) store = JSON.parse(raw); } catch (e) {}
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) {} };
-  const USER_FIELDS = ["anchor", "slot", "order"];
+  const USER_FIELDS = ["anchor", "slot", "order", "after", "renamed"];
 
   const ready = fetch("seed.json", { cache: "no-cache" }).then(r => r.json()).then(seed => {
     if ((store.seedVersion || 0) >= seed.version) return;
@@ -19,7 +19,7 @@
       for (const [id, data] of Object.entries(seed[coll] || {})) {
         if (!cur[id]) { cur[id] = { ...data }; continue; }
         const keep = {};
-        if (coll === "habits") USER_FIELDS.forEach(k => { if (k in cur[id]) keep[k] = cur[id][k]; });
+        if (coll === "habits") { USER_FIELDS.forEach(k => { if (k in cur[id]) keep[k] = cur[id][k]; }); if (cur[id].renamed && cur[id].short) keep.short = cur[id].short; }
         if (coll === "anchors" && cur[id].name) keep.name = cur[id].name;
         cur[id] = { ...data, ...keep };
       }
