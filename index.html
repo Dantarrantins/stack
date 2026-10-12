@@ -101,19 +101,6 @@ h2{font-size:28px;font-weight:300;letter-spacing:-.01em;line-height:1.1;margin:0
 .acct-btn{font:inherit;font-size:14px;background:none;border:0;padding:4px 0;color:var(--ink);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 .acct-btn.danger{color:#A3412F}
 .acct-msg{margin:0;font-size:13px}
-.daytabs{display:flex;gap:4px;border:1px solid var(--line);border-radius:999px;padding:4px;overflow-x:auto;scrollbar-width:none;background:color-mix(in srgb,var(--bg) 70%,transparent)}
-.daytabs::-webkit-scrollbar{display:none}
-.daytabs button{flex:1 0 auto;display:inline-flex;align-items:center;justify-content:center;gap:7px;border:0;background:transparent;color:var(--muted);font:inherit;font-size:14.5px;font-weight:500;padding:10px 16px;border-radius:999px;cursor:pointer;white-space:nowrap;transition:background .18s,color .18s}
-.daytabs button[aria-selected="true"]{background:var(--chip-on-bg);color:var(--chip-on-ink)}
-.daytabs button.past:not([aria-selected="true"]){color:var(--faint)}
-.dt-check svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;display:block}
-.dt-now{width:7px;height:7px;border-radius:50%;background:var(--accent)}
-.daytabs button[aria-selected="true"] .dt-now{background:currentColor}
-.past-sum{margin:-4px 0 8px;font-size:13.5px;color:var(--muted)}
-.inline-link{display:inline;padding:0;border:0;background:none;font:inherit;color:var(--ink);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
-.routine.tab-in{animation:tabin .3s cubic-bezier(.2,.8,.2,1)}
-@keyframes tabin{from{opacity:.4;transform:translateY(6px)}to{opacity:1;transform:none}}
-@media (prefers-reduced-motion:reduce){.routine.tab-in{animation:none}}
 .redit{margin-left:auto;font:inherit;font-size:14px;color:var(--muted);background:none;border:0;padding:6px 0 6px 10px;cursor:pointer;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:3px;transition:color .15s,text-decoration-color .15s}
 #plan .chunk{scroll-margin-top:90px}
 .redit:hover,.redit:focus-visible{color:var(--ink);text-decoration-color:currentColor}
@@ -207,8 +194,8 @@ h2{font-size:28px;font-weight:300;letter-spacing:-.01em;line-height:1.1;margin:0
   .top-in{flex-wrap:nowrap}
   .tabs{position:fixed;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);z-index:6;justify-content:space-between;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 6px 24px rgba(0,0,0,.12)}
   .tabs button{flex:1;padding:11px 8px;font-size:14px}
-  .wrap{padding-bottom:calc(env(safe-area-inset-bottom,0px) + 48px)}
-  .toast{bottom:calc(env(safe-area-inset-bottom,0px) + 24px)}
+  .wrap{padding-bottom:calc(env(safe-area-inset-bottom,0px) + 110px)}
+  .toast{bottom:calc(env(safe-area-inset-bottom,0px) + 92px)}
 }
 /* Build + Today: actions as headings, habits stacked underneath */
 .plan{display:grid;gap:18px}
@@ -367,6 +354,19 @@ body.scrolled .top{background:color-mix(in srgb,var(--bg) 88%,transparent)!impor
 .modebar button{border:0;background:transparent;color:var(--muted);font:inherit;font-size:14px;font-weight:500;padding:8px 16px;border-radius:999px;cursor:pointer}
 .modebar button[aria-pressed="true"]{background:var(--chip-on-bg);color:var(--chip-on-ink)}
 .modehint{margin:-6px 0 0;font-size:14px}
+.buildbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.daytabs{display:flex;gap:4px;border:1px solid var(--line);border-radius:999px;padding:4px;overflow-x:auto;scrollbar-width:none;flex:1 1 auto;min-width:0}
+.daytabs::-webkit-scrollbar{display:none}
+.daytabs button{flex:1 0 auto;display:inline-flex;align-items:center;justify-content:center;gap:7px;border:0;background:transparent;color:var(--muted);font:inherit;font-size:14.5px;font-weight:500;padding:9px 16px;border-radius:999px;cursor:pointer;white-space:nowrap;transition:background .18s,color .18s}
+.daytabs button[aria-selected="true"]{background:var(--chip-on-bg);color:var(--chip-on-ink)}
+.dt-now{width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.daytabs button[aria-selected="true"] .dt-now{background:currentColor}
+.edittoggle{font:inherit;font-size:14px;background:none;border:0;padding:8px 2px;color:var(--muted);cursor:pointer;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:3px;white-space:nowrap}
+.edittoggle:hover,.edittoggle:focus-visible{color:var(--ink);text-decoration-color:currentColor}
+.edittoggle[aria-pressed="true"]{color:var(--ink);font-weight:500}
+.chunk.tab-in{animation:tabin .3s cubic-bezier(.2,.8,.2,1)}
+@keyframes tabin{from{opacity:.4;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.chunk.tab-in{animation:none}}
 .ename{flex:1;min-width:0;font:inherit;font-size:19px;letter-spacing:-.01em;color:var(--ink);background:transparent;border:0;border-bottom:1px dashed transparent;border-radius:0;padding:2px 0;outline:none}
 .ename:hover:not(:disabled){border-bottom-color:var(--faint)}
 .ename:focus{border-bottom-color:var(--accent)}
@@ -448,8 +448,12 @@ body.scrolled .top{background:color-mix(in srgb,var(--bg) 88%,transparent)!impor
 <header class="top">
   <div class="top-in">
     <div class="brand"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="2" y="13" width="16" height="4" rx="2"/><rect x="4" y="8" width="12" height="4" rx="2"/><rect x="6" y="3" width="8" height="4" rx="2"/></svg>Stack</div>
-
-    <button class="iconbtn" id="back" type="button" hidden>Done</button><button class="iconbtn" id="rerun" type="button">Setup</button>
+    <nav class="tabs" aria-label="Views">
+      <button type="button" data-view="today">Today</button>
+      <button type="button" data-view="day">Build</button>
+      <button type="button" data-view="library">Library</button>
+    </nav>
+    <button class="iconbtn" id="rerun" type="button">Setup</button>
   </div>
 </header>
 
@@ -472,7 +476,7 @@ body.scrolled .top{background:color-mix(in srgb,var(--bg) 88%,transparent)!impor
   <section class="view" id="v-day" aria-labelledby="day-h" hidden>
     <div>
       <h1 id="day-h">Build your day</h1>
-      <p class="sub">The things you already do, in order, with new habits stacked underneath. Times shift to fit as you stack. <button class="linkbtn inline-link" type="button" id="to-lib">Browse the library</button></p>
+      <p class="sub">The things you already do, in order, with new habits stacked underneath. Times shift to fit as you stack.</p>
     </div>
     <div class="plan" id="plan"></div>
     <div class="btns"><button class="btn" id="add-chunk" type="button" hidden>+ Add a part of the day</button></div>
@@ -646,7 +650,7 @@ function renderToday(){
   const all=habits.filter(h=>h.anchor);
   const n=all.filter(h=>done[h.id]).length;const nsk=all.filter(h=>!done[h.id]&&skipped[h.id]).length;const due=all.length-nsk;
   const m=nowMins();const cs=chunks();
-  const sig=JSON.stringify([loaded,done,skipped,tabSel,all.map(h=>[h.id,h.anchor,h.order,h.short||h.title,h.effort]),anchors,cs,Object.keys(checkins).length,can(),Math.floor(m/5),settings&&settings.name,[...openPast]]);
+  const sig=JSON.stringify([loaded,done,skipped,all.map(h=>[h.id,h.anchor,h.order,h.short||h.title,h.effort]),anchors,cs,Object.keys(checkins).length,can(),Math.floor(m/5),settings&&settings.name,[...openPast]]);
   if(sig===lastSig)return;lastSig=sig;
   const name=settings&&settings.name;
   $("today-h").textContent=`${greeting(m)}${name?", "+name:""}`;
@@ -661,44 +665,34 @@ function renderToday(){
   if(!loaded){box.append(el("p",{class:"sub",text:"Loading…"}));return}
   if(!all.length){box.append(el("div",{class:"emptycard"},el("p",{text:"Nothing stacked yet."}),el("button",{class:"btn primary",onclick:()=>go("day")},"Open Build")));return}
   const live=cs.filter(c=>anchorsIn(c.id).length||cs.length<2);
-  /* Parts of the day as tabs: opens on the part you're in now (or the next one) */
-  const info=live.map(c=>{const i=cs.indexOf(c);const nx=cs[i+1];return{c,state:nx&&m>=toM(nx.time)?"past":m>=toM(c.time)?"now":"future"}});
-  if(!info.length)return;
-  const auto=info.find(x=>x.state==="now")||info.find(x=>x.state==="future")||info[info.length-1];
-  if(tabAuto!==auto.c.id){tabAuto=auto.c.id;tabSel=null}
-  const cur=info.find(x=>x.c.id===tabSel)||auto;
-  const firstFuture=info.find(x=>x.state==="future");
-  box.append(el("div",{class:"daytabs",role:"tablist","aria-label":"Parts of the day"},info.map(x=>{
-    const st=anchorsIn(x.c.id).flatMap(a=>stepsAt(a.id));const fin=st.length&&st.every(h=>done[h.id]||skipped[h.id]);
-    return el("button",{role:"tab","aria-selected":String(x===cur),class:(x.state==="past"?"past":"")+(fin?" fin":""),onclick:()=>selectTab(x.c.id)},
-      x.state==="past"||fin?el("span",{class:"dt-check","aria-hidden":"true"},checkSvg()):x.state==="now"?el("span",{class:"dt-now","aria-hidden":"true"}):null,
-      el("span",{text:x.c.name}))})));
-  {
-    const c=cur.c,state=cur.state;const as=anchorsIn(c.id);const sch=schedule(c.id);
+  let nextMarked=false;
+  live.forEach(c=>{
+    const i=cs.indexOf(c);const as=anchorsIn(c.id);const sch=schedule(c.id);
     const steps=as.flatMap(a=>stepsAt(a.id));
     const dn=steps.filter(h=>done[h.id]).length;const sk=steps.filter(h=>!done[h.id]&&skipped[h.id]).length;const due=steps.length-sk;const pct=due?Math.round(dn/due*100):100;
-    const label=cur===firstFuture&&!info.some(x=>x.state==="now")?"Up next":null;
+    const nx=cs[i+1];const state=nx&&m>=toM(nx.time)?"past":m>=toM(c.time)?"now":"future";
+    const label=state==="future"&&!nextMarked?(nextMarked=true,"Up next"):null;
+    if(state==="now")nextMarked=true;
     const cel=fx.done===c.id&&Date.now()-fx.td<1500;
-    box.append(el("section",{class:"routine"+(cel?" celebrate":"")+(fx.tabIn===c.id&&Date.now()-fx.tt<600?" tab-in":""),style:{background:soft(c.id)},"aria-label":c.name,role:"tabpanel"},
+    if(state==="past"&&!openPast.has(c.id)){
+      box.append(el("button",{class:"pastcard"+(fx.fold===c.id&&Date.now()-fx.tf<800?" pc-in":""),style:{background:soft(c.id)},onclick:()=>{openPast.add(c.id);fx.unfold=c.id;fx.tu=Date.now();lastSig="";renderToday()},"aria-label":`${c.name} complete: ${dn} of ${steps.length} habits done. Open`},
+        el("span",{class:"pc-check","aria-hidden":"true"},checkSvg()),
+        el("span",{class:"pc-main"},el("span",{class:"pc-name",text:c.name}),el("span",{class:"pc-stat",text:steps.length?`Complete \u00B7 ${dn} of ${due} habits`+(sk?` \u00B7 ${sk} not today`:"")+` \u00B7 ${pct}%`:"Complete \u00B7 nothing stacked"})),
+        el("span",{class:"pc-show","aria-hidden":"true",text:"\u2304"})));
+      return;
+    }
+    box.append(el("section",{class:"routine"+(cel?" celebrate":"")+(fx.unfold===c.id&&Date.now()-fx.tu<800?" unfolding":"")+(state==="now"?" is-now":""),style:{background:soft(c.id)},"aria-label":c.name},
       cel&&!reduced()?burst():null,
-      el("div",{class:"rhead"},el("h2",{text:c.name}),label?el("span",{class:"nowtag",text:label}):null,steps.length&&dn+sk===steps.length&&dn?el("span",{class:"done-label",text:"Done"}):null,
-        el("button",{class:"redit",onclick:()=>editChunk(c.id),"aria-label":`Edit ${c.name} in Build`},"Edit")),
-      state==="past"&&steps.length?el("p",{class:"past-sum",text:`Complete \u00B7 ${dn} of ${due} habits`+(sk?` \u00B7 ${sk} not today`:"")+` \u00B7 ${pct}%`}):null,
+      el("div",{class:"rhead"},el("h2",{text:c.name}),label?el("span",{class:"nowtag"+(label==="Now"?" on":""),text:label}):null,steps.length&&dn+sk===steps.length&&dn?el("span",{class:"done-label",text:"Done"}):null,
+        el("button",{class:"redit",onclick:()=>editChunk(c.id),"aria-label":`Edit ${c.name} in Build`},"Edit"),
+        state==="past"?el("button",{class:"mini",onclick:e=>{const sec=e.currentTarget.closest(".routine");const done=()=>{openPast.delete(c.id);fx.fold=c.id;fx.tf=Date.now();lastSig="";renderToday()};if(reduced()||!sec)return done();sec.classList.add("folding");setTimeout(done,320)},"aria-label":`Collapse ${c.name}`},"\u2303"):null),
       el("div",{class:"acts"},as.map(a=>{const st=stepsAt(a.id);
         return el("div",{class:"act"+(st.length?"":" quiet")},
           el("div",{class:"act-h"},el("span",{class:"act-time mono",text:fromM(sch.times[a.id].start)}),el("span",{class:"act-name",text:a.name})),
           st.length?el("ol",{class:"stack"},st.map(h=>habitRow(h))):null)})),
-      steps.length?null:el("button",{class:"linkbtn empty-hint",onclick:()=>editChunk(c.id)},"Nothing stacked here yet \u00B7 add a habit")));
-  }
+      steps.length?null:el("button",{class:"linkbtn empty-hint",onclick:()=>go("day")},"Nothing stacked here yet \u00B7 add a habit in Build")));
+  });
 }
-let tabSel=null,tabAuto=null;
-function selectTab(id){if(id===tabSel)return;tabSel=id;fx.tabIn=id;fx.tt=Date.now();lastSig="";renderToday()}
-/* Swipe left/right on the routine to move between parts of the day */
-(()=>{let x0=null,y0=null;const r=$("routines");
-  r.addEventListener("touchstart",e=>{const t=e.touches[0];x0=t.clientX;y0=t.clientY},{passive:true});
-  r.addEventListener("touchend",e=>{if(x0==null)return;const t=e.changedTouches[0];const dx=t.clientX-x0,dy=t.clientY-y0;x0=null;
-    if(Math.abs(dx)<60||Math.abs(dx)<Math.abs(dy)*1.5)return;
-    const tabs=[...r.querySelectorAll(".daytabs [role=tab]")];const i=tabs.findIndex(b=>b.getAttribute("aria-selected")==="true");const n=tabs[i+(dx<0?1:-1)];if(n)n.click()},{passive:true})})();
 setInterval(()=>{lastSig="";renderToday()},60000);
 function tickClock(){const d=new Date();const h=$("clock-h"),mm=$("clock-m");if(h){h.textContent=pad(d.getHours());mm.textContent=pad(d.getMinutes())}}
 tickClock();setInterval(tickClock,1000);
@@ -709,9 +703,14 @@ function renderDay(){
   const box=$("plan");box.replaceChildren();
   if(!loaded){box.append(el("p",{class:"sub",text:"Loading…"}));return}
   const keep=document.activeElement&&document.activeElement.dataset&&document.activeElement.dataset.key;
-  box.append(el("div",{class:"modebar",role:"group","aria-label":"Build mode"},
-    el("button",{"aria-pressed":String(!editMode),onclick:()=>{editMode=false;renderDay()}},"Stack habits"),
-    el("button",{"aria-pressed":String(editMode),onclick:()=>{editMode=true;renderDay()}},"Edit routine")));
+  const cs0=chunks();
+  /* Parts of the day as tabs; opens on the part you're in now */
+  const m0=nowMins();const autoC=[...cs0].reverse().find(c=>m0>=toM(c.time))||cs0[0];
+  if(!cs0.some(c=>c.id===buildSel))buildSel=autoC&&autoC.id;
+  box.append(el("div",{class:"buildbar"},
+    el("div",{class:"daytabs",role:"tablist","aria-label":"Parts of the day"},cs0.map(c=>el("button",{role:"tab","aria-selected":String(c.id===buildSel),onclick:()=>{if(buildSel!==c.id){buildSel=c.id;fx.btab=c.id;fx.bt=Date.now();renderDay()}}},
+      autoC&&c.id===autoC.id?el("span",{class:"dt-now","aria-hidden":"true"}):null,el("span",{text:c.name})))),
+    el("button",{class:"edittoggle","aria-pressed":String(editMode),onclick:()=>{editMode=!editMode;renderDay()}},editMode?"Done editing":"Edit routine")));
   $("add-chunk").hidden=!editMode;
   if(editMode)box.append(el("p",{class:"sub modehint",text:"Rename, retime, reorder or remove the things you already do. Your stacked habits are locked while you edit."}));
   const tr=!editMode&&trial(),ta=tr&&firstFit(tr);
@@ -725,9 +724,9 @@ function renderDay(){
       el("button",{class:"btn",onclick:()=>saveSettings({dismissed:[...dismissed(),tr.id]}),disabled:!can()},"Not for me"))));
   const used=new Set(habits.filter(h=>h.anchor).map(h=>h.id));
   const cs=chunks();
-  cs.forEach(c=>{
+  cs.filter(c=>c.id===buildSel).forEach(c=>{
     const as=anchorsIn(c.id);const sch=schedule(c.id);
-    box.append(el("section",{"data-chunk":c.id,class:"chunk"+(editMode?" editing":""),style:{background:soft(c.id)},"aria-label":c.name},
+    box.append(el("section",{"data-chunk":c.id,class:"chunk"+(editMode?" editing":"")+(fx.btab===c.id&&Date.now()-fx.bt<600?" tab-in":""),style:{background:soft(c.id)},"aria-label":c.name},
       el("div",{class:"chead"},
         editMode?el("input",{class:"ename ename-chunk",value:c.name,"data-key":"c-"+c.id,"aria-label":"Part of the day name",disabled:!can(),onchange:e=>{const v=e.target.value.trim();if(v&&v!==c.name)saveChunks(chunks().map(x=>x.id===c.id?{...x,name:v}:x))},onkeydown:e=>{if(e.key==="Enter")e.target.blur()}}):el("h2",{text:c.name}),
         editMode?el("label",{class:"act-time mono"},el("input",{type:"time",value:c.time,"aria-label":`${c.name} starts`,disabled:!can(),onchange:e=>{if(e.target.value)saveChunks(chunks().map(x=>x.id===c.id?{...x,time:e.target.value}:x))}})):el("span",{class:"rmeta mono",text:as.length?`until ${fromM(sch.end)}`:""}),
@@ -895,10 +894,11 @@ function openRename(c){
 
 /* ---------- Routing ---------- */
 /* Today → Build, scrolled to that part of the day */
-function editChunk(id){go("day");requestAnimationFrame(()=>{const sec=document.querySelector(`#plan [data-chunk="${id}"]`);if(sec)sec.scrollIntoView({block:"start",behavior:reduced()?"auto":"smooth"})})}
+let buildSel=null;
+function editChunk(id){buildSel=id;renderDay();go("day")}
 function go(v){if(!["today","day","library"].includes(v))v="today";try{history.replaceState(null,"","#"+v)}catch(e){}show(v)}
-function show(v){["today","day","library"].forEach(x=>{const e=$("v-"+x);e.hidden=x!==v;if(x===v){e.classList.remove("enter");void e.offsetWidth;e.classList.add("enter")}});$("back").hidden=v==="today";$("rerun").hidden=v!=="today";window.scrollTo(0,0);if(v==="today")fitHello()}
-$("back").addEventListener("click",()=>go(location.hash==="#library"&&$("v-library").dataset.from==="day"?"day":"today"));$("to-lib").addEventListener("click",()=>{$("v-library").dataset.from="day";go("library")});
+function show(v){["today","day","library"].forEach(x=>{const e=$("v-"+x);e.hidden=x!==v;if(x===v){e.classList.remove("enter");void e.offsetWidth;e.classList.add("enter")}});document.querySelectorAll(".tabs button").forEach(b=>b.setAttribute("aria-current",b.dataset.view===v?"page":"false"));window.scrollTo(0,0);if(v==="today")fitHello()}
+document.querySelectorAll(".tabs button").forEach(b=>b.addEventListener("click",()=>go(b.dataset.view)));
 window.addEventListener("hashchange",()=>show((location.hash||"#today").slice(1)));
 $("q").addEventListener("input",e=>{query=e.target.value;renderLib()});
 function renderAll(){if(drag)return;renderToday();renderDay();renderCats();renderLib();if(sheet&&sheet.type!=="rename")renderSheet()}
@@ -944,7 +944,7 @@ function showErr(e){
   if(e&&e.code==="invalid_argument"){canWrite=false;s.textContent="This view is read-only, so changes can't be saved.";renderAll()}
   else s.textContent="That change didn't save. Try again in a moment.";
 }
-$("add-chunk").addEventListener("click",()=>{if(!can())return;const cs=chunks();const last=cs[cs.length-1];const t=last?Math.min(toM(last.time)+180,23*60):20*60;saveChunks([...cs,{id:uid("c"),name:"Late evening",time:fromM(t)}])});
+$("add-chunk").addEventListener("click",()=>{if(!can())return;const cs=chunks();const last=cs[cs.length-1];const t=last?Math.min(toM(last.time)+180,23*60):20*60;const id=uid("c");buildSel=id;saveChunks([...cs,{id,name:"Late evening",time:fromM(t)}])});
 
 /* ---------- One-time upgrade: grouped moments become individual actions ---------- */
 /* Remove accidental duplicates (same action twice in one part of the day), keeping their habits */
