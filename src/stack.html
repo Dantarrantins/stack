@@ -798,7 +798,7 @@ function renderDay(){
       editMode?el("button",{class:"dt-add","aria-label":"Add a part of the day",title:"Add a part of the day",onclick:addChunk,disabled:!can()},"+ Add"):null)));
   if(!editMode)box.append(slotMeter(slotInfo()));
   if(editMode)box.append(el("p",{class:"sub modehint",text:"Rename, retime, reorder or remove the things you already do. Your stacked habits are locked while you edit."}));
-  const tr=!editMode&&trial(),ta=tr&&firstFit(tr);
+  const tr=null,ta=null; /* "Try this week" card retired */
   if(tr&&ta)box.append(el("div",{class:"trial"+(Date.now()-fx.swap<900?" in":"")},
     el("div",{class:"trial-top"},el("span",{class:"tag",text:"Try this week"}),el("span",{class:"rmeta",text:`Fits after ${ta.name.toLowerCase()}`})),
     el("button",{class:"trial-name",onclick:()=>openSheet(tr.id),text:tr.title}),
@@ -834,7 +834,7 @@ function renderDay(){
             el("span",{class:"act-name",text:a.name}),
             el("span",{class:"rmeta",text:`${a.duration||5} min`})),
           el("ol",{class:"stack","data-drop":"habits","data-anchor":a.id},st.map(h=>habitRow(h,{drag:true}))),
-          sug?el("div",{class:"sugg"},el("span",{class:"sugg-l",text:"Suggested"}),el("button",{class:"sugg-n",onclick:()=>openSheet(sug.id),text:sug.short||sug.title}),el("button",{class:"sugg-add",onclick:()=>place(sug,a.id),disabled:!can()},"Add")):null,
+          false&&sug?el("div",{class:"sugg"},el("span",{class:"sugg-l",text:"Suggested"}),el("button",{class:"sugg-n",onclick:()=>openSheet(sug.id),text:sug.short||sug.title}),el("button",{class:"sugg-add",onclick:()=>place(sug,a.id),disabled:!can()},"Add")):null,
           el("button",{class:"stacklink",onclick:()=>openPicker(a.id),disabled:!can()},"+ Stack a habit"));
       })),
       editMode?el("button",{class:"addact",onclick:()=>addActivity(c.id),disabled:!can()},`+ Add something you do in the ${c.name.toLowerCase()}`):null));
