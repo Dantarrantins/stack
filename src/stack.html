@@ -191,6 +191,7 @@ h2{font-size:28px;font-weight:300;letter-spacing:-.01em;line-height:1.1;margin:0
 .act.quiet{padding:6px 0}
 .stack{list-style:none;margin:2px 0 0 56px;padding:0 0 0 14px;border-left:2px solid color-mix(in srgb,var(--accent) 35%,transparent);display:grid;gap:2px;min-height:4px}
 #v-day .stack{margin-left:22px}
+.hbul{width:9px;height:9px;border-radius:50%;background:var(--accent);margin:0 6px}
 .stack:empty{border-left:0;min-height:0;margin-top:0}
 .hab{display:grid;grid-template-columns:auto auto 1fr auto;gap:10px;align-items:center;padding:6px 0;border-radius:10px;background:inherit}
 #v-today .hab{grid-template-columns:auto 1fr auto}
@@ -453,9 +454,9 @@ function stats(){
 const doneMap=()=>(checkins[todayKey]&&checkins[todayKey].done)||{};
 function habitRow(h,opts={}){
   const done=doneMap();const on=!!done[h.id];const now=Date.now();
-  return el("li",{class:"hab"+(on?" done":"")+(fx.tick===h.id&&now-fx.t<700?" pop":"")+(fx.arrive===h.id&&now-fx.ta<1500?" arrive":""),"data-id":h.id},
+  return el("li",{class:"hab"+(on&&!opts.drag?" done":"")+(fx.tick===h.id&&now-fx.t<700?" pop":"")+(fx.arrive===h.id&&now-fx.ta<1500?" arrive":""),"data-id":h.id},
     opts.drag?el("span",{class:"grip",title:"Drag to move","aria-hidden":"true"},"⠇"):null,
-    el("button",{class:"tick","aria-pressed":String(on),"aria-label":(on?"Untick ":"Tick ")+(h.short||h.title),onclick:()=>toggleDone(h.id),disabled:!can()},checkSvg()),
+    opts.drag?el("span",{class:"hbul","aria-hidden":"true"}):el("button",{class:"tick","aria-pressed":String(on),"aria-label":(on?"Untick ":"Tick ")+(h.short||h.title),onclick:()=>toggleDone(h.id),disabled:!can()},checkSvg()),
     el("button",{class:"sname",onclick:()=>openSheet(h.id),text:h.short||h.title}),
     el("span",{class:"sside"},h.listen?el("span",{class:"play","aria-label":"Has a clip",text:"▶"}):null,el("span",{class:"mono",text:`${hMins(h)} min`})));
 }
