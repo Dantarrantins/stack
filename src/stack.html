@@ -85,6 +85,7 @@ h2{font-size:28px;font-weight:300;letter-spacing:-.01em;line-height:1.1;margin:0
 .acct-btn{font:inherit;font-size:14px;background:none;border:0;padding:4px 0;color:var(--ink);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 .acct-btn.danger{color:#A3412F}
 .acct-msg{margin:0;font-size:13px}
+.app-ver{margin:0;font-size:12.5px!important;color:var(--faint)!important}
 .redit{margin-left:auto;font:inherit;font-size:14px;color:var(--muted);background:none;border:0;padding:6px 0 6px 10px;cursor:pointer;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:3px;transition:color .15s,text-decoration-color .15s}
 #plan .chunk{scroll-margin-top:90px}
 .redit:hover,.redit:focus-visible{color:var(--ink);text-decoration-color:currentColor}
@@ -981,7 +982,8 @@ function renderSetup(){
     el("label",{class:"namefield",for:"ob-name"},"What should we call you?",el("input",{id:"ob-name",value:ob.name||"",placeholder:"First name",autocomplete:"given-name",oninput:e=>{ob.name=e.target.value}})),
     el("p",{text:"You already have routines: you wake up, shower, brush your teeth, eat. Stack helps you attach small, expert-backed habits to those moments, so a new habit has somewhere to live."}),
     el("p",{text:"First you'll map what you already do. Then you'll stack one or two new things onto it."}),
-    accountBox());}
+    accountBox(),
+    window.STACK_VERSION?el("p",{class:"app-ver",text:`Stack ${window.STACK_VERSION}`+(window.STACK_ENV&&window.STACK_ENV!=="live"?` \u00B7 ${window.STACK_ENV}`:"")}):null);}
   else if(i===1){body.append(el("h1",{id:"onb-h",text:"How is your day shaped?"}),el("p",{text:"Most days split into a few parts. Set roughly when each one starts."}),
     el("div",{class:"ob-chunks"},ob.chunks.map((c,ci)=>el("div",{class:"ob-chunkrow",style:{background:soft(c.id)}},
       el("input",{class:"ob-cname",value:c.name,"aria-label":"Part of the day",oninput:e=>{c.name=e.target.value}}),
