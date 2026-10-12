@@ -1,5 +1,5 @@
 {
- "version": 2,
+ "version": 3,
  "habits": {
   "bartlett-filter": {
    "added": "2026-10-12",
@@ -50,7 +50,8 @@
    "evidence": "Several experts",
    "expert": "Dr Darren Candow",
    "fits": [
-    "breakfast"
+    "breakfast",
+    "coffee"
    ],
    "flag": true,
    "kind": "step",
@@ -90,8 +91,7 @@
    "evidence": "One expert",
    "expert": "James Clear",
    "fits": [
-    "dinner",
-    "bedtime"
+    "after-dinner"
    ],
    "flag": false,
    "kind": "step",
@@ -214,7 +214,7 @@
    "evidence": "Christian tradition",
    "expert": "John Mark Comer",
    "fits": [
-    "bedtime"
+    "bed"
    ],
    "flag": false,
    "kind": "step",
@@ -319,8 +319,9 @@
    "evidence": "Christian tradition",
    "expert": "John Mark Comer",
    "fits": [
+    "coffee",
     "breakfast",
-    "bedtime"
+    "bed"
    ],
    "flag": false,
    "kind": "step",
@@ -344,8 +345,8 @@
    "evidence": "Christian tradition",
    "expert": "John Mark Comer",
    "fits": [
-    "ready",
-    "after-breakfast"
+    "dressed",
+    "wake"
    ],
    "flag": false,
    "kind": "step",
@@ -408,7 +409,7 @@
    "expert": "Andrew Huberman",
    "fits": [
     "pause",
-    "bedtime"
+    "bed"
    ],
    "flag": false,
    "kind": "step",
@@ -436,7 +437,8 @@
    "evidence": "Several experts",
    "expert": "Andrew Huberman",
    "fits": [
-    "bedtime"
+    "after-dinner",
+    "teeth-pm"
    ],
    "flag": false,
    "kind": "step",
@@ -464,7 +466,8 @@
    "evidence": "Several experts",
    "expert": "Andrew Huberman",
    "fits": [
-    "after-breakfast"
+    "work-start",
+    "wake"
    ],
    "flag": false,
    "kind": "step",
@@ -492,7 +495,7 @@
    "evidence": "One expert",
    "expert": "Andrew Huberman",
    "fits": [
-    "ready"
+    "wake"
    ],
    "flag": false,
    "kind": "step",
@@ -577,8 +580,8 @@
    "evidence": "Debated",
    "expert": "Jessie Inchauspé",
    "fits": [
-    "lunch",
-    "dinner"
+    "lunch-prep",
+    "cook"
    ],
    "flag": true,
    "kind": "step",
@@ -621,8 +624,8 @@
    "evidence": "One expert",
    "expert": "Dan Murray-Serter",
    "fits": [
-    "ready",
-    "breakfast"
+    "wake",
+    "dressed"
    ],
    "flag": false,
    "kind": "step",
@@ -848,7 +851,7 @@
    "evidence": "Debated",
    "expert": "Chris Williamson",
    "fits": [
-    "breakfast"
+    "coffee"
    ],
    "flag": false,
    "kind": "step",
@@ -896,7 +899,7 @@
    "expert": "Chris Williamson",
    "fits": [
     "after-lunch",
-    "dinner"
+    "after-dinner"
    ],
    "flag": false,
    "kind": "step",
@@ -943,7 +946,7 @@
    "evidence": "One expert",
    "expert": "Chris Williamson",
    "fits": [
-    "ready"
+    "wake"
    ],
    "flag": false,
    "kind": "step",
@@ -970,7 +973,8 @@
    "evidence": "One expert",
    "expert": "Chris Williamson",
    "fits": [
-    "bedtime"
+    "teeth-pm",
+    "bed"
    ],
    "flag": false,
    "kind": "step",
@@ -998,8 +1002,8 @@
    "evidence": "One expert",
    "expert": "Dr Vonda Wright",
    "fits": [
-    "bedtime",
-    "ready"
+    "teeth-am",
+    "teeth-pm"
    ],
    "flag": false,
    "kind": "step",
@@ -1028,7 +1032,7 @@
    "expert": "Dr Vonda Wright",
    "fits": [
     "after-lunch",
-    "after-breakfast"
+    "work-start"
    ],
    "flag": false,
    "kind": "step",
@@ -1075,7 +1079,7 @@
    "evidence": "One expert",
    "expert": "Dr Vonda Wright",
    "fits": [
-    "after-breakfast"
+    "work-start"
    ],
    "flag": false,
    "kind": "step",
@@ -1087,85 +1091,117 @@
   }
  },
  "anchors": {
-  "d-after": {
-   "name": "After eating",
-   "order": 3,
-   "slot": "midday",
-   "kind": "after-lunch",
-   "existing": [
-    "Back to work"
-   ]
-  },
-  "d-lunch": {
-   "name": "Lunch",
-   "order": 2,
-   "slot": "midday",
-   "kind": "lunch",
-   "existing": [
-    "Make lunch",
-    "Eat lunch"
-   ]
-  },
-  "d-pause": {
-   "name": "Pause work",
-   "order": 1,
-   "slot": "midday",
-   "kind": "pause",
-   "existing": [
-    "Close the laptop"
-   ]
-  },
-  "e-dinner": {
-   "name": "Evening meal",
-   "order": 1,
-   "slot": "evening",
-   "kind": "dinner",
-   "existing": [
-    "Cook",
-    "Eat dinner",
-    "Wash up"
-   ]
-  },
-  "e-wind": {
-   "name": "Winding down",
-   "order": 2,
-   "slot": "evening",
-   "kind": "bedtime",
-   "existing": [
-    "Brush teeth",
-    "Get into bed"
-   ]
-  },
-  "m-breakfast": {
-   "name": "Breakfast",
-   "order": 2,
+  "a-morning-wake": {
+   "name": "Wake up",
    "slot": "morning",
+   "order": 1,
+   "kind": "wake",
+   "duration": 5
+  },
+  "a-morning-shower": {
+   "name": "Shower",
+   "slot": "morning",
+   "order": 2,
+   "kind": "shower",
+   "duration": 10
+  },
+  "a-morning-teeth-am": {
+   "name": "Brush teeth",
+   "slot": "morning",
+   "order": 3,
+   "kind": "teeth-am",
+   "duration": 3
+  },
+  "a-morning-dressed": {
+   "name": "Get dressed",
+   "slot": "morning",
+   "order": 4,
+   "kind": "dressed",
+   "duration": 5
+  },
+  "a-morning-coffee": {
+   "name": "Make a coffee",
+   "slot": "morning",
+   "order": 5,
+   "kind": "coffee",
+   "duration": 5
+  },
+  "a-morning-breakfast": {
+   "name": "Eat breakfast",
+   "slot": "morning",
+   "order": 6,
    "kind": "breakfast",
-   "existing": [
-    "Make a coffee",
-    "Eat breakfast"
-   ]
+   "duration": 15
   },
-  "m-out": {
-   "name": "After breakfast",
-   "order": 3,
+  "a-morning-work-start": {
+   "name": "Head to work",
    "slot": "morning",
-   "kind": "after-breakfast",
-   "existing": [
-    "Head to work"
-   ]
+   "order": 7,
+   "kind": "work-start",
+   "duration": 5
   },
-  "m-ready": {
-   "name": "Getting ready",
+  "a-midday-pause": {
+   "name": "Close the laptop",
+   "slot": "midday",
    "order": 1,
-   "slot": "morning",
-   "kind": "ready",
-   "existing": [
-    "Wake up",
-    "Shower",
-    "Brush teeth",
-    "Get dressed"
-   ]
+   "kind": "pause",
+   "duration": 2
+  },
+  "a-midday-lunch-prep": {
+   "name": "Make lunch",
+   "slot": "midday",
+   "order": 2,
+   "kind": "lunch-prep",
+   "duration": 10
+  },
+  "a-midday-lunch": {
+   "name": "Eat lunch",
+   "slot": "midday",
+   "order": 3,
+   "kind": "lunch",
+   "duration": 20
+  },
+  "a-midday-after-lunch": {
+   "name": "Back to work",
+   "slot": "midday",
+   "order": 4,
+   "kind": "after-lunch",
+   "duration": 2
+  },
+  "a-evening-cook": {
+   "name": "Cook",
+   "slot": "evening",
+   "order": 1,
+   "kind": "cook",
+   "duration": 30
+  },
+  "a-evening-dinner": {
+   "name": "Eat dinner",
+   "slot": "evening",
+   "order": 2,
+   "kind": "dinner",
+   "duration": 30
+  },
+  "a-evening-after-dinner": {
+   "name": "Wash up",
+   "slot": "evening",
+   "order": 3,
+   "kind": "after-dinner",
+   "duration": 15
+  },
+  "a-evening-teeth-pm": {
+   "name": "Brush teeth",
+   "slot": "evening",
+   "order": 4,
+   "kind": "teeth-pm",
+   "duration": 3
+  },
+  "a-evening-bed": {
+   "name": "Get into bed",
+   "slot": "evening",
+   "order": 5,
+   "kind": "bed",
+   "duration": 5
   }
  }
 }

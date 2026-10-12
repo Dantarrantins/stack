@@ -15,6 +15,7 @@
     if ((store.seedVersion || 0) >= seed.version) return;
     for (const coll of ["habits", "anchors"]) {
       const cur = store.c[coll] || (store.c[coll] = {});
+      if (coll === "anchors" && Object.keys(cur).length) continue; // routines belong to the user once set up
       for (const [id, data] of Object.entries(seed[coll] || {})) {
         if (!cur[id]) { cur[id] = { ...data }; continue; }
         const keep = {};
