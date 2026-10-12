@@ -514,8 +514,11 @@ function stats(){
   const rate=k=>{const d=checkins[k]&&checkins[k].done;if(!d)return 0;return Math.min(1,steps.filter(h=>d[h.id]).length/total)};
   const days=[...Array(7)].map((_,i)=>{const d=new Date(today);d.setDate(d.getDate()-i);return dkey(d)});
   const avg=days.reduce((a,k)=>a+rate(k),0)/7;
-  let streak=0;for(let i=0;i<400;i++){const d=new Date(today);d.setDate(d.getDate()-i);const k=dkey(d);const any=checkins[k]&&checkins[k].done&&Object.keys(checkins[k].done).length;if(any)streak++;else if(i===0)continue;else break}
-  return{today:Math.round(rate(todayKey)*100),week:Math.round(avg*100),streak};
+  /* Average completion: every day since your first tick, including days with none */
+  const keys=Object.keys(checkins).filter(k=>checkins[k].done&&Object.keys(checkins[k].done).length).sort();
+  let overall=0;if(keys.length){const first=new Date(keys[0]+"T12:00:00");const n=Math.max(1,Math.round((new Date(todayKey+"T12:00:00")-first)/864e5)+1);
+    let sum=0;for(let i=0;i<n;i++){const d=new Date(today);d.setDate(d.getDate()-i);sum+=rate(dkey(d))}overall=sum/n}
+  return{today:Math.round(rate(todayKey)*100),week:Math.round(avg*100),overall:Math.round(overall*100)};
 }
 
 /* ---------- Shared rows ---------- */
@@ -565,7 +568,7 @@ function renderToday(){
   $("today-sub").textContent=today.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"})+` · Week ${wk.n}`+(loaded&&all.length?` · ${n} of ${all.length} done`:"");
   $("prog").style.width=all.length?(n/all.length*100)+"%":"0";
   const st=loaded?stats():null;const sb=$("stats");sb.replaceChildren();
-  if(st)sb.append(el("span",{},el("b",{text:st.today+"%"})," today"),el("span",{},el("b",{text:st.week+"%"})," last 7 days"),el("span",{},el("b",{text:String(st.streak)}),` day${st.streak===1?"":"s"} in a row`));
+  if(st)sb.append(el("span",{},el("b",{text:st.today+"%"})," today"),el("span",{},el("b",{text:st.week+"%"})," last 7 days"),el("span",{},el("b",{text:st.overall+"%"})," average"));
   const box=$("routines");box.replaceChildren();
   if(!loaded){box.append(el("p",{class:"sub",text:"Loading…"}));return}
   if(!all.length){box.append(el("div",{class:"emptycard"},el("p",{text:"Nothing stacked yet."}),el("button",{class:"btn primary",onclick:()=>go("day")},"Open Build")));return}
