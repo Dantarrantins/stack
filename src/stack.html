@@ -296,6 +296,12 @@ html,body{overflow-x:hidden}
 .pc-name{font-size:28px;font-weight:300;letter-spacing:-.01em;line-height:1.1}
 .pc-stat{font-size:13px;color:var(--muted)}
 .pc-show{font-size:16px;color:var(--faint);transform:translateY(-4px)}
+/* Top bar is see-through at the top of the page so the sky glow can sit behind it */
+.top{background:transparent!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;transition:background .25s}
+body.scrolled .top{background:color-mix(in srgb,var(--bg) 88%,transparent)!important;backdrop-filter:blur(10px)!important;-webkit-backdrop-filter:blur(10px)!important}
+@media (max-width:600px){body.scrolled .top{background:transparent!important;backdrop-filter:none!important}}
+.wrap{position:relative;z-index:1}
+#v-today>.sky{top:-120px}
 /* Build modes */
 .wrap>*,.view>*,.plan>*,.chunk>*,.acts>*,.act>*{min-width:0}
 .ename{width:0}
@@ -563,6 +569,7 @@ function phase(m){return m<5*60?"night":m<11*60?"morning":m<17*60?"midday":m<21*
 /* Keep the greeting on one line: size it to the available width (max 72px); the clock matches */
 function fitHello(){const h=$("today-h"),c=$("clock");if(!h)return;h.style.fontSize="72px";const w=h.parentElement.clientWidth;const need=h.scrollWidth;const size=need>w?Math.max(26,Math.floor(72*w/need)):72;h.style.fontSize=size+"px";if(c)c.style.fontSize=size+"px"}
 addEventListener("resize",()=>fitHello());
+addEventListener("scroll",()=>document.body.classList.toggle("scrolled",scrollY>8),{passive:true});
 function lede(m,all,done){const p=phase(m);const left=all.filter(h=>!done[h.id]).length;
   if(all.length&&!left)return"Everything's stacked and done for today. Nicely done.";
   return p==="morning"?"A fresh start. Begin with what's up next.":p==="midday"?"Keep the rhythm going through the afternoon.":p==="evening"?"Time to slow down and finish the day well.":"Rest well. Tomorrow's stack is ready."}
