@@ -1015,13 +1015,13 @@ function renderSheet(){
     const mine=cand.filter(h=>h.custom);
     const n=stepsAt(a.id).length;
     frame(el("div",{class:"sheet-top"},el("span",{class:"kv",text:`${chunkName(a.slot)} · ${a.name}`}),el("button",{class:"iconbtn",onclick:closeSheet},n?"Done":"Close")),
-      el("h2",{id:"sheet-h",text:`After you ${a.name.charAt(0).toLowerCase()+a.name.slice(1)}…`}),
+      el("h2",{id:"sheet-h",text:"Pick a habit to stack"}),
       el("p",{class:"sub",style:{marginTop:0},text:n?`${n} habit${n>1?"s":""} stacked here. Add another, or tap Done.`:"Pick one or more habits to stack here. Good fits come first."}),
       slotMeter(si),
       el("button",{class:"create-btn",onclick:()=>{sheet={type:"create",anchorId:a.id};renderSheet();focusSheet()},disabled:!can()},"+ Create your own habit"),
-      mine.length?el("div",{class:"sec"},el("h3",{text:"Your own"}),el("div",{class:"picklist"},mine.map(row))):null,
       cand.some(h=>h.saved&&!h.custom)?el("div",{class:"sec"},el("h3",{text:"Saved"}),el("div",{class:"picklist"},cand.filter(h=>h.saved&&!h.custom).map(row))):null,
       good.length?el("div",{class:"sec"},el("h3",{text:"Good fits"}),el("div",{class:"picklist"},good.filter(h=>!h.custom).map(row))):null,
+      mine.length?el("div",{class:"sec"},el("h3",{text:"Your own"}),el("div",{class:"picklist"},mine.map(row))):null,
       el("div",{class:"sec"},el("h3",{text:good.length?"Everything else":"All habits"}),el("div",{class:"picklist"},rest.filter(h=>!h.custom).map(row))));
     return;
   }
