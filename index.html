@@ -309,6 +309,25 @@ html,body{overflow-x:hidden}
 .pc-bar i{display:block;height:100%;background:var(--accent)}
 .pc-stat{font-size:13px;color:var(--muted)}
 .pc-show{font-size:13px;font-weight:500;color:var(--accent)}
+/* Build modes */
+.wrap>*,.view>*,.plan>*,.chunk>*,.acts>*,.act>*{min-width:0}
+.ename{width:0}
+.act-time input{width:64px}
+.act-time input::-webkit-calendar-picker-indicator{display:none}
+.act-time input::-webkit-datetime-edit-ampm-field{display:none}
+.chunk.editing .act-h{gap:8px}
+@media (max-width:600px){.ename{font-size:17px}.ename-chunk{font-size:26px}.act-dur{font-size:12px}}
+.modebar{display:inline-flex;gap:4px;border:1px solid var(--line);border-radius:999px;padding:4px;justify-self:start}
+.modebar button{border:0;background:transparent;color:var(--muted);font:inherit;font-size:14px;font-weight:500;padding:8px 16px;border-radius:999px;cursor:pointer}
+.modebar button[aria-pressed="true"]{background:var(--chip-on-bg);color:var(--chip-on-ink)}
+.modehint{margin:-6px 0 0;font-size:14px}
+.ename{flex:1;min-width:0;font:inherit;font-size:19px;letter-spacing:-.01em;color:var(--ink);background:transparent;border:0;border-bottom:1px dashed transparent;border-radius:0;padding:2px 0;outline:none}
+.ename:hover:not(:disabled){border-bottom-color:var(--faint)}
+.ename:focus{border-bottom-color:var(--accent)}
+.ename-chunk{flex:1;font-size:28px;font-weight:300}
+.chunk.editing .act-h{min-height:40px}
+.locked{margin:2px 0 0 22px;padding-left:14px;border-left:2px solid var(--line);font-size:13px;color:var(--muted)}
+.addact{justify-self:start;font:inherit;font-size:14px;color:var(--accent);background:none;border:0;padding:10px 0 4px;cursor:pointer}
 /* Stats */
 .statrow{display:flex;align-items:center;gap:14px;margin-top:18px;flex-wrap:wrap}
 .statrow .progress{margin-top:0;flex:0 1 240px}
@@ -401,10 +420,10 @@ html,body{overflow-x:hidden}
   <section class="view" id="v-day" aria-labelledby="day-h" hidden>
     <div>
       <h1 id="day-h">Build your day</h1>
-      <p class="sub">The things you already do, in order, with new habits stacked underneath. Drag to reorder, tap a time to change it, and everything after shifts to fit.</p>
+      <p class="sub">The things you already do, in order, with new habits stacked underneath. Times shift to fit as you stack.</p>
     </div>
     <div class="plan" id="plan"></div>
-    <div class="btns"><button class="btn" id="edit-day" type="button">Edit what you already do</button><button class="btn" id="add-chunk" type="button">+ Add a part of the day</button></div>
+    <div class="btns"><button class="btn" id="add-chunk" type="button" hidden>+ Add a part of the day</button></div>
   </section>
 
   <section class="view" id="v-library" aria-labelledby="lib-h" hidden>
@@ -606,10 +625,17 @@ function tickClock(){const d=new Date();const h=$("clock-h"),mm=$("clock-m");if(
 tickClock();setInterval(tickClock,1000);
 
 /* ---------- Build: the schedule builder ---------- */
+let editMode=false;
 function renderDay(){
   const box=$("plan");box.replaceChildren();
   if(!loaded){box.append(el("p",{class:"sub",text:"Loading…"}));return}
-  const tr=trial(),ta=firstFit(tr);
+  const keep=document.activeElement&&document.activeElement.dataset&&document.activeElement.dataset.key;
+  box.append(el("div",{class:"modebar",role:"group","aria-label":"Build mode"},
+    el("button",{"aria-pressed":String(!editMode),onclick:()=>{editMode=false;renderDay()}},"Stack habits"),
+    el("button",{"aria-pressed":String(editMode),onclick:()=>{editMode=true;renderDay()}},"Edit routine")));
+  $("add-chunk").hidden=!editMode;
+  if(editMode)box.append(el("p",{class:"sub modehint",text:"Rename, retime, reorder or remove the things you already do. Your stacked habits are locked while you edit."}));
+  const tr=!editMode&&trial(),ta=tr&&firstFit(tr);
   if(tr&&ta)box.append(el("div",{class:"trial"+(Date.now()-fx.swap<900?" in":"")},
     el("div",{class:"trial-top"},el("span",{class:"tag",text:"Try this week"}),el("span",{class:"rmeta",text:`Fits after ${ta.name.toLowerCase()}`})),
     el("button",{class:"trial-name",onclick:()=>openSheet(tr.id),text:tr.title}),
@@ -619,29 +645,42 @@ function renderDay(){
       el("button",{class:"btn",onclick:skip,disabled:!can()},"Show another"),
       el("button",{class:"btn",onclick:()=>saveSettings({dismissed:[...dismissed(),tr.id]}),disabled:!can()},"Not for me"))));
   const used=new Set(habits.filter(h=>h.anchor).map(h=>h.id));
-  chunks().forEach(c=>{
+  const cs=chunks();
+  cs.forEach(c=>{
     const as=anchorsIn(c.id);const sch=schedule(c.id);
-    box.append(el("section",{class:"chunk",style:{background:soft(c.id)},"aria-label":c.name},
+    box.append(el("section",{class:"chunk"+(editMode?" editing":""),style:{background:soft(c.id)},"aria-label":c.name},
       el("div",{class:"chead"},
-        el("h2",{text:c.name}),
-        el("span",{class:"rmeta mono",text:as.length?`until ${fromM(sch.end)}`:""}),
-        el("button",{class:"mini",title:"Rename",onclick:()=>openRename(c),disabled:!can(),"aria-label":`Rename ${c.name}`},"✎")),
+        editMode?el("input",{class:"ename ename-chunk",value:c.name,"data-key":"c-"+c.id,"aria-label":"Part of the day name",disabled:!can(),onchange:e=>{const v=e.target.value.trim();if(v&&v!==c.name)saveChunks(chunks().map(x=>x.id===c.id?{...x,name:v}:x))},onkeydown:e=>{if(e.key==="Enter")e.target.blur()}}):el("h2",{text:c.name}),
+        editMode?el("label",{class:"act-time mono"},el("input",{type:"time",value:c.time,"aria-label":`${c.name} starts`,disabled:!can(),onchange:e=>{if(e.target.value)saveChunks(chunks().map(x=>x.id===c.id?{...x,time:e.target.value}:x))}})):el("span",{class:"rmeta mono",text:as.length?`until ${fromM(sch.end)}`:""}),
+        editMode&&!as.length&&cs.length>1?el("button",{class:"mini",title:"Remove this part of the day",onclick:()=>saveChunks(chunks().filter(x=>x.id!==c.id)),"aria-label":`Remove ${c.name}`},"\u00D7"):null),
       el("div",{class:"acts","data-drop":"acts","data-chunk":c.id},as.map((a,i)=>{
         const st=stepsAt(a.id);const t=sch.times[a.id];
+        if(editMode)return el("div",{class:"act","data-id":a.id},
+          el("div",{class:"act-h"},
+            el("span",{class:"grip",title:"Drag to move","aria-hidden":"true"},"\u2807"),
+            el("label",{class:"act-time mono"},el("input",{type:"time",value:fromM(t.start),"aria-label":`${a.name} time`,disabled:!can(),onchange:e=>{const v=e.target.value;if(!v)return;i===0?saveChunks(chunks().map(x=>x.id===c.id?{...x,time:v}:x)):updAnchor(a,{time:v})}})),
+            el("input",{class:"ename",value:a.name,id:"an-"+a.id,"data-key":"a-"+a.id,"aria-label":"Activity name",disabled:!can(),onchange:e=>{const v=e.target.value.trim();if(v&&v!==a.name)updAnchor(a,{name:v,kind:a.kind&&a.kind!=="custom"?a.kind:kindFor(v,a.slot)})},onkeydown:e=>{if(e.key==="Enter")e.target.blur()}}),
+            el("select",{class:"act-dur","aria-label":`${a.name} takes`,disabled:!can(),onchange:e=>updAnchor(a,{duration:+e.target.value})},DURS.map(d=>el("option",{value:d,selected:(a.duration||5)===d,text:`${d} min`}))),
+            el("button",{class:"mini",title:"Remove",onclick:()=>delAnchor(a),disabled:!can(),"aria-label":`Remove ${a.name}`},"\u00D7")),
+          st.length?el("p",{class:"locked",text:`${st.length} stacked habit${st.length>1?"s":""} \u00B7 ${st.map(h=>h.short||h.title).join(", ")}`}):null);
         const sug=!st.length?habits.find(h=>!used.has(h.id)&&(h.kind||"step")==="step"&&fitsAnchor(h,a)&&!dismissed().includes(h.id)):null;
         if(sug)used.add(sug.id);
         return el("div",{class:"act","data-id":a.id},
           el("div",{class:"act-h"},
-            el("span",{class:"grip",title:"Drag to move","aria-hidden":"true"},"⠇"),
-            el("label",{class:"act-time mono"},el("input",{type:"time",value:fromM(t.start),"aria-label":`${a.name} time`,disabled:!can(),onchange:e=>{const v=e.target.value;if(!v)return;i===0?saveChunks(chunks().map(x=>x.id===c.id?{...x,time:v}:x)):updAnchor(a,{time:v})}})),
+            el("span",{class:"act-time mono",text:fromM(t.start)}),
             el("span",{class:"act-name",text:a.name}),
-            el("select",{class:"act-dur","aria-label":`${a.name} takes`,disabled:!can(),onchange:e=>updAnchor(a,{duration:+e.target.value})},DURS.map(d=>el("option",{value:d,selected:(a.duration||5)===d,text:`${d} min`})))),
+            el("span",{class:"rmeta",text:`${a.duration||5} min`})),
           el("ol",{class:"stack","data-drop":"habits","data-anchor":a.id},st.map(h=>habitRow(h,{drag:true}))),
           sug?el("div",{class:"sugg"},el("span",{class:"sugg-l",text:"Suggested"}),el("button",{class:"sugg-n",onclick:()=>openSheet(sug.id),text:sug.short||sug.title}),el("button",{class:"sugg-add",onclick:()=>place(sug,a.id),disabled:!can()},"Add")):null,
           el("button",{class:"stacklink",onclick:()=>openPicker(a.id),disabled:!can()},"+ Stack a habit"));
-      }))));
+      })),
+      editMode?el("button",{class:"addact",onclick:()=>addActivity(c.id),disabled:!can()},`+ Add something you do in the ${c.name.toLowerCase()}`):null));
   });
+  if(keep){const k=box.querySelector(`[data-key="${keep}"]`);k&&k.focus()}
 }
+async function addActivity(cid){if(!db)return;const as=anchorsIn(cid);const id=uid("a");
+  try{await db.doc("anchors/"+id).set({name:"New activity",slot:cid,order:Math.max(0,...as.map(x=>x.order||0))+1,kind:"custom",duration:5});setTimeout(()=>{const i=$("an-"+id);if(i){i.focus();i.select()}},150)}catch(e){showErr(e)}}
+async function delAnchor(a){if(!db)return;try{for(const h of stepsAt(a.id))await unplace(h);await db.doc("anchors/"+a.id).delete();toast(`Removed ${a.name.toLowerCase()}`)}catch(e){showErr(e)}}
 
 /* ---------- Drag to reorder (pointer events: works with touch and mouse) ---------- */
 let drag=null;
@@ -815,7 +854,6 @@ function showErr(e){
   else s.textContent="That change didn't save. Try again in a moment.";
 }
 $("add-chunk").addEventListener("click",()=>{if(!can())return;const cs=chunks();const last=cs[cs.length-1];const t=last?Math.min(toM(last.time)+180,23*60):20*60;saveChunks([...cs,{id:uid("c"),name:"Late evening",time:fromM(t)}])});
-$("edit-day").addEventListener("click",()=>{if(loaded)openSetup(2)});
 
 /* ---------- One-time upgrade: grouped moments become individual actions ---------- */
 /* Remove accidental duplicates (same action twice in one part of the day), keeping their habits */
