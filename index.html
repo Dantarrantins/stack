@@ -25,7 +25,7 @@
   --accent:#405A50; --accent-ink:#FBF9F4; --accent-soft:#E4EBE6;
   --warn:#8A5A1C; --warn-soft:#F5E9D6;
   --morning:#B88A45; --midday:#4F7A61; --evening:#56658A;
-  --morning-soft:#F2ECE2; --midday-soft:#E8EEE9; --evening-soft:#E5E9EC;
+  --morning-soft:#F2ECE2; --late-soft:#EEEAF1; --midday-soft:#E8EEE9; --evening-soft:#E5E9EC;
   --c-brain:#6B5BA8; --c-move:#3F7A57; --c-sleep:#435663; --c-food:#A0692A; --c-supp:#B4545C; --c-mind:#3E7D80; --c-habit:#7A7468; --c-faith:#8C7A3E;
   --f:"Figtree","Helvetica Neue",Arial,sans-serif; --mono:"Figtree","Helvetica Neue",Arial,sans-serif;
   --chip-bg:transparent; --chip-ink:#1E2421; --chip-line:#E2DDD4; --chip-on-bg:#111111; --chip-on-ink:#F4F2EC; --chip-on-line:#111111;
@@ -36,7 +36,7 @@
   --accent:#9CC0AF; --accent-ink:#141716; --accent-soft:#22302A;
   --warn:#E2AE66; --warn-soft:#352915;
   --morning:#E0B06A; --midday:#86BC9A; --evening:#98A7CF;
-  --morning-soft:#221F1A; --midday-soft:#1B2420; --evening-soft:#1A1F24;
+  --morning-soft:#221F1A; --late-soft:#1E1B23; --midday-soft:#1B2420; --evening-soft:#1A1F24;
   --c-brain:#AA9DE6; --c-move:#7CC49A; --c-sleep:#94AEC2; --c-food:#E0A866; --c-supp:#EC8D95; --c-mind:#7FC4C6; --c-habit:#B9B2A4; --c-faith:#D4BF79;
   --chip-bg:#ECEAE4; --chip-ink:#141716; --chip-line:#ECEAE4; --chip-on-bg:#000000; --chip-on-ink:#ECEAE4; --chip-on-line:#9CC0AF; color-scheme:dark}}
 :root[data-theme="dark"]{
@@ -44,7 +44,7 @@
   --accent:#9CC0AF; --accent-ink:#141716; --accent-soft:#22302A;
   --warn:#E2AE66; --warn-soft:#352915;
   --morning:#E0B06A; --midday:#86BC9A; --evening:#98A7CF;
-  --morning-soft:#221F1A; --midday-soft:#1B2420; --evening-soft:#1A1F24;
+  --morning-soft:#221F1A; --late-soft:#1E1B23; --midday-soft:#1B2420; --evening-soft:#1A1F24;
   --c-brain:#AA9DE6; --c-move:#7CC49A; --c-sleep:#94AEC2; --c-food:#E0A866; --c-supp:#EC8D95; --c-mind:#7FC4C6; --c-habit:#B9B2A4; --c-faith:#D4BF79;
   --chip-bg:#ECEAE4; --chip-ink:#141716; --chip-line:#ECEAE4; --chip-on-bg:#000000; --chip-on-ink:#ECEAE4; --chip-on-line:#9CC0AF; color-scheme:dark}
 *{box-sizing:border-box}
@@ -187,8 +187,65 @@ h2{font-size:28px;font-weight:300;letter-spacing:-.01em;line-height:1.1;margin:0
   .tabs{position:fixed;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);z-index:6;justify-content:space-between;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 6px 24px rgba(0,0,0,.12)}
   .tabs button{flex:1;padding:11px 8px;font-size:14px}
   .wrap{padding-bottom:calc(env(safe-area-inset-bottom,0px) + 110px)}
-  .toast{bottom:calc(env(safe-area-inset-bottom,0px) + 84px)}
+  .toast{bottom:calc(env(safe-area-inset-bottom,0px) + 92px)}
 }
+/* Day plan editor */
+.plan{display:grid;gap:22px}
+.chunk{display:grid;gap:12px}
+.chead{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.chead h2{flex:1;min-width:0}
+.cmeta{margin:-6px 0 0;font-size:13px;color:var(--accent)}
+.ctime{font:inherit;font-size:14px;padding:7px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.moment{border-radius:var(--r);padding:12px 16px 12px;display:grid;gap:2px}
+.mhead{display:flex;align-items:center;gap:2px}
+.mname{flex:1;font:inherit;font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);background:transparent;border:1px solid transparent;border-radius:8px;padding:6px;margin-left:-6px;min-width:0}
+.mname:focus{border-color:var(--line);background:var(--surface);color:var(--ink);outline:none}
+.mini{border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:15px;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;flex:none;padding:0}
+.mini:hover:not(:disabled){background:color-mix(in srgb,var(--ink) 7%,transparent);color:var(--ink)}
+.mini:disabled{opacity:.3;cursor:default}
+.items{list-style:none;margin:0;padding:0;display:grid}
+.it{display:grid;grid-template-columns:18px 1fr auto;gap:10px;align-items:center;min-height:42px;border-radius:10px}
+.it .bul,.step.own .bul{width:9px;height:9px;border-radius:50%;border:1.5px solid var(--faint);justify-self:center}
+.it.own .txt{color:var(--muted)}
+.it.new .bul{background:var(--accent);border-color:var(--accent)}
+.it.new .txt{font:inherit;font-weight:500;color:var(--ink);background:none;border:0;padding:0;text-align:left;font-size:15.5px;cursor:pointer}
+.it .acts{display:flex;align-items:center;gap:2px}
+.mini.plus{color:var(--accent);font-weight:600;font-size:19px;border:1px solid color-mix(in srgb,var(--accent) 35%,transparent)}
+.addown{display:flex;margin-top:8px}
+.addown input{flex:1;font:inherit;font-size:14px;padding:9px 14px;border-radius:999px;border:1px dashed var(--faint);background:transparent;color:var(--ink);min-width:0}
+.ghostbtn{font:inherit;font-size:14px;font-weight:500;color:var(--accent);background:transparent;border:0;cursor:pointer;padding:6px 0;text-align:left;justify-self:start}
+.addchunk{font:inherit;font-size:14.5px;font-weight:500;border:1px dashed var(--faint);background:transparent;color:var(--ink);border-radius:var(--r);padding:16px;cursor:pointer}
+.gapline{margin:0;font-size:13px;color:var(--faint);text-align:center}
+.step.own{grid-template-columns:26px 1fr auto;padding:4px 0}
+.step.own .otxt{color:var(--muted);font-size:14.5px}
+.picklist{display:grid;gap:6px}
+.pickrow{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);cursor:pointer;text-align:left;font:inherit}
+.pickrow:hover{border-color:var(--accent)}
+.pr-main{display:grid;min-width:0}.pr-t{font-weight:500}.pr-m{font-size:12.5px;color:var(--muted)}
+.pr-add{font-size:13px;font-weight:500;color:var(--accent)}
+/* Setup builder */
+.ob-chunks{display:grid;gap:8px}
+.ob-chunkrow{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:12px}
+.ob-cname{flex:1;font:inherit;font-size:18px;font-weight:300;background:transparent;border:1px solid transparent;border-radius:8px;padding:6px 8px;color:var(--ink);min-width:0}
+.ob-cname:focus{border-color:var(--line);background:var(--surface);outline:none}
+.ob-chunk{display:grid;gap:4px;padding:18px;border-radius:var(--r)}
+.ob-chunk h2{margin-bottom:6px}
+.ob-moment{display:grid;gap:8px;padding:12px 0;border-top:1px solid var(--line)}
+.ob-moment.off .ob-mt span{color:var(--muted);text-decoration:line-through}
+.ob-mt{display:flex;align-items:center;gap:10px;font-weight:500;cursor:pointer}
+.ob-mt input{width:18px;height:18px;accent-color:var(--accent)}
+.ob-items{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding-left:28px}
+.own-chip{background:var(--surface);color:var(--ink);border-color:var(--line)}
+.ob-add{display:flex}
+.ob-add input{font:inherit;font-size:13.5px;padding:7px 12px;border-radius:999px;border:1px dashed var(--faint);background:transparent;color:var(--ink);min-width:0}
+.ob-chunk>.ob-add{margin-top:8px}.ob-chunk>.ob-add input{flex:1}
+.picks{display:grid;gap:8px}
+.pick{display:flex;gap:12px;align-items:flex-start;padding:13px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);cursor:pointer;text-align:left;color:var(--ink);font:inherit;font-weight:500}
+.pick[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.pick .box{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--accent);flex:none;display:grid;place-items:center;color:var(--accent-ink);font-size:12px}
+.pick[aria-pressed="true"] .box{background:var(--accent)}
+.pick small{display:block;color:var(--muted);font-size:13px;font-weight:400}
+.it.arrive{animation:arrive .9s ease}
 /* Stats */
 .statrow{display:flex;align-items:center;gap:14px;margin-top:18px;flex-wrap:wrap}
 .statrow .progress{margin-top:0;flex:0 1 240px}
@@ -279,10 +336,10 @@ h2{font-size:28px;font-weight:300;letter-spacing:-.01em;line-height:1.1;margin:0
   <section class="view" id="v-day" aria-labelledby="day-h" hidden>
     <div>
       <h1 id="day-h">Your day</h1>
-      <p class="sub">Built from your routines. Change the times to fit your day; blocks size themselves from the steps inside.</p>
+      <p class="sub">The things you already do, in order. Tap + next to any of them to stack a new habit straight after it.</p>
     </div>
-    <div class="times" id="times"></div>
-    <div class="timeline" id="timeline"></div>
+    <div class="plan" id="plan"></div>
+    <button class="addchunk" id="add-chunk" type="button">+ Add a part of the day</button>
     <p class="note">Next up: sending these blocks to Google Calendar. Until then, add them as recurring events yourself.</p>
   </section>
 
@@ -302,12 +359,26 @@ h2{font-size:28px;font-weight:300;letter-spacing:-.01em;line-height:1.1;margin:0
 
 <script src="local-db.js"></script>
 <script>
-const SLOTS=[{key:"morning",name:"Morning"},{key:"midday",name:"Midday"},{key:"evening",name:"Evening"}];
-const DEF_T={morning:"07:00",midday:"13:00",evening:"19:00",bed:"22:30"};
+/* ---------- Model ----------
+   chunks   (settings.chunks): parts of the day, e.g. Morning 07:00
+   anchors  (collection):      moments inside a chunk, each with the things you already do (existing[])
+   habits   (collection):      library; a stacked habit has anchor + after (an existing item) + order */
+const DEFAULT_CHUNKS=[{id:"morning",name:"Morning",time:"07:00"},{id:"midday",name:"Midday",time:"12:30"},{id:"evening",name:"Evening",time:"18:30"}];
+const PRESETS=[
+  {chunk:"morning",name:"Getting ready",kind:"ready",existing:["Wake up","Shower","Brush teeth","Get dressed"]},
+  {chunk:"morning",name:"Breakfast",kind:"breakfast",existing:["Make a coffee","Eat breakfast"]},
+  {chunk:"morning",name:"After breakfast",kind:"after-breakfast",existing:["Head to work"]},
+  {chunk:"midday",name:"Pause work",kind:"pause",existing:["Close the laptop"]},
+  {chunk:"midday",name:"Lunch",kind:"lunch",existing:["Make lunch","Eat lunch"]},
+  {chunk:"midday",name:"After eating",kind:"after-lunch",existing:["Back to work"]},
+  {chunk:"evening",name:"Evening meal",kind:"dinner",existing:["Cook","Eat dinner","Wash up"]},
+  {chunk:"evening",name:"Winding down",kind:"bedtime",existing:["Brush teeth","Get into bed"]}
+];
+const STARTERS=["huberman-water","williamson-meal-walk","huberman-evening-dim"];
 const CATS=[["Brain","--c-brain"],["Movement","--c-move"],["Sleep & light","--c-sleep"],["Nutrition","--c-food"],["Supplements","--c-supp"],["Mind & stress","--c-mind"],["Habits & focus","--c-habit"],["Christian spirituality","--c-faith"]];
 const KIND={weekly:"Weekly practice",principle:"Principle",once:"One-off"};
 const catVar=c=>(CATS.find(x=>x[0]===c)||[0,"--c-habit"])[1];
-let habits=[],anchors=[],checkins={},settings=null,settingsSeen=false,week={},filter="All",query="",db=null,canWrite=true,loaded=false,sheetId=null;
+let habits=[],anchors=[],checkins={},settings=null,settingsSeen=false,week={},filter="All",query="",db=null,canWrite=true,loaded=false,sheet=null;
 const $=id=>document.getElementById(id);
 const pad=n=>String(n).padStart(2,"0");
 const dkey=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
@@ -315,29 +386,63 @@ const today=new Date(),todayKey=dkey(today);
 function isoWeek(d){const t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));const day=t.getUTCDay()||7;t.setUTCDate(t.getUTCDate()+4-day);const y=new Date(Date.UTC(t.getUTCFullYear(),0,1));return{year:t.getUTCFullYear(),n:Math.ceil(((t-y)/864e5+1)/7)}}
 const wk=isoWeek(today),weekKey=`${wk.year}-W${pad(wk.n)}`;
 $("today-h").textContent=today.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"});
+const uid=p=>p+"-"+Math.random().toString(36).slice(2,8);
 
 function el(tag,attrs={},...kids){const e=document.createElement(tag);for(const[k,v]of Object.entries(attrs)){if(v===undefined||v===false||v===null)continue;if(k==="class")e.className=v;else if(k==="text")e.textContent=v;else if(k==="style"&&typeof v==="object")Object.assign(e.style,v);else if(k.startsWith("on"))e.addEventListener(k.slice(2),v);else e.setAttribute(k,v===true?"":v)}kids.flat().forEach(k=>k!=null&&k!==false&&e.append(k));return e}
 function dot(c){return el("span",{class:"dot","aria-hidden":"true",style:{background:`var(${catVar(c)})`}})}
 const mins=s=>{const m=String(s||"").match(/(\d+)\s*min/);return m?+m[1]:0};
 const toM=t=>{const[h,m]=(t||"0:0").split(":").map(Number);return h*60+m};
-const fromM=m=>{m=((Math.round(m)%1440)+1440)%1440;return pad(Math.floor(m/60))+":"+pad(m%60)};
-const times=()=>({...DEF_T,...((settings&&settings.times)||{})});
+const fmtDur=m=>m>=60?`${Math.floor(m/60)} h${m%60?` ${m%60} min`:""}`:`${m} min`;
 const interests=()=>settings&&settings.interests&&settings.interests.length?settings.interests:null;
 const dismissed=()=>(settings&&settings.dismissed)||[];
-const anchorsIn=slot=>anchors.filter(a=>a.slot===slot).sort((a,b)=>a.order-b.order);
-const stepsAt=aid=>habits.filter(h=>h.anchor===aid).sort((a,b)=>(a.order??99)-(b.order??99));
+function chunks(){
+  let c=settings&&settings.chunks;
+  if(!c||!c.length){const t=(settings&&settings.times)||{};c=DEFAULT_CHUNKS.map(x=>({...x,time:t[x.id]||x.time}))}
+  return c.slice().sort((a,b)=>toM(a.time)-toM(b.time));
+}
+const chunkById=id=>chunks().find(c=>c.id===id);
+const chunkName=id=>(chunkById(id)||{name:"Unplaced"}).name;
+const soft=id=>["morning","midday","evening"].includes(id)?`var(--${id}-soft)`:"var(--late-soft)";
+const anchorsIn=cid=>anchors.filter(a=>a.slot===cid).sort((a,b)=>(a.order??99)-(b.order??99));
 const anchorById=id=>anchors.find(a=>a.id===id);
+const existingOf=a=>Array.isArray(a.existing)?a.existing:[];
+function stepsAt(aid){const a=anchorById(aid);const ex=a?existingOf(a):[];
+  return habits.filter(h=>h.anchor===aid).sort((x,y)=>{const ix=x.after!=null&&ex.includes(x.after)?ex.indexOf(x.after):ex.length,iy=y.after!=null&&ex.includes(y.after)?ex.indexOf(y.after):ex.length;return ix-iy||(x.order??99)-(y.order??99)})}
+/* Sequence of a moment: things you already do, with stacked habits inserted after the item they follow */
+function sequence(a,extra){
+  const ex=existingOf(a),st=stepsAt(a.id).concat(extra?[extra]:[]);const out=[];
+  ex.forEach(item=>{out.push({own:item});st.filter(h=>h.after===item).forEach(h=>out.push({habit:h}))});
+  st.filter(h=>h.after==null||!ex.includes(h.after)).forEach(h=>out.push({habit:h}));
+  return out;
+}
 const can=()=>canWrite&&!!db;
+const fitsAnchor=(h,a)=>(h.fits||[]).includes(a.kind);
+
+/* ---------- Motion helpers ---------- */
 const fx={tick:null,t:0,arrive:null,ta:0,done:null,td:0,swap:0};
 const SVGNS="http://www.w3.org/2000/svg";
 function checkSvg(){const s=document.createElementNS(SVGNS,"svg");s.setAttribute("viewBox","0 0 16 16");s.setAttribute("aria-hidden","true");const p=document.createElementNS(SVGNS,"path");p.setAttribute("d","M3.5 8.5l3 3 6-7");s.append(p);return s}
 const reduced=()=>{try{return matchMedia("(prefers-reduced-motion: reduce)").matches}catch(e){return false}};
 function buzz(ms){try{navigator.vibrate&&navigator.vibrate(ms)}catch(e){}}
 function toast(msg){document.querySelectorAll(".toast").forEach(t=>t.remove());const t=el("div",{class:"toast",role:"status",text:msg});document.body.append(t);setTimeout(()=>t.remove(),2700)}
-function burst(slot){const b=el("div",{class:"burst","aria-hidden":"true"});const cols=["var(--accent)",`var(--${slot})`,"var(--c-faith)","var(--c-mind)"];
-  for(let i=0;i<18;i++){const a=(i/18)*Math.PI*2+Math.random()*.3,r=90+Math.random()*90;const p=el("i",{style:{}});p.style.setProperty("--x",Math.cos(a)*r+"px");p.style.setProperty("--y",Math.sin(a)*r*.6+"px");p.style.setProperty("--r",(Math.random()*360)+"deg");p.style.setProperty("--d",(Math.random()*.08)+"s");p.style.setProperty("--c",cols[i%cols.length]);b.append(p)}
+function burst(cid){const b=el("div",{class:"burst","aria-hidden":"true"});const cols=["var(--accent)","var(--morning)","var(--c-faith)","var(--c-mind)"];
+  for(let i=0;i<18;i++){const a=(i/18)*Math.PI*2+Math.random()*.3,r=90+Math.random()*90;const p=el("i");p.style.setProperty("--x",Math.cos(a)*r+"px");p.style.setProperty("--y",Math.sin(a)*r*.6+"px");p.style.setProperty("--r",(Math.random()*360)+"deg");p.style.setProperty("--d",(Math.random()*.08)+"s");p.style.setProperty("--c",cols[i%cols.length]);b.append(p)}
   return b}
-/* Stats: today's rate, 7-day rate and streak */
+
+/* ---------- Weekly trial ---------- */
+function trial(){
+  const ints=interests();
+  const ok=h=>anchors.some(a=>fitsAnchor(h,a));
+  let c=habits.filter(h=>(h.kind||"step")==="step"&&!h.anchor&&!dismissed().includes(h.id)&&ok(h));
+  if(ints){const f=c.filter(h=>ints.includes(h.category));if(f.length)c=f}
+  if(!c.length)return null;
+  c.sort((a,b)=>a.id.localeCompare(b.id));
+  const off=typeof week.skips==="number"?week.skips:0;
+  return c[(wk.n+off)%c.length];
+}
+const trialAnchor=tr=>tr&&anchors.slice().sort((a,b)=>toM((chunkById(a.slot)||{}).time)-toM((chunkById(b.slot)||{}).time)||(a.order??0)-(b.order??0)).find(a=>fitsAnchor(tr,a));
+
+/* ---------- Stats ---------- */
 function stats(){
   const steps=habits.filter(h=>h.anchor);const total=steps.length||1;
   const rate=k=>{const d=checkins[k]&&checkins[k].done;if(!d)return 0;return Math.min(1,steps.filter(h=>d[h.id]).length/total)};
@@ -346,107 +451,99 @@ function stats(){
   let streak=0;for(let i=0;i<400;i++){const d=new Date(today);d.setDate(d.getDate()-i);const k=dkey(d);const any=checkins[k]&&checkins[k].done&&Object.keys(checkins[k].done).length;if(any)streak++;else if(i===0)continue;else break}
   return{today:Math.round(rate(todayKey)*100),week:Math.round(avg*100),streak};
 }
-let lastSig="";
-
-function trial(){
-  const ints=interests();
-  let c=habits.filter(h=>(h.kind||"step")==="step"&&(h.fits||[]).length&&!h.anchor&&!dismissed().includes(h.id));
-  if(ints){const f=c.filter(h=>ints.includes(h.category));if(f.length)c=f}
-  if(!c.length)return null;
-  c.sort((a,b)=>a.id.localeCompare(b.id));
-  const off=typeof week.skips==="number"?week.skips:0;
-  return c[(wk.n+off)%c.length];
-}
 
 /* ---------- Today ---------- */
+let lastSig="";
 function stepRow(h,done,isTrial){
-  const on=!!done[h.id];
-  const days=Object.keys(checkins).filter(k=>checkins[k].done&&checkins[k].done[h.id]&&k!==todayKey).length;
-  const now=Date.now();
+  const on=!!done[h.id];const now=Date.now();
   return el("li",{class:"step"+(on?" done":"")+(fx.tick===h.id&&now-fx.t<700?" pop":"")+(fx.arrive===h.id&&now-fx.ta<1500?" arrive":"")},
     el("button",{class:"tick","aria-pressed":String(on),"aria-label":(on?"Untick ":"Tick ")+(h.short||h.title),onclick:()=>toggleDone(h.id),disabled:!can()},checkSvg()),
     el("button",{class:"sname",onclick:()=>openSheet(h.id),text:h.short||h.title}),
     el("span",{class:"sside"},isTrial?el("span",{class:"newtag",text:"Trying"}):null,h.listen?el("span",{class:"play","aria-label":"Has a clip",text:"▶"}):null,h.effort?el("span",{class:"mono",text:h.effort}):null));
 }
+const ownRow=t=>el("li",{class:"step own"},el("span",{class:"bul","aria-hidden":"true"}),el("span",{class:"otxt",text:t}),el("span"));
 function renderToday(){
   const done=(checkins[todayKey]&&checkins[todayKey].done)||{};
-  const tr=loaded?trial():null;
-  const all=habits.filter(h=>h.anchor).concat(tr?[tr]:[]);
+  const tr=loaded?trial():null;const ta=trialAnchor(tr);
+  const all=habits.filter(h=>h.anchor).concat(tr&&ta?[tr]:[]);
   const n=all.filter(h=>done[h.id]).length;
-  const sig=JSON.stringify([loaded,done,tr&&tr.id,habits.filter(h=>h.anchor).map(h=>[h.id,h.anchor,h.order,h.short||h.title,h.effort,!!h.listen]),anchors.map(a=>[a.id,a.name,a.cue,a.order]),times(),Object.keys(checkins).length,can()]);
+  const sig=JSON.stringify([loaded,done,tr&&tr.id,habits.filter(h=>h.anchor).map(h=>[h.id,h.anchor,h.after,h.order,h.short||h.title,h.effort]),anchors,chunks(),Object.keys(checkins).length,can()]);
   if(sig===lastSig)return;lastSig=sig;
   $("today-sub").textContent=loaded?`Week ${wk.n} · ${n} of ${all.length} done`:"Loading your routines…";
   $("prog").style.width=all.length?(n/all.length*100)+"%":"0";
   const st=loaded?stats():null;const sb=$("stats");sb.replaceChildren();
   if(st)sb.append(el("span",{},el("b",{text:st.today+"%"})," today"),el("span",{},el("b",{text:st.week+"%"})," last 7 days"),el("span",{},el("b",{text:String(st.streak)}),` day${st.streak===1?"":"s"} in a row`));
   const tbox=$("trial");tbox.replaceChildren();
-  if(tr){const a=anchorById((tr.fits||[])[0]);
-    tbox.append(el("div",{class:"trial"+(Date.now()-fx.swap<900?" in":"")},
-      el("div",{class:"trial-top"},el("span",{class:"tag",text:"New this week"}),a?el("span",{class:"rmeta",text:`Goes in ${SLOTS.find(s=>s.key===a.slot).name} · ${a.name}`}):null),
+  if(tr&&ta){tbox.append(el("div",{class:"trial"+(Date.now()-fx.swap<900?" in":"")},
+      el("div",{class:"trial-top"},el("span",{class:"tag",text:"New this week"}),el("span",{class:"rmeta",text:`Goes in ${chunkName(ta.slot)} · ${ta.name}`})),
       el("button",{class:"trial-name",onclick:()=>openSheet(tr.id),text:tr.title}),
       el("p",{class:"sub",style:{margin:0,fontSize:"14px"},text:tr.detail}),
       el("div",{class:"btns"},
-        el("button",{class:"btn primary",onclick:()=>a&&place(tr,a.id),disabled:!can()},"Keep it"),
+        el("button",{class:"btn primary",onclick:()=>place(tr,ta.id,null),disabled:!can()},"Keep it"),
         el("button",{class:"btn",onclick:skip,disabled:!can()},"Show another"),
         el("button",{class:"btn",onclick:()=>saveSettings({dismissed:[...dismissed(),tr.id]}),disabled:!can()},"Not for me"))));}
   const box=$("routines");box.replaceChildren();
   if(!loaded){box.append(el("p",{class:"sub",text:"Loading…"}));return}
-  const t=times();
-  SLOTS.forEach(s=>{
-    const as=anchorsIn(s.key);if(!as.length)return;
-    const steps=as.flatMap(a=>stepsAt(a.id)).concat(tr&&as.some(a=>a.id===(tr.fits||[])[0])?[tr]:[]);
+  chunks().forEach(c=>{
+    const as=anchorsIn(c.id);if(!as.length)return;
+    const steps=as.flatMap(a=>stepsAt(a.id)).concat(tr&&ta&&ta.slot===c.id?[tr]:[]);
     const dn=steps.filter(h=>done[h.id]).length;
-    const cel=fx.done===s.key&&Date.now()-fx.td<1500;
+    const cel=fx.done===c.id&&Date.now()-fx.td<1500;
     const complete=steps.length&&dn===steps.length;
-    box.append(el("section",{class:"routine"+(cel?" celebrate":""),"data-slot":s.key,"aria-label":s.name},
-      cel&&!reduced()?burst(s.key):null,
-      el("div",{class:"rhead"},el("span",{class:"rdot",style:{background:`var(--${s.key})`}}),el("h2",{text:s.name}),complete?el("span",{class:"done-label",text:"Done"}):null,el("span",{class:"rmeta mono",text:`${t[s.key]} · ${dn}/${steps.length}`})),
+    box.append(el("section",{class:"routine"+(cel?" celebrate":""),style:{background:soft(c.id)},"aria-label":c.name},
+      cel&&!reduced()?burst(c.id):null,
+      el("div",{class:"rhead"},el("h2",{text:c.name}),complete?el("span",{class:"done-label",text:"Done"}):null,el("span",{class:"rmeta mono",text:`${c.time} · ${dn}/${steps.length}`})),
       el("div",{class:"rbody"},as.map(a=>{
-        const st=stepsAt(a.id);const isT=tr&&(tr.fits||[])[0]===a.id;
+        const seq=sequence(a,ta&&ta.id===a.id?tr:null);const has=seq.some(x=>x.habit);
         return el("div",{class:"anchor"},
           el("div",{class:"aname"},el("span",{text:a.name})),
-          el("p",{class:"acue",text:a.cue+(st.length||isT?", then…":"")}),
-          st.length||isT?el("ol",{class:"steps"},st.map(h=>stepRow(h,done)),isT?stepRow(tr,done,true):null)
-            :el("p",{class:"aempty"},"Nothing stacked here yet. ",el("button",{onclick:()=>go("library")},"Browse the library")));
+          el("ol",{class:"steps"},seq.map(x=>x.own?ownRow(x.own):stepRow(x.habit,done,tr&&x.habit.id===tr.id))),
+          has?null:el("p",{class:"aempty"},"Nothing stacked here yet. ",el("button",{onclick:()=>go("day")},"Stack something")));
       }))));
   });
+  if(!anchors.length)box.append(el("p",{class:"sub",text:"Your day is empty. Open Setup to add the things you already do."}));
 }
 
-/* ---------- Day plan ---------- */
-function blockLen(aid){const a=anchorById(aid);const m=(a?a.base||0:0)+stepsAt(aid).reduce((x,h)=>x+Math.max(mins(h.effort),h.effort?0:1),0);return m?Math.max(5,Math.ceil(m/5)*5):0}
+/* ---------- Day plan (the editor) ---------- */
 function renderDay(){
-  const tb=$("times");
-  if(!tb.childElementCount){
-    [["morning","Get up"],["midday","Lunch"],["evening","Evening meal"],["bed","Bed"]].forEach(([k,l])=>tb.append(el("label",{for:"tm-"+k},l,el("input",{type:"time",id:"tm-"+k,onchange:e=>{if(e.target.value)saveSettings({times:{...times(),[k]:e.target.value}})}}))));
-  }
-  const t=times();
-  ["morning","midday","evening","bed"].forEach(k=>{const i=$("tm-"+k);if(i&&document.activeElement!==i)i.value=t[k];i.disabled=!can()});
-  const box=$("timeline");box.replaceChildren();
+  const box=$("plan");box.replaceChildren();
   if(!loaded){box.append(el("p",{class:"sub",text:"Loading…"}));return}
-  const rows=[];
-  const routine=(slot,title,ids,start)=>{const len=ids.reduce((x,id)=>x+blockLen(id),0)||15;
-    rows.push({t:start,kind:"r",slot,title,len,items:ids.map(id=>{const a=anchorById(id);const n=stepsAt(id).length;return `${a.name}${n?` · ${n} step${n>1?"s":""}`:""}`})});return start+len};
-  const gap=(start,end,title)=>{if(end-start>=10)rows.push({t:start,kind:"g",title,len:end-start})};
-  const ids=s=>anchorsIn(s).map(a=>a.id);
-  const wind=anchors.filter(a=>a.slot==="evening"&&a.id==="e-wind").map(a=>a.id);
-  const eve=ids("evening").filter(id=>!wind.includes(id));
-  let c=toM(t.morning);
-  c=routine("morning","Morning routine",ids("morning"),c);
-  gap(c,toM(t.midday),"Work");
-  c=routine("midday","Lunch break",ids("midday"),toM(t.midday));
-  gap(c,toM(t.evening),"Work");
-  c=routine("evening","Evening meal",eve,toM(t.evening));
-  const wl=wind.reduce((x,id)=>x+blockLen(id),0)||30;
-  const ws=toM(t.bed)-Math.max(30,wl);
-  gap(c,ws,"Free time");
-  if(wind.length)routine("evening","Winding down",wind,ws);
-  rows.push({t:toM(t.bed),kind:"s",title:"Sleep"});
-  rows.forEach(r=>{
-    const body=r.kind==="r"?el("div",{class:"blk r",style:{borderLeftColor:`var(--${r.slot})`}},el("div",{class:"card",style:{background:`var(--${r.slot}-soft)`}},
-        el("div",{class:"bt"},r.title,el("span",{text:`${r.len} min`})),el("ul",{},r.items.map(x=>el("li",{text:x})))))
-      :el("div",{class:"blk gap"},el("div",{class:"bt"},r.title,r.len?el("span",{text:r.len>=60?`${Math.floor(r.len/60)} h${r.len%60?` ${r.len%60} min`:""}`:`${r.len} min`}):null));
-    box.append(el("div",{class:"tl"},el("div",{class:"t",text:fromM(r.t)}),body));
+  const cs=chunks();
+  cs.forEach((c,ci)=>{
+    const as=anchorsIn(c.id);
+    const newMins=as.flatMap(a=>stepsAt(a.id)).reduce((x,h)=>x+mins(h.effort),0);
+    const sec=el("section",{class:"chunk","aria-label":c.name},
+      el("div",{class:"chead"},
+        el("h2",{text:c.name}),
+        el("input",{class:"ctime",type:"time",value:c.time,"aria-label":`${c.name} start time`,disabled:!can(),onchange:e=>{if(e.target.value)saveChunks(cs.map(x=>x.id===c.id?{...x,time:e.target.value}:x))}}),
+        el("button",{class:"mini",title:"Rename",onclick:()=>renameChunk(c),disabled:!can(),"aria-label":`Rename ${c.name}`},"✎"),
+        !as.length?el("button",{class:"mini",title:"Remove",onclick:()=>saveChunks(cs.filter(x=>x.id!==c.id)),disabled:!can(),"aria-label":`Remove ${c.name}`},"×"):null),
+      newMins?el("p",{class:"cmeta",text:`+${newMins} min of new habits stacked in`}):null,
+      as.map((a,ai)=>momentCard(a,ai,as)),
+      el("button",{class:"ghostbtn",onclick:()=>addMoment(c.id),disabled:!can()},`+ Add a moment to ${c.name.toLowerCase()}`));
+    box.append(sec);
+    const next=cs[ci+1];
+    if(next){const gap=toM(next.time)-toM(c.time);if(gap>0)box.append(el("p",{class:"gapline",text:`${fmtDur(gap)} until ${next.name.toLowerCase()}`}))}
   });
+}
+function momentCard(a,ai,as){
+  const seq=sequence(a);
+  return el("div",{class:"moment",style:{background:soft(a.slot)}},
+    el("div",{class:"mhead"},
+      el("input",{class:"mname",value:a.name,"aria-label":"Moment name",disabled:!can(),onchange:e=>{const v=e.target.value.trim();if(v)updAnchor(a,{name:v})}}),
+      el("button",{class:"mini",title:"Move up",disabled:!can()||ai===0,onclick:()=>swapAnchors(a,as[ai-1]),"aria-label":"Move up"},"↑"),
+      el("button",{class:"mini",title:"Move down",disabled:!can()||ai===as.length-1,onclick:()=>swapAnchors(a,as[ai+1]),"aria-label":"Move down"},"↓"),
+      !seq.length?el("button",{class:"mini",title:"Remove moment",onclick:()=>delAnchor(a),disabled:!can(),"aria-label":"Remove moment"},"×"):null),
+    el("ul",{class:"items"},seq.map(x=>x.own?
+      el("li",{class:"it own"},el("span",{class:"bul","aria-hidden":"true"}),el("span",{class:"txt",text:x.own}),
+        el("span",{class:"acts"},
+          el("button",{class:"mini plus",title:`Stack a habit after ${x.own}`,"aria-label":`Stack a habit after ${x.own}`,onclick:()=>openPicker(a.id,x.own),disabled:!can()},"+"),
+          el("button",{class:"mini",title:"Remove",onclick:()=>updAnchor(a,{existing:existingOf(a).filter(t=>t!==x.own)}),disabled:!can(),"aria-label":`Remove ${x.own}`},"×")))
+      :el("li",{class:"it new"+(fx.arrive===x.habit.id&&Date.now()-fx.ta<1500?" arrive":"")},el("span",{class:"bul","aria-hidden":"true"}),el("button",{class:"txt",onclick:()=>openSheet(x.habit.id),text:x.habit.short||x.habit.title}),
+        el("span",{class:"acts"},x.habit.effort?el("span",{class:"rmeta",text:x.habit.effort}):null,el("button",{class:"mini",title:"Unstack",onclick:()=>unplace(x.habit),disabled:!can(),"aria-label":`Unstack ${x.habit.short||x.habit.title}`},"×"))))),
+    el("form",{class:"addown",onsubmit:e=>{e.preventDefault();const i=e.target.querySelector("input");const v=i.value.trim();if(v&&!existingOf(a).includes(v)){updAnchor(a,{existing:[...existingOf(a),v]});i.value=""}}},
+      el("input",{placeholder:"Add something you already do",id:"own-"+a.id,"aria-label":`Add something you already do in ${a.name}`,disabled:!can()})),
+    el("button",{class:"ghostbtn",onclick:()=>openPicker(a.id,null),disabled:!can()},"+ Stack a new habit at the end"));
 }
 
 /* ---------- Library ---------- */
@@ -470,34 +567,50 @@ function renderLib(){
     box.append(el("div",{class:"row"},dot(h.category),
       el("div",{style:{minWidth:0}},el("button",{class:"sname",onclick:()=>openSheet(h.id),text:h.title}),
         el("div",{class:"rowmeta",text:[h.expert,KIND[h.kind]||h.effort,h.listen?"▶ clip":""].filter(Boolean).join(" · ")})),
-      el("span",{class:"placed",text:a?`${SLOTS.find(s=>s.key===a.slot).name} · ${a.name}`:""})));
+      el("span",{class:"placed",text:a?`${chunkName(a.slot)} · ${a.name}`:""})));
   });
 }
 
-/* ---------- Detail sheet ---------- */
-function openSheet(id){sheetId=id;renderSheet();setTimeout(()=>{const c=document.querySelector(".sheet .iconbtn");c&&c.focus()},0)}
-function closeSheet(){sheetId=null;const r=$("sheet-root");if(reduced()||!r.childElementCount){r.replaceChildren();return}r.classList.add("closing");setTimeout(()=>{if(!sheetId){r.replaceChildren()}r.classList.remove("closing")},220)}
+/* ---------- Sheets: habit detail and habit picker ---------- */
+function openSheet(id){sheet={type:"habit",id};renderSheet();focusSheet()}
+function openPicker(anchorId,after){sheet={type:"pick",anchorId,after};renderSheet();focusSheet()}
+function focusSheet(){setTimeout(()=>{const c=document.querySelector(".sheet .iconbtn");c&&c.focus()},0)}
+function closeSheet(){sheet=null;const r=$("sheet-root");if(reduced()||!r.childElementCount){r.replaceChildren();return}r.classList.add("closing");setTimeout(()=>{if(!sheet)r.replaceChildren();r.classList.remove("closing")},220)}
+function anchorOptions(){return chunks().flatMap(c=>anchorsIn(c.id).map(a=>({a,c})))}
 function renderSheet(){
-  const root=$("sheet-root");root.replaceChildren();
-  const h=habits.find(x=>x.id===sheetId);if(!h){sheetId=null;return}
+  const root=$("sheet-root");root.replaceChildren();if(!sheet)return;
+  const frame=(...kids)=>root.append(el("div",{class:"scrim",onclick:closeSheet}),el("aside",{class:"sheet",role:"dialog","aria-modal":"true","aria-labelledby":"sheet-h"},...kids));
+  if(sheet.type==="pick"){
+    const a=anchorById(sheet.anchorId);if(!a){sheet=null;return}
+    const cand=habits.filter(h=>(h.kind||"step")==="step");
+    const good=cand.filter(h=>fitsAnchor(h,a)),rest=cand.filter(h=>!fitsAnchor(h,a));
+    const row=h=>{const at=h.anchor&&anchorById(h.anchor);return el("button",{class:"pickrow",onclick:()=>{const s=sheet;closeSheet();place(h,s.anchorId,s.after)}},dot(h.category),
+      el("span",{class:"pr-main"},el("span",{class:"pr-t",text:h.short||h.title}),el("span",{class:"pr-m",text:[h.expert,h.effort,at?`now in ${at.name}`:""].filter(Boolean).join(" · ")})),
+      el("span",{class:"pr-add",text:at?"Move":"Add"}))};
+    frame(el("div",{class:"sheet-top"},el("span",{class:"kv",text:`${chunkName(a.slot)} · ${a.name}`}),el("button",{class:"iconbtn",onclick:closeSheet},"Close")),
+      el("h2",{id:"sheet-h",text:sheet.after?`After you ${sheet.after.charAt(0).toLowerCase()+sheet.after.slice(1)}…`:`At the end of ${a.name.toLowerCase()}…`}),
+      el("p",{class:"sub",style:{marginTop:0},text:"Pick a habit to stack here. Good fits for this moment come first."}),
+      good.length?el("div",{class:"sec"},el("h3",{text:"Good fits"}),el("div",{class:"picklist"},good.map(row))):null,
+      el("div",{class:"sec"},el("h3",{text:good.length?"Everything else":"All habits"}),el("div",{class:"picklist"},rest.map(row))));
+    return;
+  }
+  const h=habits.find(x=>x.id===sheet.id);if(!h){sheet=null;return}
   const ev=h.evidence||"",k=KIND[h.kind];
-  const opts=(h.kind||"step")==="step"?anchors.slice().sort((a,b)=>SLOTS.findIndex(s=>s.key===a.slot)-SLOTS.findIndex(s=>s.key===b.slot)||a.order-b.order):[];
-  const sel=el("select",{id:"place-sel","aria-label":"Stack this habit at",disabled:!can(),onchange:e=>{const v=e.target.value;v?place(h,v):unplace(h)}},
-    el("option",{value:"",text:h.anchor?"Not in a routine":"Choose where to stack it…"}),
-    opts.map(a=>el("option",{value:a.id,selected:h.anchor===a.id,text:`${SLOTS.find(s=>s.key===a.slot).name} · ${a.name}${(h.fits||[]).includes(a.id)?" (good fit)":""}`})));
-  root.append(el("div",{class:"scrim",onclick:closeSheet}),
-    el("aside",{class:"sheet",role:"dialog","aria-modal":"true","aria-labelledby":"sheet-h"},
-      el("div",{class:"sheet-top"},el("span",{class:"kv"},dot(h.category),h.category),el("button",{class:"iconbtn",onclick:closeSheet,"aria-label":"Close"},"Close")),
-      el("h2",{id:"sheet-h",text:h.title}),
-      el("div",{class:"kv"},el("span",{text:h.expert}),h.effort?el("span",{class:"mono",text:h.effort}):null,k?el("span",{class:"pill",text:k}):null,ev?el("span",{class:"pill"+(ev==="Several experts"?" strong":""),text:ev}):null,h.flag?el("span",{class:"pill flag",text:"GP check"}):null),
-      el("p",{class:"why",text:h.why||h.detail}),
-      h.listen?el("a",{class:"listen",href:h.listen.url,target:"_blank",rel:"noopener"},"▶  Listen on Spotify",el("span",{text:`from ${h.listen.label}`})):null,
-      h.research?el("div",{class:"sec"},el("h3",{text:"What the research says"}),el("p",{text:h.research})):null,
-      h.caveat?el("p",{class:"caveat"},el("b",{text:h.flag?"Check first: ":"Note: "}),h.caveat):null,
-      opts.length?el("div",{class:"place"},el("label",{for:"place-sel",class:"sec"},el("h3",{text:"Stack it in a routine"})),sel):el("p",{class:"sub",style:{fontSize:"13.5px"},text:"This one is a weekly practice or principle, so it isn't stacked into a daily routine."}),
-      el("p",{class:"src kv"},"Source: ",h.url?el("a",{href:h.url,target:"_blank",rel:"noopener",text:h.episode||"Episode"}):(h.episode||""),h.listen?" · clip times are approximate":"")));
+  const opts=(h.kind||"step")==="step"?anchorOptions():[];
+  const sel=el("select",{id:"place-sel","aria-label":"Stack this habit in",disabled:!can(),onchange:e=>{const v=e.target.value;v?place(h,v,null):unplace(h)}},
+    el("option",{value:"",text:h.anchor?"Not stacked":"Choose a moment…"}),
+    opts.map(({a,c})=>el("option",{value:a.id,selected:h.anchor===a.id,text:`${c.name} · ${a.name}${fitsAnchor(h,a)?" (good fit)":""}`})));
+  frame(el("div",{class:"sheet-top"},el("span",{class:"kv"},dot(h.category),h.category),el("button",{class:"iconbtn",onclick:closeSheet,"aria-label":"Close"},"Close")),
+    el("h2",{id:"sheet-h",text:h.title}),
+    el("div",{class:"kv"},el("span",{text:h.expert}),h.effort?el("span",{class:"mono",text:h.effort}):null,k?el("span",{class:"pill",text:k}):null,ev?el("span",{class:"pill"+(ev==="Several experts"?" strong":""),text:ev}):null,h.flag?el("span",{class:"pill flag",text:"GP check"}):null),
+    el("p",{class:"why",text:h.why||h.detail}),
+    h.listen?el("a",{class:"listen",href:h.listen.url,target:"_blank",rel:"noopener"},"▶  Listen on Spotify",el("span",{text:`from ${h.listen.label}`})):null,
+    h.research?el("div",{class:"sec"},el("h3",{text:"What the research says"}),el("p",{text:h.research})):null,
+    h.caveat?el("p",{class:"caveat"},el("b",{text:h.flag?"Check first: ":"Note: "}),h.caveat):null,
+    opts.length?el("div",{class:"place"},el("label",{for:"place-sel",class:"sec"},el("h3",{text:"Stack it into your day"})),sel):el("p",{class:"sub",style:{fontSize:"13.5px"},text:"This one is a weekly practice or principle, so it isn't stacked into a daily moment."}),
+    el("p",{class:"src kv"},"Source: ",h.url?el("a",{href:h.url,target:"_blank",rel:"noopener",text:h.episode||"Episode"}):(h.episode||""),h.listen?" · clip times are approximate":""));
 }
-document.addEventListener("keydown",e=>{if(e.key==="Escape"&&sheetId)closeSheet()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&sheet)closeSheet()});
 
 /* ---------- Routing ---------- */
 function go(v){if(!["today","day","library"].includes(v))v="today";try{history.replaceState(null,"","#"+v)}catch(e){}show(v)}
@@ -505,60 +618,122 @@ function show(v){["today","day","library"].forEach(x=>{const e=$("v-"+x);e.hidde
 document.querySelectorAll(".tabs button").forEach(b=>b.addEventListener("click",()=>go(b.dataset.view)));
 window.addEventListener("hashchange",()=>show((location.hash||"#today").slice(1)));
 $("q").addEventListener("input",e=>{query=e.target.value;renderLib()});
-
-function renderAll(){renderToday();renderDay();renderCats();renderLib();if(sheetId)renderSheet()}
+function renderAll(){renderToday();renderDay();renderCats();renderLib();if(sheet)renderSheet()}
 
 /* ---------- Writes ---------- */
-async function place(h,aid){
+async function place(h,aid,after){
   if(!db)return;const a=anchorById(aid);if(!a)return;
   const order=Math.max(0,...stepsAt(aid).filter(x=>x.id!==h.id).map(x=>x.order||0))+1;
   fx.arrive=h.id;fx.ta=Date.now();fx.swap=Date.now();buzz(10);
-  try{await db.doc("habits/"+h.id).update({anchor:aid,slot:a.slot,order});toast(`Stacked into ${SLOTS.find(s=>s.key===a.slot).name} · ${a.name}`)}catch(e){showErr(e)}
+  try{await db.doc("habits/"+h.id).update({anchor:aid,slot:a.slot,order,after:after||null});toast(after?`Stacked after “${after}”`:`Stacked into ${a.name}`)}catch(e){showErr(e)}
 }
-async function unplace(h){if(!db)return;try{await db.doc("habits/"+h.id).update({anchor:null,slot:null,order:null})}catch(e){showErr(e)}}
+async function unplace(h){if(!db)return;try{await db.doc("habits/"+h.id).update({anchor:null,slot:null,order:null,after:null})}catch(e){showErr(e)}}
+async function updAnchor(a,patch){if(!db)return;try{await db.doc("anchors/"+a.id).update(patch)}catch(e){showErr(e)}}
+async function delAnchor(a){if(!db)return;try{await db.doc("anchors/"+a.id).delete()}catch(e){showErr(e)}}
+async function addMoment(cid){if(!db)return;const as=anchorsIn(cid);const id=uid("m");
+  try{await db.doc("anchors/"+id).set({name:"New moment",slot:cid,order:Math.max(0,...as.map(x=>x.order||0))+1,kind:"custom",existing:[]});setTimeout(()=>{const i=$("own-"+id);i&&i.focus()},120)}catch(e){showErr(e)}}
+async function swapAnchors(a,b){if(!db||!b)return;try{await db.doc("anchors/"+a.id).update({order:b.order});await db.doc("anchors/"+b.id).update({order:a.order})}catch(e){showErr(e)}}
+function saveChunks(list){saveSettings({chunks:list})}
+function renameChunk(c){openRename(c)}
 async function toggleDone(id){
   if(!db)return;
   const cur=(checkins[todayKey]&&checkins[todayKey].done)||{};
   const next={...cur};const adding=!next[id];if(adding)next[id]=true;else delete next[id];
   checkins={...checkins,[todayKey]:{date:todayKey,done:next}};
   if(adding){fx.tick=id;fx.t=Date.now();buzz(8);
-    const tr=trial();const h=habits.find(x=>x.id===id)||tr;
-    const slot=h&&(h.slot||(anchorById((h.fits||[])[0])||{}).slot);
-    if(slot){const steps=anchorsIn(slot).flatMap(a=>stepsAt(a.id)).concat(tr&&anchorsIn(slot).some(a=>a.id===(tr.fits||[])[0])?[tr]:[]);
-      if(steps.length&&steps.every(x=>next[x.id])){fx.done=slot;fx.td=Date.now();buzz([10,40,18]);
-        const all=habits.filter(x=>x.anchor).concat(tr?[tr]:[]);
-        toast(all.every(x=>next[x.id])?"Every routine done today. Well stacked.":`${SLOTS.find(x=>x.key===slot).name} routine done`)}}}
+    const tr=trial(),ta=trialAnchor(tr);const h=habits.find(x=>x.id===id);
+    const cid=h&&h.anchor?h.slot:(tr&&tr.id===id&&ta?ta.slot:null);
+    if(cid){const steps=anchorsIn(cid).flatMap(a=>stepsAt(a.id)).concat(tr&&ta&&ta.slot===cid?[tr]:[]);
+      if(steps.length&&steps.every(x=>next[x.id])){fx.done=cid;fx.td=Date.now();buzz([10,40,18]);
+        const all=habits.filter(x=>x.anchor).concat(tr&&ta?[tr]:[]);
+        toast(all.every(x=>next[x.id])?"Everything stacked today is done.":`${chunkName(cid)} done`)}}}
   renderToday();
   try{await db.doc("checkins/"+todayKey).set({date:todayKey,done:next})}catch(e){showErr(e)}
 }
 async function skip(){if(!db)return;fx.swap=Date.now();const n=(typeof week.skips==="number"?week.skips:0)+1;try{await db.doc("weeks/"+weekKey).set({skips:n})}catch(e){showErr(e)}}
-async function saveSettings(patch){if(!db)return;try{await db.doc("settings/main").set({...(settings||{}),...patch})}catch(e){showErr(e)}}
+async function saveSettings(patch){if(!db)return;const next={...(settings||{}),...patch};settings=next;try{await db.doc("settings/main").set(next)}catch(e){showErr(e)}}
 function showErr(e){
   const s=$("status");s.hidden=false;
   if(e&&e.code==="invalid_argument"){canWrite=false;s.textContent="This view is read-only, so changes can't be saved.";renderAll()}
   else s.textContent="That change didn't save. Try again in a moment.";
 }
+/* Rename a part of the day in a small sheet (the viewer has no prompt dialogs) */
+function openRename(c){
+  sheet={type:"rename"};const root=$("sheet-root");root.replaceChildren();
+  const inp=el("input",{class:"ctime",id:"rn",value:c.name,style:{width:"100%",fontSize:"18px",padding:"12px 14px"}});
+  root.append(el("div",{class:"scrim",onclick:closeSheet}),el("aside",{class:"sheet",role:"dialog","aria-modal":"true","aria-labelledby":"sheet-h"},
+    el("div",{class:"sheet-top"},el("span",{class:"kv",text:"Part of the day"}),el("button",{class:"iconbtn",onclick:closeSheet},"Close")),
+    el("h2",{id:"sheet-h",text:"Rename"}),
+    el("form",{style:{display:"grid",gap:"12px"},onsubmit:e=>{e.preventDefault();const v=inp.value.trim();if(v)saveChunks(chunks().map(x=>x.id===c.id?{...x,name:v}:x));closeSheet()}},inp,el("button",{class:"btn primary",type:"submit"},"Save"))));
+  setTimeout(()=>inp.focus(),50);
+}
+$("add-chunk").addEventListener("click",()=>{if(!can())return;const cs=chunks();const last=cs[cs.length-1];const t=last?Math.min(toM(last.time)+180,23*60):20*60;saveChunks([...cs,{id:uid("c"),name:"Late evening",time:pad(Math.floor(t/60))+":"+pad(t%60)}])});
 
-/* ---------- Setup ---------- */
-let ob=null;const STEPS=4;
-function openSetup(){ob={step:0,times:times(),interests:new Set(interests()||CATS.map(c=>c[0]))};$("onb").hidden=false;renderSetup()}
+/* ---------- Setup: build your day from what you already do ---------- */
+let ob=null;const STEPS=5;
+function openSetup(){
+  const cs=chunks().map(c=>({...c}));
+  let moments;
+  if(anchors.length){moments=anchors.map(a=>({id:a.id,chunk:a.slot,name:a.name,kind:a.kind||"custom",existing:[...existingOf(a)],on:true,order:a.order??0}))}
+  else moments=PRESETS.map((p,i)=>({...p,existing:[...p.existing],on:true,order:i+1}));
+  ob={step:0,chunks:cs,moments,interests:new Set(interests()||CATS.map(c=>c[0])),starters:new Set(habits.some(h=>h.anchor)?[]:STARTERS),open:null};
+  $("onb").hidden=false;renderSetup();
+}
 function closeSetup(){$("onb").hidden=true;ob=null}
 function renderSetup(){
   const box=$("onb-in");box.replaceChildren();const i=ob.step;
   box.append(el("div",{class:"bar","aria-hidden":"true"},[...Array(STEPS)].map((_,j)=>el("i",{class:j<=i?"on":null}))));
-  const body=el("div",{style:{display:"grid",gap:"16px"}});
+  const body=el("div",{style:{display:"grid",gap:"18px"}});
   if(i===0){body.append(el("h1",{id:"onb-h",text:"Small practices, stacked onto your day."}),
-    el("p",{text:"Stack turns advice from Diary of a CEO guests, and the practices of Practicing the Way, into short steps you attach to things you already do: getting ready, breakfast, lunch, dinner, bedtime."}),
-    el("p",{text:"Keep the steps that work. Each week one new practice is offered on trial, so your routines grow slowly instead of all at once."}));}
-  else if(i===1){body.append(el("h1",{id:"onb-h",text:"When do these usually happen?"}),el("p",{text:"Rough times are fine. They shape your day plan."}),
-    el("div",{class:"times"},[["morning","Get up"],["midday","Lunch"],["evening","Evening meal"],["bed","Bed"]].map(([k,l])=>el("label",{for:"ob-"+k},l,el("input",{type:"time",id:"ob-"+k,value:ob.times[k],oninput:e=>{ob.times[k]=e.target.value}})))));}
-  else if(i===2){body.append(el("h1",{id:"onb-h",text:"What do you want more of?"}),el("p",{text:"New practices each week come from these areas."}),
+    el("p",{text:"You already have routines: you wake up, shower, brush your teeth, eat. Stack helps you attach small, expert-backed habits to those moments, so a new habit has somewhere to live."}),
+    el("p",{text:"First you'll map what you already do. Then you'll stack one or two new things onto it."}));}
+  else if(i===1){body.append(el("h1",{id:"onb-h",text:"How is your day shaped?"}),el("p",{text:"Most days split into a few parts. Set roughly when each one starts."}),
+    el("div",{class:"ob-chunks"},ob.chunks.map((c,ci)=>el("div",{class:"ob-chunkrow",style:{background:soft(c.id)}},
+      el("input",{class:"ob-cname",value:c.name,"aria-label":"Part of the day",oninput:e=>{c.name=e.target.value}}),
+      el("input",{class:"ctime",type:"time",value:c.time,"aria-label":`${c.name} start`,oninput:e=>{c.time=e.target.value}}),
+      ob.chunks.length>1?el("button",{class:"mini","aria-label":`Remove ${c.name}`,onclick:()=>{ob.chunks.splice(ci,1);ob.moments=ob.moments.filter(m=>m.chunk!==c.id);renderSetup()}},"×"):null))),
+    el("button",{class:"ghostbtn",onclick:()=>{ob.chunks.push({id:uid("c"),name:"Late evening",time:"21:00"});renderSetup()}},"+ Add another part of the day"));}
+  else if(i===2){body.append(el("h1",{id:"onb-h",text:"What do you already do?"}),el("p",{text:"Tick the moments that are part of your day and edit what happens in them. These are your anchors: new habits get stacked onto them."}),
+    ...ob.chunks.map(c=>el("div",{class:"ob-chunk",style:{background:soft(c.id)}},el("h2",{text:c.name}),
+      ob.moments.filter(m=>m.chunk===c.id).sort((a,b)=>a.order-b.order).map(m=>el("div",{class:"ob-moment"+(m.on?"":" off")},
+        el("label",{class:"ob-mt"},el("input",{type:"checkbox",checked:m.on,onchange:e=>{m.on=e.target.checked;renderSetup()}}),el("span",{text:m.name})),
+        m.on?el("div",{class:"ob-items"},m.existing.map(t=>el("button",{class:"chip own-chip","aria-label":`Remove ${t}`,onclick:()=>{m.existing=m.existing.filter(x=>x!==t);renderSetup()}},t," ×")),
+          el("form",{class:"ob-add",onsubmit:e=>{e.preventDefault();const inp=e.target.querySelector("input");const v=inp.value.trim();if(v&&!m.existing.includes(v)){m.existing.push(v);renderSetup()}}},el("input",{placeholder:"+ add",size:"8","aria-label":`Add to ${m.name}`}))):null)),
+      el("form",{class:"ob-add",onsubmit:e=>{e.preventDefault();const inp=e.target.querySelector("input");const v=inp.value.trim();if(v){ob.moments.push({id:null,chunk:c.id,name:v,kind:"custom",existing:[],on:true,order:99});renderSetup()}}},el("input",{placeholder:`+ Add a moment to ${c.name.toLowerCase()}`,"aria-label":`Add a moment to ${c.name}`})))));}
+  else if(i===3){body.append(el("h1",{id:"onb-h",text:"What do you want more of?"}),el("p",{text:"Each week Stack suggests one new habit from these areas."}),
     el("div",{class:"tools"},CATS.map(([c])=>el("button",{class:"chip","aria-pressed":String(ob.interests.has(c)),onclick:()=>{ob.interests.has(c)?ob.interests.delete(c):ob.interests.add(c);if(!ob.interests.size)ob.interests.add(c);renderSetup()}},dot(c),c))));}
-  else{body.append(el("h1",{id:"onb-h",text:"Block the time, then just follow the list."}),
-    el("p",{text:"Add three recurring blocks to your calendar: morning, lunch and evening. When one comes round, open Today and work down the steps. Tap any habit to hear why it matters."}));}
+  else{
+    const kinds=new Set(ob.moments.filter(m=>m.on).map(m=>m.kind));
+    const sugg=habits.filter(h=>(h.kind||"step")==="step"&&!h.anchor&&(h.fits||[]).some(k=>kinds.has(k))&&ob.interests.has(h.category)).sort((a,b)=>(STARTERS.includes(b.id)-STARTERS.includes(a.id))||a.title.localeCompare(b.title)).slice(0,8);
+    body.append(el("h1",{id:"onb-h",text:"Stack your first habits."}),el("p",{text:"Start small. One or two is plenty; you can add more any time from Day plan."}),
+      sugg.length?el("div",{class:"picks"},sugg.map(h=>{const on=ob.starters.has(h.id);const m=ob.moments.find(m=>m.on&&(h.fits||[]).includes(m.kind));
+        return el("button",{class:"pick","aria-pressed":String(on),onclick:()=>{on?ob.starters.delete(h.id):ob.starters.add(h.id);renderSetup()}},el("span",{class:"box","aria-hidden":"true"},on?"✓":""),
+          el("span",{},h.short||h.title,el("small",{text:`${m?m.name:""} · ${h.expert}`})))})):el("p",{text:"Your current stacks stay as they are."}));
+  }
   box.append(body,el("div",{class:"onb-nav"},
     i===0?el("button",{class:"btn",onclick:()=>{closeSetup();if(!(settings&&settings.onboarded))saveSettings({onboarded:true})}},"Skip"):el("button",{class:"btn",onclick:()=>{ob.step--;renderSetup()}},"Back"),
-    i<STEPS-1?el("button",{class:"btn primary",onclick:()=>{ob.step++;renderSetup()}},"Continue"):el("button",{class:"btn primary",disabled:!can(),onclick:async()=>{const s=ob;closeSetup();await saveSettings({onboarded:true,times:s.times,interests:[...s.interests]});go("day")}},"See my day")));
+    i<STEPS-1?el("button",{class:"btn primary",onclick:()=>{ob.step++;renderSetup();$("onb").scrollTop=0}},"Continue"):el("button",{class:"btn primary",disabled:!can(),onclick:finishSetup},"Build my day")));
+}
+async function finishSetup(){
+  const s=ob;closeSetup();if(!db)return;
+  const cs=s.chunks.filter(c=>c.name.trim()).map(c=>({id:c.id,name:c.name.trim(),time:c.time||"08:00"}));
+  await saveSettings({onboarded:true,chunks:cs,interests:[...s.interests]});
+  const valid=new Set(cs.map(c=>c.id));const created={};
+  for(const [idx,m] of s.moments.entries()){
+    const has=m.id&&habits.some(h=>h.anchor===m.id);
+    try{
+      if(!m.on||!valid.has(m.chunk)){if(m.id&&!has)await db.doc("anchors/"+m.id).delete();continue}
+      if(m.id)await db.doc("anchors/"+m.id).update({name:m.name,existing:m.existing,slot:m.chunk});
+      else{const id=uid("m");created[idx]=id;await db.doc("anchors/"+id).set({name:m.name,slot:m.chunk,order:m.order??idx+1,kind:m.kind||"custom",existing:m.existing})}
+    }catch(e){showErr(e)}
+  }
+  for(const hid of s.starters){
+    const h=habits.find(x=>x.id===hid);if(!h)continue;
+    const mi=s.moments.findIndex(m=>m.on&&valid.has(m.chunk)&&(h.fits||[]).includes(m.kind));if(mi<0)continue;
+    const aid=s.moments[mi].id||created[mi];if(!aid)continue;
+    try{await db.doc("habits/"+hid).update({anchor:aid,slot:s.moments[mi].chunk,order:99,after:null})}catch(e){showErr(e)}
+  }
+  toast("Your day is set up");go("day");
 }
 $("rerun").addEventListener("click",()=>{if(loaded)openSetup()});
 
@@ -566,7 +741,7 @@ go((location.hash||"#today").slice(1));
 renderAll();
 (async()=>{
   db=await claude.use("db");
-  if(!db){loaded=true;const s=$("status");s.hidden=false;s.textContent="Sign in to claude.ai to see and update your habits.";renderAll();return}
+  if(!db){loaded=true;const s=$("status");s.hidden=false;s.textContent="Sign in to see and update your habits.";renderAll();return}
   const user=await claude.use("user");
   if(user){try{if(await user.can("data.write")===false)canWrite=false}catch(e){}}
   let gH=false,gS=false,gA=false;
@@ -574,7 +749,7 @@ renderAll();
   db.collection("anchors").onSnapshot(s=>{gA=true;anchors=s.docs.map(d=>({id:d.id,...d.data()}));ready();renderAll()},showErr);
   db.collection("habits").onSnapshot(s=>{gH=true;habits=s.docs.map(d=>({id:d.id,...d.data()}));ready();renderAll()},showErr);
   db.doc("settings/main").onSnapshot(d=>{settings=d.exists?d.data():null;if(!d.metadata||!d.metadata.fromCache||d.exists)gS=true;ready();renderAll()},showErr);
-  db.doc("weeks/"+weekKey).onSnapshot(d=>{week=d.exists?d.data():{};renderToday()},showErr);
+  db.doc("weeks/"+weekKey).onSnapshot(d=>{week=d.exists?d.data():{};lastSig="";renderToday()},showErr);
   db.collection("checkins").orderBy("date","desc").limit(40).onSnapshot(s=>{checkins={};s.docs.forEach(d=>checkins[d.id]=d.data());renderToday()},showErr);
 })();
 </script>

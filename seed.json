@@ -1,9 +1,8 @@
 {
- "version": 1,
+ "version": 2,
  "habits": {
   "bartlett-filter": {
    "added": "2026-10-12",
-   "anchor": null,
    "cadence": "Always",
    "category": "Habits & focus",
    "caveat": "",
@@ -15,8 +14,6 @@
    "fits": [],
    "flag": false,
    "kind": "principle",
-   "order": null,
-   "slot": null,
    "source": "Diary of a CEO",
    "status": "library",
    "title": "The yes test",
@@ -25,7 +22,6 @@
   },
   "bartlett-nature": {
    "added": "2026-10-12",
-   "anchor": null,
    "cadence": "Weekly",
    "category": "Mind & stress",
    "caveat": "",
@@ -37,8 +33,6 @@
    "fits": [],
    "flag": false,
    "kind": "weekly",
-   "order": null,
-   "slot": null,
    "source": "Diary of a CEO",
    "status": "library",
    "title": "Regular time in nature",
@@ -47,7 +41,6 @@
   },
   "candow-creatine": {
    "added": "2026-10-12",
-   "anchor": null,
    "cadence": "Daily",
    "category": "Supplements",
    "caveat": "Tell your GP you take it, as it can raise creatinine on blood tests. Check first if you have a kidney condition.",
@@ -57,12 +50,10 @@
    "evidence": "Several experts",
    "expert": "Dr Darren Candow",
    "fits": [
-    "m-breakfast"
+    "breakfast"
    ],
    "flag": true,
    "kind": "step",
-   "order": null,
-   "slot": null,
    "source": "Diary of a CEO",
    "status": "library",
    "title": "5 g creatine monohydrate daily",
@@ -71,7 +62,6 @@
   },
   "candow-strength": {
    "added": "2026-10-12",
-   "anchor": null,
    "cadence": "2× a week",
    "category": "Movement",
    "caveat": "",
@@ -83,8 +73,6 @@
    "fits": [],
    "flag": false,
    "kind": "weekly",
-   "order": null,
-   "slot": null,
    "source": "Diary of a CEO",
    "status": "library",
    "title": "Strength train at least twice a week",
@@ -93,7 +81,6 @@
   },
   "clear-prep": {
    "added": "2026-10-12",
-   "anchor": "e-dinner",
    "cadence": "Daily",
    "category": "Habits & focus",
    "caveat": "",
@@ -103,8 +90,8 @@
    "evidence": "One expert",
    "expert": "James Clear",
    "fits": [
-    "e-dinner",
-    "e-wind"
+    "dinner",
+    "bedtime"
    ],
    "flag": false,
    "kind": "step",
@@ -112,10 +99,8 @@
     "label": "13:13",
     "url": "https://open.spotify.com/episode/5uVMeBdtjkdk8cYjacsned?t=778"
    },
-   "order": 2,
    "research": "A behavioural design principle from Atomic Habits.",
    "short": "Set up tomorrow",
-   "slot": "evening",
    "source": "Diary of a CEO",
    "status": "library",
    "title": "Set up tomorrow tonight",
@@ -125,7 +110,6 @@
   },
   "clear-review": {
    "added": "2026-10-12",
-   "anchor": null,
    "cadence": "Monthly",
    "category": "Habits & focus",
    "caveat": "",
@@ -137,8 +121,6 @@
    "fits": [],
    "flag": false,
    "kind": "weekly",
-   "order": null,
-   "slot": null,
    "source": "Diary of a CEO",
    "status": "library",
    "title": "Monthly systems review",
@@ -147,7 +129,6 @@
   },
   "clear-stack": {
    "added": "2026-10-12",
-   "anchor": null,
    "cadence": "Always",
    "category": "Habits & focus",
    "caveat": "",
@@ -159,8 +140,6 @@
    "fits": [],
    "flag": false,
    "kind": "principle",
-   "order": null,
-   "slot": null,
    "source": "Diary of a CEO",
    "status": "library",
    "title": "Stack it onto something you already do",
@@ -169,7 +148,6 @@
   },
   "clear-two-minutes": {
    "added": "2026-10-12",
-   "anchor": null,
    "cadence": "Always",
    "category": "Habits & focus",
    "caveat": "",
@@ -181,8 +159,6 @@
    "fits": [],
    "flag": false,
    "kind": "principle",
-   "order": null,
-   "slot": null,
    "source": "Diary of a CEO",
    "status": "library",
    "title": "Shrink it to two minutes",
@@ -191,7 +167,6 @@
   },
   "comer-community": {
    "added": "2026-10-12",
-   "anchor": null,
    "cadence": "Weekly",
    "category": "Christian spirituality",
    "caveat": "",
@@ -203,8 +178,6 @@
    "fits": [],
    "flag": false,
    "kind": "weekly",
-   "order": null,
-   "slot": null,
    "source": "Practicing the Way",
    "status": "library",
    "title": "Share a meal with your community",
@@ -213,7 +186,6 @@
   },
   "comer-digital-sabbath": {
    "added": "2026-10-12",
-   "anchor": null,
    "cadence": "Weekly",
    "category": "Christian spirituality",
    "caveat": "",
@@ -225,8 +197,6 @@
    "fits": [],
    "flag": false,
    "kind": "weekly",
-   "order": null,
-   "slot": null,
    "source": "Practicing the Way",
    "status": "library",
    "title": "Phone-free block",
@@ -235,7 +205,6 @@
   },
   "comer-examen": {
    "added": "2026-10-12",
-   "anchor": "e-wind",
    "cadence": "Daily",
    "category": "Christian spirituality",
    "caveat": "",
@@ -245,14 +214,12 @@
    "evidence": "Christian tradition",
    "expert": "John Mark Comer",
    "fits": [
-    "e-wind"
+    "bedtime"
    ],
    "flag": false,
    "kind": "step",
-   "order": 2,
    "research": "An Ignatian practice from the 1500s, taught in Practicing the Way.",
    "short": "Evening examen",
-   "slot": "evening",
    "source": "Practicing the Way",
    "status": "library",
    "title": "Evening examen",
@@ -262,7 +229,6 @@
   },
   "comer-fasting": {
    "added": "2026-10-12",
-   "anchor": null,
    "cadence": "Weekly",
    "category": "Christian spirituality",
    "caveat": "Check with your GP before fasting if you have a health condition.",
@@ -274,8 +240,6 @@
    "fits": [],
    "flag": true,
    "kind": "weekly",
-   "order": null,
-   "slot": null,
    "source": "Practicing the Way",
    "status": "library",
    "title": "Weekly fast",
@@ -284,7 +248,6 @@
   },
   "comer-fixed-hour": {
    "added": "2026-10-12",
-   "anchor": "d-pause",
    "cadence": "Daily",
    "category": "Christian spirituality",
    "caveat": "",
@@ -294,14 +257,12 @@
    "evidence": "Christian tradition",
    "expert": "John Mark Comer",
    "fits": [
-    "d-pause"
+    "pause"
    ],
    "flag": false,
    "kind": "step",
-   "order": 2,
    "research": "Christian tradition (the Daily Office), taught in Practicing the Way.",
    "short": "Midday prayer",
-   "slot": "midday",
    "source": "Practicing the Way",
    "status": "library",
    "title": "Pray at fixed points in the day",
@@ -311,7 +272,6 @@
   },
   "comer-generosity": {
    "added": "2026-10-12",
-   "anchor": null,
    "cadence": "Monthly",
    "category": "Christian spirituality",
    "caveat": "",
@@ -323,8 +283,6 @@
    "fits": [],
    "flag": false,
    "kind": "weekly",
-   "order": null,
-   "slot": null,
    "source": "Practicing the Way",
    "status": "library",
    "title": "Give something away",
@@ -333,7 +291,6 @@
   },
   "comer-sabbath": {
    "added": "2026-10-12",
-   "anchor": null,
    "cadence": "Weekly",
    "category": "Christian spirituality",
    "caveat": "",
@@ -345,8 +302,6 @@
    "fits": [],
    "flag": false,
    "kind": "weekly",
-   "order": null,
-   "slot": null,
    "source": "Practicing the Way",
    "status": "library",
    "title": "Keep a weekly Sabbath",
@@ -355,7 +310,6 @@
   },
   "comer-scripture": {
    "added": "2026-10-12",
-   "anchor": "m-breakfast",
    "cadence": "Daily",
    "category": "Christian spirituality",
    "caveat": "",
@@ -365,15 +319,13 @@
    "evidence": "Christian tradition",
    "expert": "John Mark Comer",
    "fits": [
-    "m-breakfast",
-    "e-wind"
+    "breakfast",
+    "bedtime"
    ],
    "flag": false,
    "kind": "step",
-   "order": 4,
    "research": "Christian tradition (lectio divina), taught in Practicing the Way.",
    "short": "Read Scripture slowly",
-   "slot": "morning",
    "source": "Practicing the Way",
    "status": "library",
    "title": "Slow Scripture reading",
@@ -383,7 +335,6 @@
   },
   "comer-silence": {
    "added": "2026-10-12",
-   "anchor": "m-ready",
    "cadence": "Daily",
    "category": "Christian spirituality",
    "caveat": "",
@@ -393,15 +344,13 @@
    "evidence": "Christian tradition",
    "expert": "John Mark Comer",
    "fits": [
-    "m-ready",
-    "m-out"
+    "ready",
+    "after-breakfast"
    ],
    "flag": false,
    "kind": "step",
-   "order": 3,
    "research": "A practice from Christian tradition, taught in Practicing the Way.",
    "short": "10 minutes of silence with God",
-   "slot": "morning",
    "source": "Practicing the Way",
    "status": "focus",
    "title": "Morning silence before the phone",
@@ -411,7 +360,6 @@
   },
   "comer-slowing": {
    "added": "2026-10-12",
-   "anchor": null,
    "cadence": "Daily",
    "category": "Christian spirituality",
    "caveat": "",
@@ -423,8 +371,6 @@
    "fits": [],
    "flag": false,
    "kind": "principle",
-   "order": null,
-   "slot": null,
    "source": "Practicing the Way",
    "status": "library",
    "title": "Practise slowing down",
@@ -433,7 +379,6 @@
   },
   "huberman-back-to-sleep": {
    "added": "2026-10-12",
-   "anchor": null,
    "cadence": "As needed",
    "category": "Sleep & light",
    "caveat": "",
@@ -445,8 +390,6 @@
    "fits": [],
    "flag": false,
    "kind": "principle",
-   "order": null,
-   "slot": null,
    "source": "Diary of a CEO",
    "status": "library",
    "title": "Can't get back to sleep?",
@@ -455,7 +398,6 @@
   },
   "huberman-breathing": {
    "added": "2026-10-12",
-   "anchor": "d-pause",
    "cadence": "Daily",
    "category": "Mind & stress",
    "caveat": "",
@@ -465,8 +407,8 @@
    "evidence": "One expert",
    "expert": "Andrew Huberman",
    "fits": [
-    "d-pause",
-    "e-wind"
+    "pause",
+    "bedtime"
    ],
    "flag": false,
    "kind": "step",
@@ -474,10 +416,8 @@
     "label": "52:25",
     "url": "https://open.spotify.com/episode/1jtTjklF331gB4TJXty31Q?t=3130"
    },
-   "order": 1,
    "research": "A 2023 Stanford study found five minutes of daily cyclic sighing improved mood more than mindfulness meditation.",
    "short": "5 minutes of slow breathing",
-   "slot": "midday",
    "source": "Diary of a CEO",
    "status": "library",
    "title": "5 minutes of long-exhale breathing",
@@ -487,7 +427,6 @@
   },
   "huberman-evening-dim": {
    "added": "2026-10-12",
-   "anchor": "e-wind",
    "cadence": "Daily",
    "category": "Sleep & light",
    "caveat": "",
@@ -497,7 +436,7 @@
    "evidence": "Several experts",
    "expert": "Andrew Huberman",
    "fits": [
-    "e-wind"
+    "bedtime"
    ],
    "flag": false,
    "kind": "step",
@@ -505,10 +444,8 @@
     "label": "11:44",
     "url": "https://open.spotify.com/episode/1jtTjklF331gB4TJXty31Q?t=689"
    },
-   "order": 1,
    "research": "Strong evidence that bright evening light delays melatonin and sleep.",
    "short": "Lights down, screens away",
-   "slot": "evening",
    "source": "Diary of a CEO",
    "status": "library",
    "title": "Dim the lights in the evening",
@@ -518,7 +455,6 @@
   },
   "huberman-morning-light": {
    "added": "2026-10-12",
-   "anchor": "m-out",
    "cadence": "Daily",
    "category": "Sleep & light",
    "caveat": "",
@@ -528,7 +464,7 @@
    "evidence": "Several experts",
    "expert": "Andrew Huberman",
    "fits": [
-    "m-out"
+    "after-breakfast"
    ],
    "flag": false,
    "kind": "step",
@@ -536,10 +472,8 @@
     "label": "08:12",
     "url": "https://open.spotify.com/episode/1jtTjklF331gB4TJXty31Q?t=477"
    },
-   "order": 1,
    "research": "Circadian research on morning light is strong; the exact minutes are rules of thumb.",
    "short": "Walk outside in the daylight",
-   "slot": "morning",
    "source": "Diary of a CEO",
    "status": "focus",
    "title": "Morning daylight walk",
@@ -549,7 +483,6 @@
   },
   "huberman-water": {
    "added": "2026-10-12",
-   "anchor": "m-ready",
    "cadence": "Daily",
    "category": "Nutrition",
    "caveat": "",
@@ -559,7 +492,7 @@
    "evidence": "One expert",
    "expert": "Andrew Huberman",
    "fits": [
-    "m-ready"
+    "ready"
    ],
    "flag": false,
    "kind": "step",
@@ -567,10 +500,8 @@
     "label": "07:11",
     "url": "https://open.spotify.com/episode/1jtTjklF331gB4TJXty31Q?t=416"
    },
-   "order": 1,
    "research": "General hydration research is solid; the exact amounts are his own routine.",
    "short": "Big glass of water (500 ml)",
-   "slot": "morning",
    "source": "Diary of a CEO",
    "status": "library",
    "title": "Big glass of water on waking",
@@ -580,7 +511,6 @@
   },
   "jessie-savoury-breakfast": {
    "added": "2026-10-12",
-   "anchor": "m-breakfast",
    "cadence": "Daily",
    "category": "Nutrition",
    "caveat": "",
@@ -590,7 +520,7 @@
    "evidence": "Several experts",
    "expert": "Jessie Inchauspé",
    "fits": [
-    "m-breakfast"
+    "breakfast"
    ],
    "flag": false,
    "kind": "step",
@@ -598,10 +528,8 @@
     "label": "63:19",
     "url": "https://open.spotify.com/episode/2qhhXg2L6vVE7BngA1kloJ?t=3784"
    },
-   "order": 1,
    "research": "Based on glucose-monitor studies; how much it helps varies between people.",
    "short": "Savoury breakfast",
-   "slot": "morning",
    "source": "Diary of a CEO",
    "status": "library",
    "title": "Savoury breakfast",
@@ -611,7 +539,6 @@
   },
   "jessie-veg-first": {
    "added": "2026-10-12",
-   "anchor": null,
    "cadence": "Daily",
    "category": "Nutrition",
    "caveat": "",
@@ -621,8 +548,8 @@
    "evidence": "One expert",
    "expert": "Jessie Inchauspé",
    "fits": [
-    "d-lunch",
-    "e-dinner"
+    "lunch",
+    "dinner"
    ],
    "flag": false,
    "kind": "step",
@@ -630,10 +557,8 @@
     "label": "49:21",
     "url": "https://open.spotify.com/episode/2qhhXg2L6vVE7BngA1kloJ?t=2946"
    },
-   "order": null,
    "research": "Small but consistent clinical studies, mostly in people with type 2 diabetes.",
    "short": "Eat your veg first",
-   "slot": null,
    "source": "Diary of a CEO",
    "status": "library",
    "title": "Eat your veg first",
@@ -643,7 +568,6 @@
   },
   "jessie-vinegar": {
    "added": "2026-10-12",
-   "anchor": "e-dinner",
    "cadence": "As needed",
    "category": "Nutrition",
    "caveat": "Check with your GP if you're on any glucose-lowering medication.",
@@ -653,15 +577,13 @@
    "evidence": "Debated",
    "expert": "Jessie Inchauspé",
    "fits": [
-    "d-lunch",
-    "e-dinner"
+    "lunch",
+    "dinner"
    ],
    "flag": true,
    "kind": "step",
-   "order": 1,
    "research": "Small studies show modest reductions in glucose spikes; results vary.",
    "short": "Vinegar in water before eating",
-   "slot": "evening",
    "source": "Diary of a CEO",
    "status": "library",
    "title": "Vinegar before a carb-heavy meal",
@@ -671,7 +593,6 @@
   },
   "murray-calendar": {
    "added": "2026-10-12",
-   "anchor": null,
    "cadence": "Weekly",
    "category": "Habits & focus",
    "caveat": "",
@@ -683,8 +604,6 @@
    "fits": [],
    "flag": false,
    "kind": "weekly",
-   "order": null,
-   "slot": null,
    "source": "Diary of a CEO",
    "status": "library",
    "title": "Put rest and exercise in the calendar",
@@ -693,7 +612,6 @@
   },
   "murray-gratitude": {
    "added": "2026-10-12",
-   "anchor": "m-ready",
    "cadence": "Daily",
    "category": "Mind & stress",
    "caveat": "",
@@ -703,13 +621,11 @@
    "evidence": "One expert",
    "expert": "Dan Murray-Serter",
    "fits": [
-    "m-ready",
-    "m-breakfast"
+    "ready",
+    "breakfast"
    ],
    "flag": false,
    "kind": "step",
-   "order": 4,
-   "slot": "morning",
    "source": "Diary of a CEO",
    "status": "library",
    "title": "Morning gratitude prompt",
@@ -718,7 +634,6 @@
   },
   "murray-one-habit": {
    "added": "2026-10-12",
-   "anchor": null,
    "cadence": "Always",
    "category": "Habits & focus",
    "caveat": "",
@@ -730,8 +645,6 @@
    "fits": [],
    "flag": false,
    "kind": "principle",
-   "order": null,
-   "slot": null,
    "source": "Diary of a CEO",
    "status": "library",
    "title": "One new habit at a time",
@@ -740,7 +653,6 @@
   },
   "murray-walk": {
    "added": "2026-10-12",
-   "anchor": null,
    "cadence": "Most days",
    "category": "Mind & stress",
    "caveat": "",
@@ -752,8 +664,6 @@
    "fits": [],
    "flag": false,
    "kind": "step",
-   "order": null,
-   "slot": null,
    "source": "Diary of a CEO",
    "status": "library",
    "title": "An hour's walk with no headphones",
@@ -762,7 +672,6 @@
   },
   "nicola-4x4": {
    "added": "2026-10-12",
-   "anchor": null,
    "cadence": "Weekly",
    "category": "Brain",
    "caveat": "",
@@ -774,8 +683,6 @@
    "fits": [],
    "flag": false,
    "kind": "weekly",
-   "order": null,
-   "slot": null,
    "source": "Diary of a CEO",
    "status": "library",
    "title": "One 4×4 interval session",
@@ -784,7 +691,6 @@
   },
   "nicola-air-squats": {
    "added": "2026-10-12",
-   "anchor": "d-after",
    "cadence": "Hourly",
    "category": "Brain",
    "caveat": "",
@@ -794,14 +700,12 @@
    "evidence": "Several experts",
    "expert": "Louisa Nicola",
    "fits": [
-    "d-after"
+    "after-lunch"
    ],
    "flag": false,
    "kind": "step",
-   "order": 3,
    "research": "Good evidence for breaking up sitting; ten squats is a practical number rather than a researched one.",
    "short": "10 air squats",
-   "slot": "midday",
    "source": "Diary of a CEO",
    "status": "focus",
    "title": "10 air squats for every hour you sit",
@@ -811,7 +715,6 @@
   },
   "nicola-bp": {
    "added": "2026-10-12",
-   "anchor": null,
    "cadence": "Weekly",
    "category": "Brain",
    "caveat": "Take readings to your GP rather than acting on them alone.",
@@ -823,8 +726,6 @@
    "fits": [],
    "flag": true,
    "kind": "weekly",
-   "order": null,
-   "slot": null,
    "source": "Diary of a CEO",
    "status": "library",
    "title": "Check your blood pressure at home",
@@ -833,7 +734,6 @@
   },
   "nicola-heavy-legs": {
    "added": "2026-10-12",
-   "anchor": null,
    "cadence": "2–3× a week",
    "category": "Brain",
    "caveat": "Build up the load gradually, ideally with a coach checking your form.",
@@ -845,8 +745,6 @@
    "fits": [],
    "flag": false,
    "kind": "weekly",
-   "order": null,
-   "slot": null,
    "source": "Diary of a CEO",
    "status": "library",
    "title": "Heavy leg session",
@@ -855,7 +753,6 @@
   },
   "protein-target": {
    "added": "2026-10-12",
-   "anchor": null,
    "cadence": "Daily",
    "category": "Nutrition",
    "caveat": "The experts give different numbers, so treat this as a range.",
@@ -867,8 +764,6 @@
    "fits": [],
    "flag": false,
    "kind": "principle",
-   "order": null,
-   "slot": null,
    "source": "Diary of a CEO",
    "status": "library",
    "title": "Hit a daily protein target",
@@ -877,7 +772,6 @@
   },
   "spector-30-plants": {
    "added": "2026-10-12",
-   "anchor": null,
    "cadence": "Weekly",
    "category": "Nutrition",
    "caveat": "",
@@ -889,8 +783,6 @@
    "fits": [],
    "flag": false,
    "kind": "weekly",
-   "order": null,
-   "slot": null,
    "source": "Diary of a CEO",
    "status": "library",
    "title": "30 different plants a week",
@@ -899,7 +791,6 @@
   },
   "spector-fermented": {
    "added": "2026-10-12",
-   "anchor": "m-breakfast",
    "cadence": "Daily",
    "category": "Nutrition",
    "caveat": "",
@@ -909,8 +800,8 @@
    "evidence": "One expert",
    "expert": "Prof Tim Spector",
    "fits": [
-    "m-breakfast",
-    "d-lunch"
+    "breakfast",
+    "lunch"
    ],
    "flag": false,
    "kind": "step",
@@ -918,10 +809,8 @@
     "label": "50:03",
     "url": "https://open.spotify.com/episode/3ZgbK4ibcD2CrBzZEzuhmE?t=2988"
    },
-   "order": 2,
    "research": "A 2021 Stanford trial found a fermented-food diet increased gut microbiome diversity and lowered inflammation markers.",
    "short": "A fermented food",
-   "slot": "morning",
    "source": "Diary of a CEO",
    "status": "library",
    "title": "A fermented food every day",
@@ -931,7 +820,6 @@
   },
   "spector-window": {
    "added": "2026-10-12",
-   "anchor": null,
    "cadence": "Daily",
    "category": "Nutrition",
    "caveat": "Results vary a lot between people.",
@@ -943,8 +831,6 @@
    "fits": [],
    "flag": false,
    "kind": "principle",
-   "order": null,
-   "slot": null,
    "source": "Diary of a CEO",
    "status": "library",
    "title": "Around a 10-hour eating window",
@@ -953,7 +839,6 @@
   },
   "williamson-caffeine": {
    "added": "2026-10-12",
-   "anchor": "m-breakfast",
    "cadence": "Daily",
    "category": "Nutrition",
    "caveat": "The science behind this is disputed; try it and see if it helps you.",
@@ -963,7 +848,7 @@
    "evidence": "Debated",
    "expert": "Chris Williamson",
    "fits": [
-    "m-breakfast"
+    "breakfast"
    ],
    "flag": false,
    "kind": "step",
@@ -971,10 +856,8 @@
     "label": "37:01",
     "url": "https://open.spotify.com/episode/1YuJBWn7IWMCb32MyVuyQ8?t=2206"
    },
-   "order": 3,
    "research": "Popular advice, but the evidence is thin and debated. Treat it as an experiment.",
    "short": "Coffee after 90 minutes",
-   "slot": "morning",
    "source": "Diary of a CEO",
    "status": "library",
    "title": "Wait about 90 minutes before caffeine",
@@ -984,7 +867,6 @@
   },
   "williamson-dry-90": {
    "added": "2026-10-12",
-   "anchor": null,
    "cadence": "Monthly experiment",
    "category": "Nutrition",
    "caveat": "",
@@ -996,8 +878,6 @@
    "fits": [],
    "flag": false,
    "kind": "weekly",
-   "order": null,
-   "slot": null,
    "source": "Diary of a CEO",
    "status": "library",
    "title": "90 days alcohol-free",
@@ -1006,7 +886,6 @@
   },
   "williamson-meal-walk": {
    "added": "2026-10-12",
-   "anchor": "d-after",
    "cadence": "Daily",
    "category": "Movement",
    "caveat": "",
@@ -1016,8 +895,8 @@
    "evidence": "Several experts",
    "expert": "Chris Williamson",
    "fits": [
-    "d-after",
-    "e-dinner"
+    "after-lunch",
+    "dinner"
    ],
    "flag": false,
    "kind": "step",
@@ -1025,10 +904,8 @@
     "label": "47:26",
     "url": "https://open.spotify.com/episode/1YuJBWn7IWMCb32MyVuyQ8?t=2831"
    },
-   "order": 1,
    "research": "Well supported: several studies show short walks after meals lower glucose spikes.",
    "short": "10-minute walk",
-   "slot": "midday",
    "source": "Diary of a CEO",
    "status": "library",
    "title": "10-minute walk after meals",
@@ -1038,7 +915,6 @@
   },
   "williamson-never-twice": {
    "added": "2026-10-12",
-   "anchor": null,
    "cadence": "Always",
    "category": "Habits & focus",
    "caveat": "",
@@ -1050,8 +926,6 @@
    "fits": [],
    "flag": false,
    "kind": "principle",
-   "order": null,
-   "slot": null,
    "source": "Diary of a CEO",
    "status": "library",
    "title": "Never miss twice",
@@ -1060,7 +934,6 @@
   },
   "williamson-no-phone": {
    "added": "2026-10-12",
-   "anchor": "m-ready",
    "cadence": "Daily",
    "category": "Mind & stress",
    "caveat": "",
@@ -1070,7 +943,7 @@
    "evidence": "One expert",
    "expert": "Chris Williamson",
    "fits": [
-    "m-ready"
+    "ready"
    ],
    "flag": false,
    "kind": "step",
@@ -1078,10 +951,8 @@
     "label": "33:26",
     "url": "https://open.spotify.com/episode/1YuJBWn7IWMCb32MyVuyQ8?t=1991"
    },
-   "order": 2,
    "research": "A behavioural principle rather than a specific study.",
    "short": "No phone until you're dressed",
-   "slot": "morning",
    "source": "Diary of a CEO",
    "title": "No phone until you're ready",
    "url": "https://sozai.app/transcript/chris-williamson-fix-habit-2026-best-year/",
@@ -1090,7 +961,6 @@
   },
   "williamson-phone-out": {
    "added": "2026-10-12",
-   "anchor": "e-wind",
    "cadence": "Daily",
    "category": "Sleep & light",
    "caveat": "",
@@ -1100,7 +970,7 @@
    "evidence": "One expert",
    "expert": "Chris Williamson",
    "fits": [
-    "e-wind"
+    "bedtime"
    ],
    "flag": false,
    "kind": "step",
@@ -1108,10 +978,8 @@
     "label": "33:18",
     "url": "https://open.spotify.com/episode/1YuJBWn7IWMCb32MyVuyQ8?t=1983"
    },
-   "order": 3,
    "research": "Studies link phone use in bed to later and poorer sleep.",
    "short": "Phone on charge outside the bedroom",
-   "slot": "evening",
    "source": "Diary of a CEO",
    "status": "focus",
    "title": "Charge your phone outside the bedroom",
@@ -1121,7 +989,6 @@
   },
   "wright-balance": {
    "added": "2026-10-12",
-   "anchor": "e-wind",
    "cadence": "Daily",
    "category": "Movement",
    "caveat": "",
@@ -1131,8 +998,8 @@
    "evidence": "One expert",
    "expert": "Dr Vonda Wright",
    "fits": [
-    "e-wind",
-    "m-ready"
+    "bedtime",
+    "ready"
    ],
    "flag": false,
    "kind": "step",
@@ -1140,10 +1007,8 @@
     "label": "50:40",
     "url": "https://open.spotify.com/episode/1WIP0P7NUyDRIkWC5IBOJs?t=3025"
    },
-   "order": 4,
    "research": "How long you can balance on one leg is a well-studied marker of healthy ageing.",
    "short": "Stand on one leg while brushing",
-   "slot": "evening",
    "source": "Diary of a CEO",
    "status": "library",
    "title": "Stand on one leg while brushing your teeth",
@@ -1153,7 +1018,6 @@
   },
   "wright-impact": {
    "added": "2026-10-12",
-   "anchor": "d-after",
    "cadence": "Daily",
    "category": "Movement",
    "caveat": "Build up slowly if your joints aren't used to it.",
@@ -1163,8 +1027,8 @@
    "evidence": "One expert",
    "expert": "Dr Vonda Wright",
    "fits": [
-    "d-after",
-    "m-out"
+    "after-lunch",
+    "after-breakfast"
    ],
    "flag": false,
    "kind": "step",
@@ -1172,10 +1036,8 @@
     "label": "78:09",
     "url": "https://open.spotify.com/episode/1WIP0P7NUyDRIkWC5IBOJs?t=4674"
    },
-   "order": 2,
    "research": "Impact exercise for bone density is well supported. Start gently if your joints aren't used to it.",
    "short": "10 jumps",
-   "slot": "midday",
    "source": "Diary of a CEO",
    "status": "library",
    "title": "10 jumps to finish your walk",
@@ -1185,7 +1047,6 @@
   },
   "wright-vitamin-d": {
    "added": "2026-10-12",
-   "anchor": null,
    "cadence": "Once",
    "category": "Supplements",
    "caveat": "Ask your GP for the test and the right dose.",
@@ -1197,8 +1058,6 @@
    "fits": [],
    "flag": true,
    "kind": "once",
-   "order": null,
-   "slot": null,
    "source": "Diary of a CEO",
    "status": "library",
    "title": "Get your vitamin D tested",
@@ -1207,7 +1066,6 @@
   },
   "wright-warmup": {
    "added": "2026-10-12",
-   "anchor": null,
    "cadence": "Daily",
    "category": "Movement",
    "caveat": "",
@@ -1217,12 +1075,10 @@
    "evidence": "One expert",
    "expert": "Dr Vonda Wright",
    "fits": [
-    "m-out"
+    "after-breakfast"
    ],
    "flag": false,
    "kind": "step",
-   "order": null,
-   "slot": null,
    "source": "Diary of a CEO",
    "status": "library",
    "title": "Joint-by-joint warm-up",
@@ -1232,60 +1088,84 @@
  },
  "anchors": {
   "d-after": {
-   "base": 0,
-   "cue": "Before you sit back down",
    "name": "After eating",
    "order": 3,
-   "slot": "midday"
+   "slot": "midday",
+   "kind": "after-lunch",
+   "existing": [
+    "Back to work"
+   ]
   },
   "d-lunch": {
-   "base": 30,
-   "cue": "Make and eat your lunch",
    "name": "Lunch",
    "order": 2,
-   "slot": "midday"
+   "slot": "midday",
+   "kind": "lunch",
+   "existing": [
+    "Make lunch",
+    "Eat lunch"
+   ]
   },
   "d-pause": {
-   "base": 0,
-   "cue": "Close the laptop and step away",
    "name": "Pause work",
    "order": 1,
-   "slot": "midday"
+   "slot": "midday",
+   "kind": "pause",
+   "existing": [
+    "Close the laptop"
+   ]
   },
   "e-dinner": {
-   "base": 45,
-   "cue": "Cook, eat and clear up",
    "name": "Evening meal",
    "order": 1,
-   "slot": "evening"
+   "slot": "evening",
+   "kind": "dinner",
+   "existing": [
+    "Cook",
+    "Eat dinner",
+    "Wash up"
+   ]
   },
   "e-wind": {
-   "base": 0,
-   "cue": "About an hour before bed",
    "name": "Winding down",
    "order": 2,
-   "slot": "evening"
+   "slot": "evening",
+   "kind": "bedtime",
+   "existing": [
+    "Brush teeth",
+    "Get into bed"
+   ]
   },
   "m-breakfast": {
-   "base": 20,
-   "cue": "Make and eat breakfast",
    "name": "Breakfast",
    "order": 2,
-   "slot": "morning"
+   "slot": "morning",
+   "kind": "breakfast",
+   "existing": [
+    "Make a coffee",
+    "Eat breakfast"
+   ]
   },
   "m-out": {
-   "base": 0,
-   "cue": "Before you open the laptop",
    "name": "After breakfast",
    "order": 3,
-   "slot": "morning"
+   "slot": "morning",
+   "kind": "after-breakfast",
+   "existing": [
+    "Head to work"
+   ]
   },
   "m-ready": {
-   "base": 20,
-   "cue": "Shower, brush your teeth, get dressed",
    "name": "Getting ready",
    "order": 1,
-   "slot": "morning"
+   "slot": "morning",
+   "kind": "ready",
+   "existing": [
+    "Wake up",
+    "Shower",
+    "Brush teeth",
+    "Get dressed"
+   ]
   }
  }
 }

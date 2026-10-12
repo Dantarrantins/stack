@@ -20,7 +20,7 @@ Your progress is stored on your device (localStorage). Nothing is sent to a serv
 | `src/stack.html` | The page source, shared with the Claude artifact version |
 | `build.py` | Wraps the source into `index.html` for the web |
 | `local-db.js` | On-device data store |
-| `seed.json` | The habit library and routine anchors. Bump `version` to push content updates to existing users |
+| `seed.json` | The habit library and the default moments (things most people already do). Bump `version` to push content updates to existing users |
 | `sw.js`, `manifest.webmanifest`, `icons/` | Installable web app (PWA) |
 
 ## Deploy
