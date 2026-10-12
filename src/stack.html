@@ -457,6 +457,15 @@ html,body{overflow-x:hidden}
 .burst{position:absolute;inset:0;pointer-events:none;overflow:visible}
 .burst i{position:absolute;left:50%;top:50%;width:7px;height:7px;border-radius:2px;background:var(--c);opacity:0}
 .routine{position:relative}
+/* Live timeline rail */
+.ltl{position:absolute;left:11px;width:2px;border-radius:2px;background:color-mix(in srgb,var(--ink) 10%,transparent);pointer-events:none;--y:0px}
+.ltl-fill{position:absolute;left:0;top:0;width:100%;height:var(--y);border-radius:2px;background:var(--accent);transition:height .8s ease}
+.ltl.s-past .ltl-fill{opacity:.45}
+.ltl-now{position:absolute;left:0;top:var(--y);width:0;height:0;transition:top .8s ease}
+.ltl-dot{position:absolute;left:-4px;top:-5px;width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 22%,transparent)}
+.ltl-line{position:absolute;left:8px;top:-.5px;height:1px;width:var(--lw,0px);background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 55%,transparent),transparent 85%)}
+@media (prefers-reduced-motion:no-preference){.ltl-dot{animation:tlpulse 2.4s ease-in-out infinite}}
+@keyframes tlpulse{50%{box-shadow:0 0 0 7px color-mix(in srgb,var(--accent) 8%,transparent)}}
 .done-label{font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
 
 @media (prefers-reduced-motion:no-preference){
@@ -793,16 +802,37 @@ function renderToday(){
     }
     box.append(el("section",{class:"routine"+(cel?" celebrate":"")+(fx.unfold===c.id&&Date.now()-fx.tu<800?" unfolding":"")+(state==="now"?" is-now":""),style:{background:soft(c.id)},"aria-label":c.name},
       cel&&!reduced()?burst():null,
+      as.length?el("div",{class:"ltl s-"+state,"aria-hidden":"true"},el("span",{class:"ltl-fill"}),state==="now"?el("span",{class:"ltl-now"},el("span",{class:"ltl-dot"}),el("span",{class:"ltl-line"})):null):null,
       el("div",{class:"rhead"},el("h2",{text:c.name}),label?el("span",{class:"nowtag"+(label==="Now"?" on":""),text:label}):null,steps.length&&dn+sk===steps.length&&dn?el("span",{class:"done-label",text:"Done"}):null,
         el("button",{class:"redit",onclick:()=>editChunk(c.id),"aria-label":`Edit ${c.name} in Build`},"Edit"),
         state==="past"?el("button",{class:"pc-show pc-up",onclick:e=>{const sec=e.currentTarget.closest(".routine");const done=()=>{openPast.delete(c.id);fx.fold=c.id;fx.tf=Date.now();lastSig="";renderToday()};if(reduced()||!sec)return done();sec.classList.add("folding");setTimeout(done,320)},"aria-label":`Collapse ${c.name}`},chevSvg()):null),
       el("div",{class:"acts"},as.map(a=>{const st=stepsAt(a.id);
-        return el("div",{class:"act"+(st.length?"":" quiet")},
+        return el("div",{class:"act"+(st.length?"":" quiet"),"data-start":sch.times[a.id].start,"data-end":sch.times[a.id].end},
           el("div",{class:"act-h"},el("span",{class:"act-time mono",text:fromM(sch.times[a.id].start)}),el("span",{class:"act-name",text:a.name})),
           st.length?el("ol",{class:"stack"},st.map(h=>habitRow(h))):null)})),
       steps.length?null:el("button",{class:"linkbtn empty-hint",onclick:()=>go("day")},"Nothing stacked here yet \u00B7 add a habit in Build")));
   });
+  requestAnimationFrame(placeTimeline);
 }
+/* Live timeline: a rail down the left of each part of the day, filled up to the current time,
+   with a "now" line that moves through the activities and their habits as the minutes pass */
+function placeTimeline(){
+  const m=nowMins()+new Date().getSeconds()/60;
+  document.querySelectorAll("#routines .routine").forEach(sec=>{
+    const tl=sec.querySelector(".ltl");const acts=[...sec.querySelectorAll(".act[data-start]")];if(!tl||!acts.length)return;
+    const sr=sec.getBoundingClientRect();const box=a=>{const r=a.getBoundingClientRect();return{top:r.top-sr.top,bottom:r.bottom-sr.top}};
+    const top=box(acts[0]).top,bottom=box(acts[acts.length-1]).bottom;
+    tl.style.top=top+"px";tl.style.height=(bottom-top)+"px";
+    let y;
+    if(tl.classList.contains("s-past"))y=bottom;else if(tl.classList.contains("s-future"))y=top;
+    else{y=bottom;for(let i=0;i<acts.length;i++){const a=acts[i],s=+a.dataset.start,e=i+1<acts.length?+acts[i+1].dataset.start:+a.dataset.end;
+      if(m<s){y=box(a).top;break}
+      if(m<e){const b=box(a);y=b.top+Math.min(1,(m-s)/Math.max(1,e-s))*(b.bottom-b.top);break}}}
+    tl.style.setProperty("--y",(y-top)+"px");tl.style.setProperty("--lw",Math.max(0,sec.clientWidth-11-8-24)+"px");
+  });
+}
+if(window.ResizeObserver)new ResizeObserver(()=>requestAnimationFrame(placeTimeline)).observe($("routines"));else addEventListener("resize",()=>requestAnimationFrame(placeTimeline));
+setInterval(placeTimeline,20000);
 setInterval(()=>{lastSig="";renderToday()},60000);
 function tickClock(){const d=new Date();const h=$("clock-h"),mm=$("clock-m");if(h){h.textContent=pad(d.getHours());mm.textContent=pad(d.getMinutes())}}
 tickClock();setInterval(tickClock,1000);
