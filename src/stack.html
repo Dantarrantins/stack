@@ -204,6 +204,30 @@ h2{font-size:28px;font-weight:300;letter-spacing:-.01em;line-height:1.1;margin:0
 .placed{font-size:12px;color:var(--muted);white-space:nowrap}
 .empty{color:var(--muted);margin:0;padding:16px 0}
 
+/* Library: grouped by category, each habit a card with its key facts visible */
+#cats{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:0 -20px;padding:2px 20px 4px;-webkit-mask-image:linear-gradient(90deg,transparent,#000 16px,#000 calc(100% - 24px),transparent)}
+#cats::-webkit-scrollbar{display:none}
+#cats .chip{flex:none}
+#lib.list{display:grid;gap:34px;margin-top:6px}
+.lib-sec{display:grid;gap:14px}
+.lib-h{display:flex;align-items:center;gap:10px;margin:0;font-size:24px;font-weight:400;letter-spacing:-.01em}
+.lib-h .dot{width:10px;height:10px}
+.lib-n{font-size:14px;color:var(--muted);font-weight:500}
+.lib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:12px}
+.row.lcard{display:flex;flex-direction:column;align-items:stretch;gap:8px;padding:16px 18px 16px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);cursor:pointer;position:relative;transition:border-color .15s,transform .15s,box-shadow .15s}
+.row.lcard:first-child{border-top:1px solid var(--line)}
+.row.lcard:hover{border-color:color-mix(in srgb,var(--cc) 45%,var(--line));box-shadow:0 6px 20px -12px color-mix(in srgb,var(--ink) 30%,transparent)}
+.row.lcard::before{content:"";position:absolute;left:0;top:16px;bottom:16px;width:3px;border-radius:0 3px 3px 0;background:var(--cc);opacity:.85}
+.lc-top{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:30px;margin:-4px -8px -2px 0}
+.lc-cat,.lc-who{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:500;color:var(--muted);letter-spacing:.01em}
+.lc-title.sname{font-size:19px;font-weight:500;line-height:1.3;letter-spacing:-.01em;text-align:left;padding:0;color:var(--ink)}
+.lc-detail{margin:0;font-size:14.5px;line-height:1.5;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.lc-meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:4px}
+.lc-by{font-size:13px;color:var(--muted);margin-right:4px}
+.lc-listen{color:var(--accent)}
+.lc-placed{display:flex;align-items:center;gap:8px;margin-top:4px;padding-top:10px;border-top:1px dashed var(--line);font-size:13px;color:var(--accent);font-weight:500}
+.lc-pin{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+
 /* Sheet */
 .scrim{position:fixed;inset:0;background:rgba(20,23,22,.35);z-index:20}
 .sheet{position:fixed;z-index:21;background:var(--bg);color:var(--ink);overflow-y:auto;display:grid;gap:18px;align-content:start;
@@ -1010,13 +1034,27 @@ function renderLib(){
     .sort((a,b)=>CATS.findIndex(c=>c[0]===a.category)-CATS.findIndex(c=>c[0]===b.category)||a.title.localeCompare(b.title));
   if(!habits.length){box.append(el("p",{class:"empty",text:loaded?"The library is empty.":"Loading…"}));return}
   if(!list.length){box.append(el("p",{class:"empty",text:filter==="Saved"&&!q?"Nothing saved yet. Tap the heart on any habit to keep it here.":"Nothing matches that search."}));return}
-  list.forEach(h=>{
-    const a=h.anchor&&anchorById(h.anchor);
-    box.append(el("div",{class:"row"},dot(h.category),
-      el("div",{style:{minWidth:0}},el("button",{class:"sname",onclick:()=>openSheet(h.id),text:h.title}),
-        el("div",{class:"rowmeta",text:[h.custom?"Your own":h.expert,KIND[h.kind]||h.effort,h.listen?"▶ clip":""].filter(Boolean).join(" · ")})),
-      el("span",{class:"lib-side"},el("span",{class:"placed",text:a?`${chunkName(a.slot)} · after ${a.name.toLowerCase()}`:""}),heartBtn(h))));
-  });
+  const card=(h,showCat)=>{const a=h.anchor&&anchorById(h.anchor);const ev=h.evidence||"";const k=KIND[h.kind];
+    const open=()=>openSheet(h.id);
+    return el("article",{class:"row lcard"+(a?" in-day":""),style:`--cc:var(${catVar(h.category)})`,onclick:e=>{if(!e.target.closest("button"))open()}},
+      el("div",{class:"lc-top"},
+        showCat?el("span",{class:"lc-cat"},dot(h.category),h.category):el("span",{class:"lc-who",text:h.custom?"Your own":h.expert||""}),
+        heartBtn(h)),
+      el("button",{class:"lc-title sname",onclick:open,text:h.title}),
+      h.detail?el("p",{class:"lc-detail",text:h.detail}):null,
+      el("div",{class:"lc-meta"},
+        showCat?el("span",{class:"lc-by",text:h.custom?"Your own":h.expert||""}):null,
+        h.effort?el("span",{class:"pill",text:`${hMins(h)} min`}):null,
+        k?el("span",{class:"pill",text:k}):null,
+        ev&&!h.custom?el("span",{class:"pill"+(ev==="Several experts"?" strong":""),text:ev}):null,
+        h.listen?el("span",{class:"pill lc-listen",text:"\u25B6 Listen"}):null),
+      a?el("div",{class:"lc-placed"},el("span",{class:"lc-pin","aria-hidden":"true"}),`In your day \u00B7 ${chunkName(a.slot)}, after ${a.name.toLowerCase()}`):null)};
+  if(filter==="All"&&!q){
+    CATS.forEach(([c])=>{const hs=list.filter(h=>h.category===c);if(!hs.length)return;
+      box.append(el("section",{class:"lib-sec"},el("h2",{class:"lib-h"},dot(c),el("span",{text:c}),el("span",{class:"lib-n",text:String(hs.length)})),el("div",{class:"lib-grid"},hs.map(h=>card(h,false)))))});
+    const rest=list.filter(h=>!CATS.some(([c])=>c===h.category));
+    if(rest.length)box.append(el("section",{class:"lib-sec"},el("h2",{class:"lib-h"},el("span",{text:"Other"})),el("div",{class:"lib-grid"},rest.map(h=>card(h,true)))));
+  }else box.append(el("div",{class:"lib-grid"},list.map(h=>card(h,filter==="Saved"||!!q))));
 }
 
 /* ---------- Sheets: habit detail and habit picker ---------- */
