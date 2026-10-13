@@ -31,6 +31,25 @@
   --morning-soft:#232524; --late-soft:#1E1B23; --midday-soft:#1B2420; --evening-soft:#1A1F24;
   --c-brain:#AA9DE6; --c-move:#7CC49A; --c-sleep:#94AEC2; --c-food:#E0A866; --c-supp:#EC8D95; --c-mind:#7FC4C6; --c-habit:#B9B2A4; --c-faith:#D4BF79;
   --chip-bg:#ECEAE4; --chip-ink:#141716; --chip-line:#ECEAE4; --chip-on-bg:#000000; --chip-on-ink:#ECEAE4; --chip-on-line:#9CC0AF; color-scheme:dark}
+/* Accent colours people can pick on their profile (Sage is the default in :root) */
+:root[data-accent="ocean"]{--accent:#2F5D7C;--accent-soft:#E2EBF1}
+:root[data-accent="plum"]{--accent:#6A4C7A;--accent-soft:#ECE5F0}
+:root[data-accent="clay"]{--accent:#9A4E2C;--accent-soft:#F4E5DB}
+:root[data-accent="rose"]{--accent:#94405A;--accent-soft:#F3E3E8}
+:root[data-accent="gold"]{--accent:#7D6420;--accent-soft:#F1EAD6}
+:root[data-accent="ink"]{--accent:#2B2F2D;--accent-soft:#E7E6E2}
+:root[data-theme="dark"][data-accent="ocean"]{--accent:#8DB8D6;--accent-soft:#1E2A33;--chip-on-line:#8DB8D6}
+:root[data-theme="dark"][data-accent="plum"]{--accent:#C2A6D4;--accent-soft:#2A2230;--chip-on-line:#C2A6D4}
+:root[data-theme="dark"][data-accent="clay"]{--accent:#E39B74;--accent-soft:#33241C;--chip-on-line:#E39B74}
+:root[data-theme="dark"][data-accent="rose"]{--accent:#E79AB0;--accent-soft:#33212A;--chip-on-line:#E79AB0}
+:root[data-theme="dark"][data-accent="gold"]{--accent:#D9BC6A;--accent-soft:#2F2A19;--chip-on-line:#D9BC6A}
+:root[data-theme="dark"][data-accent="ink"]{--accent:#D8D6D0;--accent-soft:#2A2C2B;--chip-on-line:#D8D6D0}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"])[data-accent="ocean"]{--accent:#8DB8D6;--accent-soft:#1E2A33;--chip-on-line:#8DB8D6}:root:not([data-theme="light"])[data-accent="plum"]{--accent:#C2A6D4;--accent-soft:#2A2230;--chip-on-line:#C2A6D4}:root:not([data-theme="light"])[data-accent="clay"]{--accent:#E39B74;--accent-soft:#33241C;--chip-on-line:#E39B74}:root:not([data-theme="light"])[data-accent="rose"]{--accent:#E79AB0;--accent-soft:#33212A;--chip-on-line:#E79AB0}:root:not([data-theme="light"])[data-accent="gold"]{--accent:#D9BC6A;--accent-soft:#2F2A19;--chip-on-line:#D9BC6A}:root:not([data-theme="light"])[data-accent="ink"]{--accent:#D8D6D0;--accent-soft:#2A2C2B;--chip-on-line:#D8D6D0}}
+.swatches{display:flex;flex-wrap:wrap;gap:12px}
+.swatch{width:38px;height:38px;border-radius:50%;border:0;padding:0;cursor:pointer;background:var(--sw);box-shadow:0 0 0 1px color-mix(in srgb,var(--ink) 12%,transparent);display:grid;place-items:center;color:#fff;transition:transform .15s}
+.swatch:hover{transform:scale(1.08)}
+.swatch[aria-pressed="true"]{box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--sw)}
+.swatch svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
 *{box-sizing:border-box}
 html,body{background:var(--bg)}
 body{color:var(--ink);font-family:var(--f);font-size:15.5px;line-height:1.55;-webkit-font-smoothing:antialiased}
@@ -41,10 +60,11 @@ button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{ou
 /* Top bar */
 .top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
 .top-in{max-width:820px;margin:0 auto;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.brand{font-size:19px;font-weight:600;letter-spacing:-.02em;color:var(--ink);display:flex;align-items:center;gap:9px}
-.brand svg{width:20px;height:20px;flex:none}
-.brand svg rect{fill:var(--accent)}
-.brand svg rect:nth-child(2){opacity:.7}.brand svg rect:nth-child(3){opacity:.45}
+.brand{font-size:19px;font-weight:600;letter-spacing:-.02em;color:var(--ink);display:flex;align-items:center;gap:8px}
+.brand svg{width:26px;height:26px;flex:none;overflow:visible}
+.brand svg ellipse{fill:var(--accent)}
+.brand .p2{opacity:.72}.brand .p3{opacity:.5}
+.brand-word{font-size:21px;font-weight:500;letter-spacing:-.04em;line-height:1;transform:translateY(-1px)}
 .tabs{display:flex;gap:4px;border:1px solid var(--line);border-radius:999px;padding:4px}
 .tabs button{border:0;background:transparent;color:var(--muted);font-size:13.5px;font-weight:500;padding:7px 14px;border-radius:999px;cursor:pointer}
 .tabs button[aria-current="page"]{background:var(--chip-on-bg);color:var(--chip-on-ink)}
@@ -459,6 +479,10 @@ html,body{overflow-x:hidden}
 .routine{position:relative}
 /* Live timeline rail */
 #routines{position:relative;padding-left:22px}
+.moveon{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;margin:6px 0 10px;padding:13px 18px;border:1px solid color-mix(in srgb,var(--accent) 40%,transparent);border-radius:999px;background:color-mix(in srgb,var(--accent) 8%,transparent);color:var(--accent);font:inherit;font-size:15px;font-weight:500;cursor:pointer;transition:background .18s,transform .18s}
+.moveon:hover{background:color-mix(in srgb,var(--accent) 14%,transparent)}
+.moveon:active{transform:scale(.98)}
+.mo-arrow{transition:transform .18s}.moveon:hover .mo-arrow{transform:translateX(3px)}
 .ltl{position:absolute;left:6px;width:2px;border-radius:2px;background:color-mix(in srgb,var(--ink) 10%,transparent);pointer-events:none;--y:0px}
 .ltl-fill{position:absolute;left:0;top:0;width:100%;height:var(--y);border-radius:2px;background:var(--accent);transition:height .8s ease}
 .ltl-now{position:absolute;left:0;top:var(--y);width:0;height:0;transition:top .8s ease}
@@ -512,7 +536,7 @@ html,body{overflow-x:hidden}
 
 <header class="top">
   <div class="top-in">
-    <div class="brand"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="2" y="13" width="16" height="4" rx="2"/><rect x="4" y="8" width="12" height="4" rx="2"/><rect x="6" y="3" width="8" height="4" rx="2"/></svg>Stack</div>
+    <div class="brand" aria-label="Stack"><svg viewBox="0 0 24 24" aria-hidden="true"><ellipse class="p1" cx="12" cy="18.6" rx="9.2" ry="3.5" transform="rotate(-3 12 18.6)"/><ellipse class="p2" cx="11.4" cy="11.9" rx="6.5" ry="2.8" transform="rotate(4 11.4 11.9)"/><ellipse class="p3" cx="12.5" cy="6.2" rx="3.9" ry="2.2" transform="rotate(-7 12.5 6.2)"/></svg><span class="brand-word" aria-hidden="true">stack</span></div>
     <nav class="tabs" aria-label="Views">
       <button type="button" data-view="today">Today</button>
       <button type="button" data-view="day">Build</button>
@@ -748,6 +772,14 @@ function habitRow(h,opts={}){
 const expanded=new Set();
 let lastSig="";
 const openPast=new Set();
+/* Parts of the day the user has moved on from early today (kept on this device, per date) */
+const movedKey=()=>"stack:moved:"+today.getFullYear()+"-"+(today.getMonth()+1)+"-"+today.getDate();
+function movedOn(){try{return new Set(JSON.parse(localStorage.getItem(movedKey())||"[]"))}catch(e){return new Set()}}
+function moveOn(cid,sec){const go2=()=>{const s=movedOn();s.add(cid);try{localStorage.setItem(movedKey(),JSON.stringify([...s]))}catch(e){}
+  fx.fold=cid;fx.tf=Date.now();lastSig="";renderToday();
+  const nxt=document.querySelector("#routines .routine.is-now");if(nxt){nxt.classList.add("unfolding");nxt.scrollIntoView({behavior:reduced()?"auto":"smooth",block:"start"})}};
+  if(reduced()||!sec)return go2();sec.classList.add("folding");setTimeout(go2,320)}
+let tlFloor=0;
 function phase(m){return m<5*60?"night":m<11*60?"morning":m<17*60?"midday":m<21*60?"evening":"night"}
 /* Keep the greeting on one line: size it to the available width (max 72px); the clock matches */
 function fitHello(){const h=$("today-h"),c=$("clock");if(!h)return;h.style.fontSize="72px";const w=h.parentElement.clientWidth;if(!w)return;const need=h.scrollWidth;const size=need>w?Math.max(26,Math.floor(72*w/need)):72;h.style.fontSize=size+"px";if(c)c.style.fontSize=size+"px"}
@@ -785,12 +817,16 @@ function renderToday(){
   if(!all.length){box.append(el("div",{class:"emptycard"},el("p",{text:"Nothing stacked yet."}),el("button",{class:"btn primary",onclick:()=>go("day")},"Open Build")));return}
   box.append(el("div",{class:"ltl","aria-hidden":"true"},el("span",{class:"ltl-fill"}),el("span",{class:"ltl-now"},el("span",{class:"ltl-dot"}),el("span",{class:"ltl-line"}))));
   const live=cs.filter(c=>anchorsIn(c.id).length||cs.length<2);
-  let nextMarked=false;
+  let nextMarked=false;const moved=movedOn();let prevMoved=false;tlFloor=0;
   live.forEach(c=>{
     const i=cs.indexOf(c);const as=anchorsIn(c.id);const sch=schedule(c.id);
     const steps=as.flatMap(a=>stepsAt(a.id));
     const dn=steps.filter(h=>done[h.id]).length;const sk=steps.filter(h=>!done[h.id]&&skipped[h.id]).length;const due=steps.length-sk;const pct=due?Math.round(dn/due*100):100;
-    const nx=cs[i+1];const state=nx&&m>=toM(nx.time)?"past":m>=toM(c.time)?"now":"future";
+    const nx=cs[i+1];let state=nx&&m>=toM(nx.time)?"past":m>=toM(c.time)?"now":"future";
+    if(state==="future"&&prevMoved){state="now";tlFloor=toM(c.time)}
+    if(state==="now"&&moved.has(c.id)&&nx)state="past";
+    prevMoved=state==="past"&&moved.has(c.id);
+    const nextLive=live[live.indexOf(c)+1];
     const label=state==="future"&&!nextMarked?(nextMarked=true,"Up next"):null;
     if(state==="now")nextMarked=true;
     const cel=fx.done===c.id&&Date.now()-fx.td<1500;
@@ -810,7 +846,8 @@ function renderToday(){
         return el("div",{class:"act"+(st.length?"":" quiet"),"data-start":sch.times[a.id].start,"data-end":sch.times[a.id].end},
           el("div",{class:"act-h"},el("span",{class:"act-time mono",text:fromM(sch.times[a.id].start)}),el("span",{class:"act-name",text:a.name})),
           st.length?el("ol",{class:"stack"},st.map(h=>habitRow(h))):null)})),
-      steps.length?null:el("button",{class:"linkbtn empty-hint",onclick:()=>go("day")},"Nothing stacked here yet \u00B7 add a habit in Build")));
+      steps.length?null:el("button",{class:"linkbtn empty-hint",onclick:()=>go("day")},"Nothing stacked here yet \u00B7 add a habit in Build"),
+      state==="now"&&nextLive?el("button",{class:"moveon",onclick:e=>moveOn(c.id,e.currentTarget.closest(".routine"))},el("span",{text:`Move on to ${nextLive.name.toLowerCase()}`}),el("span",{class:"mo-arrow","aria-hidden":"true",text:"\u2192"})):null));
   });
   requestAnimationFrame(placeTimeline);
 }
@@ -820,7 +857,7 @@ function placeTimeline(){
   const box=$("routines");const tl=box&&box.querySelector(".ltl");if(!tl)return;
   const segs=[...box.querySelectorAll(".routine .act[data-start], .pastcard[data-start]")];
   if(!segs.length){tl.hidden=true;return}tl.hidden=false;
-  const m=nowMins()+new Date().getSeconds()/60;const br=box.getBoundingClientRect();
+  const m=Math.max(tlFloor,nowMins()+new Date().getSeconds()/60);const br=box.getBoundingClientRect();
   const r=e=>{const q=e.getBoundingClientRect();return{top:q.top-br.top,bottom:q.bottom-br.top}};
   const top=r(segs[0]).top,bottom=r(segs[segs.length-1]).bottom;
   tl.style.top=top+"px";tl.style.height=(bottom-top)+"px";
@@ -1098,7 +1135,11 @@ function show(v){$("profile-btn").setAttribute("aria-current",v==="profile"?"pag
 document.querySelectorAll(".tabs button").forEach(b=>b.addEventListener("click",()=>go(b.dataset.view)));
 window.addEventListener("hashchange",()=>show((location.hash||"#today").slice(1)));
 $("q").addEventListener("input",e=>{query=e.target.value;renderLib()});
-function renderAll(){if(drag)return;renderToday();renderDay();renderCats();renderLib();renderProfile();if(sheet&&sheet.type!=="rename")renderSheet()}
+/* Accent colour: saved with your settings, cached on the device so the app opens in it */
+const ACCENTS=[["sage","Sage","#405A50","#9CC0AF"],["ocean","Ocean","#2F5D7C","#8DB8D6"],["plum","Plum","#6A4C7A","#C2A6D4"],["clay","Clay","#9A4E2C","#E39B74"],["rose","Rose","#94405A","#E79AB0"],["gold","Gold","#7D6420","#D9BC6A"],["ink","Ink","#2B2F2D","#D8D6D0"]];
+function applyAccent(a){a=ACCENTS.some(x=>x[0]===a)?a:"sage";const r=document.documentElement;if(a==="sage")delete r.dataset.accent;else r.dataset.accent=a;try{localStorage.setItem("stack:accent",a)}catch(e){}}
+try{const a0=localStorage.getItem("stack:accent");if(a0)applyAccent(a0)}catch(e){}
+function renderAll(){if(drag)return;if(settings&&settings.accent)applyAccent(settings.accent);renderToday();renderDay();renderCats();renderLib();renderProfile();if(sheet&&sheet.type!=="rename")renderSheet()}
 
 /* ---------- Writes ---------- */
 async function place(h,aid,stayOpen){
@@ -1278,6 +1319,10 @@ function renderProfile(){
       el("p",{class:"sub",text:"Stack suggests habits from these areas."}),
       el("div",{class:"tools"},CATS.map(([c])=>el("button",{class:"chip","aria-pressed":String(ints.has(c)),disabled:!can(),onclick:()=>{
         const n=new Set(ints);n.has(c)?n.delete(c):n.add(c);if(!n.size)return;saveSettings({interests:[...n]})}},dot(c),c)))),
+    el("section",{class:"pf-card"},el("h2",{text:"Accent colour"}),
+      el("p",{class:"sub",text:"Used for ticks, buttons and highlights across Stack."}),
+      el("div",{class:"swatches",role:"group","aria-label":"Accent colour"},ACCENTS.map(([k,label,lc,dc])=>{const cur=(settings&&settings.accent)||"sage";const dark=getComputedStyle(document.documentElement).colorScheme==="dark";
+        return el("button",{class:"swatch",style:`--sw:${dark?dc:lc}`,"aria-pressed":String(cur===k),"aria-label":label,title:label,disabled:!can(),onclick:()=>{if(cur===k)return;applyAccent(k);saveSettings({accent:k});toast(`${label} accent`)}},cur===k?checkSvg():null)}))),
     el("section",{class:"pf-card"},el("h2",{text:"Habit slots"}),...chunks().map(c=>slotMeter(slotInfo(c.id),true)),el("p",{class:"sub",text:slotsLine(slotInfo())})),
     el("section",{class:"pf-card"},el("h2",{text:"Your day"}),
       el("p",{class:"sub",text:"Walk through setup again to reshape the parts of your day and what you already do."}),
